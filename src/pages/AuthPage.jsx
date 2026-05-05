@@ -51,14 +51,17 @@ const EmailForm = ({ mode, onBack }) => {
   const navigate = useNavigate()
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
+  const [confirm,  setConfirm]  = useState('')
   const [showPass, setShowPass] = useState(false)
+  const [showConf, setShowConf] = useState(false)
   const [loading,  setLoading]  = useState(false)
   const [formErr,  setFormErr]  = useState({})
 
   const validate = () => {
     const e = {}
-    if (!email.includes('@'))   e.email    = 'Email invalide'
-    if (password.length < 6)   e.password = 'Minimum 6 caractères'
+    if (!email.includes('@'))                        e.email    = 'Email invalide'
+    if (password.length < 6)                         e.password = 'Minimum 6 caractères'
+    if (mode === 'signup' && password !== confirm)   e.confirm  = 'Les mots de passe ne correspondent pas'
     setFormErr(e)
     return Object.keys(e).length === 0
   }
@@ -110,6 +113,24 @@ const EmailForm = ({ mode, onBack }) => {
         </div>
         {formErr.password && <p className="text-xs text-red">{formErr.password}</p>}
       </div>
+      {mode === 'signup' && (
+        <div className="flex flex-col gap-1">
+          <label className="text-xs text-muted uppercase tracking-widest">Confirmer le mot de passe</label>
+          <div className="relative">
+            <input
+              type={showConf ? 'text' : 'password'} value={confirm}
+              onChange={e => { setConfirm(e.target.value); setFormErr({}) }}
+              placeholder="Répétez votre mot de passe"
+              className={`w-full px-4 py-3 pr-12 bg-hi rounded-2xl text-white text-sm outline-none border-2 ${formErr.confirm ? 'border-red' : confirm && confirm === password ? 'border-green' : 'border-border'}`}
+            />
+            <button onClick={() => setShowConf(s => !s)} className="absolute right-4 top-1/2 -translate-y-1/2 text-sub bg-transparent border-none cursor-pointer text-lg">
+              {showConf ? '🙈' : '👁'}
+            </button>
+          </div>
+          {formErr.confirm && <p className="text-xs text-red">{formErr.confirm}</p>}
+          {!formErr.confirm && confirm && confirm === password && <p className="text-xs text-green">✓ Mots de passe identiques</p>}
+        </div>
+      )}
       {error && <p className="text-xs text-red bg-red/10 rounded-xl px-4 py-3">{error}</p>}
       {mode === 'login' && (
         <button className="text-amber text-sm self-end bg-transparent border-none cursor-pointer">Mot de passe oublié ?</button>

@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react'
 import { useAuthStore }   from '@/store/useAuthStore'
 import { useListingStore } from '@/store/useListingStore'
 import DriverMapView   from '@/components/map/DriverMapView'
-import DriverListView  from '@/components/listing/DriverListView'
+import PickupList      from '@/components/listing/PickupList'
 import DriverProfile   from '@/components/auth/DriverProfile'
 import BottomNav       from '@/components/shared/BottomNav'
 
 const TABS = [
-  { id:'map',     icon:'🗺',  label:'Carte'   },
-  { id:'list',    icon:'📋',  label:'Liste'   },
-  { id:'alerts',  icon:'🔔',  label:'Alertes' },
-  { id:'profile', icon:'👤',  label:'Profil'  },
+  { id:'map',      icon:'🗺',  label:'Carte'    },
+  { id:'pickups',  icon:'📦',  label:'Achats'},
+  { id:'alerts',   icon:'🔔',  label:'Alertes'  },
+  { id:'profile',  icon:'👤',  label:'Profil'   },
 ]
 
 export default function DriverApp() {
@@ -29,7 +29,7 @@ export default function DriverApp() {
       {/* Contenu principal */}
       <div className="flex-1 overflow-hidden relative">
         {tab === 'map'     && <DriverMapView  profile={profile} />}
-        {tab === 'list'    && <DriverListView profile={profile} />}
+        {tab === 'pickups' && <PickupList     profile={profile} />}
         {tab === 'alerts'  && (
           <div className="flex items-center justify-center h-full flex-col gap-4 text-muted">
             <span className="text-5xl opacity-30">🔔</span>
@@ -37,7 +37,7 @@ export default function DriverApp() {
             <p className="text-sm">Bientôt disponible</p>
           </div>
         )}
-        {tab === 'profile' && <DriverProfile profile={profile} />}
+        {tab === 'profile' && <DriverProfile />}
       </div>
 
       {/* Bottom nav */}

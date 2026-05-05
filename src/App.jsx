@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/useAuthStore'
 import SplashPage      from '@/pages/SplashPage'
 import AuthPage        from '@/pages/AuthPage'
 import AuthCallbackPage from '@/pages/AuthCallbackPage'
+import ResetPasswordPage from '@/pages/ResetPasswordPage'
 import OnboardingPage  from '@/pages/OnboardingPage'
 import DriverApp       from '@/pages/DriverApp'
 import CompanyApp      from '@/pages/CompanyApp'
@@ -43,13 +44,14 @@ export default function App() {
       <Route path="/"              element={<SplashPage />} />
       <Route path="/auth"          element={<AuthPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/auth/reset"    element={<ResetPasswordPage />} />
 
       {/* Onboarding — connecté mais sans profil */}
       <Route path="/onboarding" element={
         <PrivateRoute><OnboardingPage /></PrivateRoute>
       } />
 
-      {/* App chauffeur */}
+      {/* App acheteur */}
       <Route path="/app/*" element={
         <PrivateRoute>
           <RoleRoute role="driver">
@@ -58,7 +60,7 @@ export default function App() {
         </PrivateRoute>
       } />
 
-      {/* App entreprise */}
+      {/* App vendeur */}
       <Route path="/company/*" element={
         <PrivateRoute>
           <RoleRoute role="company">

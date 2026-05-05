@@ -107,7 +107,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
               <span>🕐</span>
               <p className="text-blue text-sm">
                 Récupérer avant <strong>{listing.pickup_before}</strong>
-              </span>
+              </p>
             </div>
           )}
 
@@ -171,7 +171,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
             ) : (
               <>
                 <div className="w-full py-4 rounded-2xl bg-green/10 border border-green/30 text-center text-green text-sm font-semibold">
-                  ✅ Rendez-vous directement en entreprise
+                  ✅ Rendez-vous directement en vendeur
                 </div>
                 <button className="w-full py-3 rounded-2xl border font-bold text-gold text-sm"
                   style={{ borderColor: '#FFD16666', background: '#FFD16618' }}>

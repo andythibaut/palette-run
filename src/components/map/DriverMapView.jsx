@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Map, { Marker, NavigationControl } from 'react-map-gl'
 import { useListingStore } from '@/store/useListingStore'
 import { useAuthStore }   from '@/store/useAuthStore'
@@ -15,8 +15,8 @@ const ListingMarker = ({ listing, selected, onClick, resalePrice, goldThreshold,
 
   return (
     <Marker
-      longitude={listing.companies?.location?.coordinates?.[0] || 2.3522}
-      latitude={listing.companies?.location?.coordinates?.[1]  || 48.8566}
+      longitude={listing.companies?._lng || listing.companies?.location?.coordinates?.[0] || 2.3522}
+      latitude={listing.companies?._lat  || listing.companies?.location?.coordinates?.[1] || 48.8566}
       anchor="center"
       onClick={onClick}
     >
@@ -84,7 +84,20 @@ export default function DriverMapView({ profile }) {
   const goldThreshold = profile?.gold_threshold || 20
   const userTier      = profile?.tier           || 'free'
 
-  // Géolocalisation
+  // Géolocalisation automatique au chargement
+  useEffect(() => {
+    if (!navigator.geolocation) return
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { longitude, latitude } = pos.coords
+      setUserPos({ longitude, latitude })
+      setViewport(v => ({ ...v, longitude, latitude, zoom: 13 }))
+      mapRef.current?.flyTo({ center: [longitude, latitude], zoom: 13, duration: 1200 })
+    }, () => {
+      // Si refus géoloc → reste sur DEFAULT_CENTER
+    })
+  }, [])
+
+  // Géolocalisation manuelle (bouton 🎯)
   const handleGeolocate = useCallback(() => {
     navigator.geolocation.getCurrentPosition(pos => {
       const { longitude, latitude } = pos.coords
@@ -155,13 +168,13 @@ export default function DriverMapView({ profile }) {
       <div className="absolute bottom-32 left-3 z-20 bg-bg/90 backdrop-blur-md border border-border rounded-xl p-2.5 flex flex-col gap-1.5">
         {[
           { c: '#FFD166', l: `≥ ${goldThreshold}€/pal.` },
-          { c: '#2ECC71', l: '≥ 2€/pal.'   },
-          { c: '#F97316', l: '0,10–1,90€'  },
-          { c: '#EF4444', l: 'Perte'        },
-          { c: '#4A5568', l: 'Non config.'  },
-          { c: '#6366F1', l: 'Réservée'     },
-        ].map(x => (
-          <div key={x.l} className="flex items-center gap-1.5">
+          { c: '#2ECC71', l: '2€ à seuil doré'  },
+          { c: '#F97316', l: '0,10–1,90€'        },
+          { c: '#EF4444', l: 'Perte'              },
+          { c: '#4A5568', l: 'Non config.'        },
+          { c: '#6366F1', l: 'Réservée'           },
+        ].map((x, i) => (
+          <div key={i} className="flex items-center gap-1.5">
             <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: x.c }}/>
             <span className="text-[9px] text-muted font-mono">{x.l}</span>
           </div>
@@ -175,7 +188,7 @@ export default function DriverMapView({ profile }) {
             <span className="font-bebas text-4xl text-amber">{totalQty}</span>
             <div>
               <p className="text-sm font-semibold text-white leading-none">palettes dispo</p>
-              <p className="text-xs text-sub mt-0.5">toutes entreprises</p>
+              <p className="text-xs text-sub mt-0.5">toutes vendeurs</p>
             </div>
           </div>
           <div className="w-px h-8 bg-border" />

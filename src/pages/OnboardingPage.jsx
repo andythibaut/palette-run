@@ -8,15 +8,15 @@ const ROLES = [
   {
     id:    'driver',
     emoji: '🚛',
-    title: 'Je suis Chauffeur',
-    sub:   'Je cherche des palettes à récupérer',
+    title: "J'achète des palettes",
+    sub:   'Je recherche des palettes à acheter',
     color: '#3B82F6',
   },
   {
     id:    'company',
     emoji: '🏭',
-    title: 'Je suis une Entreprise',
-    sub:   'Je veux écouler mon stock de palettes',
+    title: 'Je vends des palettes',
+    sub:   'Je mets mes palettes en vente',
     color: '#2ECC71',
   },
 ]
@@ -41,6 +41,18 @@ export default function OnboardingPage() {
       return
     }
     setLoading(true)
+
+    // Si le profil existe déjà → rediriger directement
+    if (profile) {
+      setLoading(false)
+      if (profile.role === 'company') {
+        setStep('company-info')
+      } else {
+        navigate('/app', { replace: true })
+      }
+      return
+    }
+
     const ok = await createProfile({ role: selectedRole, fullName: fullName.trim() })
     setLoading(false)
     if (!ok) return
@@ -137,17 +149,17 @@ export default function OnboardingPage() {
     </div>
   )
 
-  // ─── Étape 2 : Infos entreprise ───────────────────────────────────────────
+  // ─── Étape 2 : Infos vendeur ───────────────────────────────────────────
   return (
     <div className="flex flex-col min-h-screen bg-bg px-6 py-10">
       <div className="mb-8">
-        <h1 className="font-bebas text-4xl text-white leading-tight">Votre entreprise</h1>
+        <h1 className="font-bebas text-4xl text-white leading-tight">Votre vendeur</h1>
         <p className="text-sub text-sm mt-2">Ces informations seront visibles sur la carte.</p>
       </div>
 
       <div className="flex flex-col gap-5 mb-8">
         {[
-          { label:'Nom de l\'entreprise', value:companyName, set:setCompanyName, placeholder:'SAS Logipro', required:true },
+          { label:'Nom de l\'vendeur', value:companyName, set:setCompanyName, placeholder:'SAS Logipro', required:true },
           { label:'Ville',                value:city,        set:setCity,        placeholder:'Paris 13e',   required:true },
           { label:'Adresse (optionnel)',  value:address,     set:setAddress,     placeholder:'22 av. d\'Italie' },
         ].map(f => (

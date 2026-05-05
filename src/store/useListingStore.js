@@ -12,7 +12,7 @@ export const useListingStore = create((set, get) => ({
   fetchListings: async (userLocation) => {
     set({ loading: true, error: null })
 
-    let query = supabase
+    const { data, error } = await supabase
       .from('listings')
       .select(`
         *,
@@ -23,10 +23,28 @@ export const useListingStore = create((set, get) => ({
       `)
       .eq('is_active', true)
 
-    const { data, error } = await query
-
     if (error) { set({ error: error.message, loading: false }); return }
-    set({ listings: data || [], loading: false })
+
+    // Parse les coordonnées GPS depuis le format EWKB hex de Supabase
+    const listings = (data || []).map(l => {
+      if (l.companies?.location) {
+        try {
+          const hex = l.companies.location
+          const buf = new Uint8Array(hex.match(/.{1,2}/g).map(b => parseInt(b, 16)))
+          const view = new DataView(buf.buffer)
+          const byteOrder = buf[0]
+          const hasSRID = (view.getUint32(1, byteOrder === 1) & 0x20000000) !== 0
+          const offset = hasSRID ? 9 : 5
+          l.companies._lng = view.getFloat64(offset,     byteOrder === 1)
+          l.companies._lat = view.getFloat64(offset + 8, byteOrder === 1)
+        } catch (e) {
+          console.error('EWKB parse error:', e)
+        }
+      }
+      return l
+    })
+
+    set({ listings, loading: false })
   },
 
   // Écoute les mises à jour en temps réel (enchères, réservations)

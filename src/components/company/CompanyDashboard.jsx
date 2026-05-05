@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { supabase } from '@/lib/supabase'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import { useAuthStore }    from '@/store/useAuthStore'
 
-const TABS = ['annonce', 'chauffeurs', 'blacklist']
+const TABS = ['annonce', 'acheteurs', 'blacklist']
 
 // ─── Formulaire annonce ───────────────────────────────────────────────────────
 const ListingForm = ({ listing, onSave }) => {
@@ -110,38 +111,66 @@ const ListingForm = ({ listing, onSave }) => {
   )
 }
 
-// ─── Liste chauffeurs ─────────────────────────────────────────────────────────
-const DriversList = ({ drivers, blacklist, onBlacklist }) => {
-  const blacklistedIds = new Set(blacklist.map(b => b.driver_id))
+// ─── Liste acheteurs ─────────────────────────────────────────────────────────
+const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate }) => {
+  const blacklistedIds  = new Set(blacklist.map(b => b.driver_id))
+  const reservedDriver  = listing?.reserved_by
 
   if (drivers.length === 0) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3 text-muted">
       <span className="text-4xl opacity-30">🚛</span>
-      <p className="font-bebas text-xl">Aucun chauffeur</p>
+      <p className="font-bebas text-xl">Aucun acheteur</p>
     </div>
   )
 
   return (
     <div className="flex flex-col gap-3 p-5">
-      <p className="text-xs text-muted">{drivers.length} chauffeur{drivers.length > 1 ? 's' : ''} ont consulté votre annonce</p>
-      {drivers.map(d => (
-        <div key={d.bidder_id} className="bg-surface border border-border rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-hi border border-border flex items-center justify-center text-xl shrink-0">🚛</div>
-          <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm text-white">{d.profiles?.full_name || 'Chauffeur'}</p>
-            <p className="text-xs text-muted mt-0.5">
-              {d.price ? `Enchère : ${d.price.toFixed(2)}€` : 'Consulté'}
-              {d.dist_km ? ` · 📍 ${d.dist_km.toFixed(1)} km` : ''}
-            </p>
-          </div>
-          {!blacklistedIds.has(d.bidder_id) && (
-            <button onClick={() => onBlacklist(d.bidder_id)}
-              className="w-9 h-9 rounded-xl bg-hi border border-border flex items-center justify-center text-base cursor-pointer hover:bg-red/10 hover:border-red/40 transition-colors">
-              🚫
-            </button>
-          )}
+      {reservedDriver && (
+        <div className="bg-amber/10 border border-amber/30 rounded-xl px-4 py-3 text-xs text-amber">
+          ⚡ Un acheteur a réservé — cliquez sur son nom quand il arrive pour valider la transaction.
         </div>
-      ))}
+      )}
+      <p className="text-xs text-muted">{drivers.length} acheteur{drivers.length > 1 ? 's' : ''} ont consulté votre annonce</p>
+      {drivers.map(d => {
+        const isReserver  = d.bidder_id === reservedDriver
+        const isBlacklisted = blacklistedIds.has(d.bidder_id)
+        return (
+          <div key={d.bidder_id}
+            className="bg-surface border rounded-2xl overflow-hidden"
+            style={{ borderColor: isReserver ? '#FFD16666' : '#1C2330' }}>
+            <div className="p-4 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
+                style={{ background: isReserver ? '#FFD16622' : '#1A2030', border: `1px solid ${isReserver ? '#FFD16644' : '#1C2330'}` }}>
+                🚛
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-sm text-white">{d.profiles?.full_name || 'Acheteur'}</p>
+                  {isReserver && <span className="text-[10px] bg-amber/20 text-amber border border-amber/30 rounded-full px-2 py-0.5 font-mono">RÉSERVÉ</span>}
+                </div>
+                <p className="text-xs text-muted mt-0.5">
+                  {d.price ? `Enchère : ${d.price.toFixed(2)}€` : 'Consulté'}
+                  {d.dist_km ? ` · 📍 ${d.dist_km.toFixed(1)} km` : ''}
+                </p>
+              </div>
+              {!isBlacklisted && (
+                <button onClick={() => onBlacklist(d.bidder_id)}
+                  className="w-9 h-9 rounded-xl bg-hi border border-border flex items-center justify-center text-base cursor-pointer hover:bg-red/10 hover:border-red/40 transition-colors">
+                  🚫
+                </button>
+              )}
+            </div>
+            {/* Bouton validation — visible uniquement pour le acheteur réservant */}
+            {isReserver && (
+              <button onClick={() => onValidate(d.bidder_id, d.profiles?.full_name)}
+                className="w-full py-3 font-bold text-bg text-sm cursor-pointer border-t border-amber/30"
+                style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)' }}>
+                ✅ Valider — {d.profiles?.full_name || 'Ce acheteur'} est arrivé
+              </button>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -150,7 +179,7 @@ const DriversList = ({ drivers, blacklist, onBlacklist }) => {
 const BlacklistPanel = ({ blacklist, onUnblacklist }) => (
   <div className="flex flex-col gap-3 p-5">
     <div className="bg-red/10 border border-red/20 rounded-xl px-4 py-3 text-xs text-red">
-      🚫 Les chauffeurs blacklistés ne voient plus vos annonces sur la carte.
+      🚫 Les acheteurs blacklistés ne voient plus vos annonces sur la carte.
     </div>
     {blacklist.length === 0 ? (
       <div className="flex flex-col items-center justify-center h-40 gap-3 text-muted">
@@ -161,7 +190,7 @@ const BlacklistPanel = ({ blacklist, onUnblacklist }) => (
       <div key={b.id} className="bg-surface border border-red/20 rounded-2xl p-4 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-red/10 border border-red/20 flex items-center justify-center text-xl shrink-0 opacity-50 grayscale">🚛</div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-muted line-through">{b.profiles?.full_name || 'Chauffeur'}</p>
+          <p className="font-semibold text-sm text-muted line-through">{b.profiles?.full_name || 'Acheteur'}</p>
           <p className="text-xs text-red/70 mt-0.5">Annonce masquée</p>
         </div>
         <button onClick={() => onUnblacklist(b.driver_id)}
@@ -183,8 +212,44 @@ export default function CompanyDashboard() {
   const totalViews = drivers.length
 
   const handleBlacklist = async (driverId) => {
-    if (!window.confirm('Blacklister ce chauffeur ?')) return
+    if (!window.confirm('Blacklister ce acheteur ?')) return
     await blacklistDriver(driverId)
+  }
+
+  const handleValidate = async (driverId, driverName) => {
+    if (!window.confirm(`Valider la transaction avec ${driverName} ?`)) return
+    if (!listing) return
+
+    const { error } = await supabase
+      .from('transactions')
+      .insert({
+        listing_id:           listing.id,
+        company_id:           company.id,
+        driver_id:            driverId,
+        qty:                  listing.qty,
+        buy_price:            listing.current_bid || listing.price,
+        status:               'confirmed',
+        company_validated_at: new Date().toISOString(),
+        driver_confirmed_at:  new Date().toISOString(),
+        had_active_bid:       listing.current_bid !== null,
+      })
+
+    if (error) { alert('Erreur lors de la validation'); return }
+
+    // Désactive l'annonce
+    await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
+
+    // Notification au acheteur
+    await supabase.from('notifications').insert({
+      user_id: driverId,
+      type:    'transaction_confirmed',
+      title:   '✅ Transaction confirmée !',
+      body:    `Votre transaction chez ${company.name} a été validée.`,
+      data:    { listing_id: listing.id },
+    })
+
+    alert(`✅ Transaction validée avec ${driverName} !`)
+    window.location.reload()
   }
 
   if (loading) return (
@@ -199,8 +264,8 @@ export default function CompanyDashboard() {
       <div className="px-5 pt-5 pb-0 shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="font-mono text-xs text-muted uppercase tracking-widest">Tableau de bord</p>
-            <h1 className="font-bebas text-2xl text-white leading-tight">{company?.name || 'Mon entreprise'}</h1>
+            <p className="font-mono text-xs text-muted uppercase tracking-widest">Mes annonces</p>
+            <h1 className="font-bebas text-2xl text-white leading-tight">{company?.name || 'Mon vendeur'}</h1>
           </div>
           <div className="w-10 h-10 rounded-xl bg-hi border border-border flex items-center justify-center text-xl">🏭</div>
         </div>
@@ -221,7 +286,7 @@ export default function CompanyDashboard() {
 
         {/* Tabs */}
         <div className="flex border-b border-border">
-          {[['annonce','Mon annonce'],['chauffeurs','Chauffeurs'],['blacklist','🚫 Liste noire']].map(([id,label]) => (
+          {[['annonce','Mon annonce'],['acheteurs','Acheteurs'],['blacklist','🚫 Liste noire']].map(([id,label]) => (
             <button key={id} onClick={() => setTab(id)}
               className={`flex-1 py-3 text-xs font-mono cursor-pointer border-none bg-transparent transition-colors ${tab === id ? 'text-amber border-b-2 border-amber' : 'text-muted'}`}>
               {label}
@@ -233,7 +298,7 @@ export default function CompanyDashboard() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto pb-20">
         {tab === 'annonce'    && <ListingForm listing={listing} />}
-        {tab === 'chauffeurs' && <DriversList drivers={drivers} blacklist={blacklist} onBlacklist={handleBlacklist} />}
+        {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
         {tab === 'blacklist'  && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}
       </div>
     </div>

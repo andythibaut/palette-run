@@ -1,14 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
 
-export default function DriverProfile({ profile }) {
-  const { updateProfile, signOut } = useAuthStore()
+export default function DriverProfile() {
+  const { updateProfile, signOut, profile } = useAuthStore()
   const [resalePrice,   setResalePrice]   = useState(profile?.resale_price   || '')
   const [goldThreshold, setGoldThreshold] = useState(profile?.gold_threshold || 20)
   const [editResale,    setEditResale]    = useState(false)
   const [editGold,      setEditGold]      = useState(false)
   const [saved,         setSaved]         = useState(null)
   const [loading,       setLoading]       = useState(false)
+
+  // Synchronise les valeurs locales quand le profil change dans le store
+  useEffect(() => {
+    if (profile?.resale_price !== undefined)   setResalePrice(profile.resale_price || '')
+    if (profile?.gold_threshold !== undefined) setGoldThreshold(profile.gold_threshold || 20)
+  }, [profile?.resale_price, profile?.gold_threshold])
 
   const tierColor = { free: '#3B82F6', premium: '#F5A623', gold: '#FFD166' }
   const tierLabel = { free: 'Gratuit', premium: 'Premium ⭐', gold: 'Gold 🥇' }
@@ -42,7 +48,7 @@ export default function DriverProfile({ profile }) {
         <div className="w-16 h-16 rounded-2xl bg-amber/10 border-2 border-amber/30 flex items-center justify-center text-4xl">🚛</div>
         <div className="flex-1">
           <h1 className="font-bebas text-2xl text-white">{profile?.full_name || 'Mon profil'}</h1>
-          <p className="text-sub text-xs mt-1">Chauffeur indépendant</p>
+          <p className="text-sub text-xs mt-1">Acheteur de palettes</p>
           <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full font-mono"
             style={{ background: `${tierColor[profile?.tier || 'free']}18`, color: tierColor[profile?.tier || 'free'], border: `1px solid ${tierColor[profile?.tier || 'free']}44` }}>
             {tierLabel[profile?.tier || 'free']}

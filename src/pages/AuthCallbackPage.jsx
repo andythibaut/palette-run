@@ -8,7 +8,9 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if (event === 'PASSWORD_RECOVERY') {
+        navigate('/auth/reset', { replace: true })
+      } else if (event === 'SIGNED_IN' && session) {
         navigate('/onboarding', { replace: true })
       }
     })
