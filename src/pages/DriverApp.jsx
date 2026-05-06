@@ -27,7 +27,7 @@ export default function DriverApp() {
   return (
     <div className="flex flex-col h-screen bg-bg overflow-hidden">
       {/* Contenu principal */}
-      <div className="flex-1 overflow-hidden relative">
+      <div className={`flex-1 relative ${tab === 'pickups' || tab === 'profile' ? 'overflow-auto' : 'overflow-hidden'}`}>
         {tab === 'map'     && <DriverMapView  profile={profile} />}
         {tab === 'pickups' && <PickupList     profile={profile} />}
         {tab === 'alerts'  && (

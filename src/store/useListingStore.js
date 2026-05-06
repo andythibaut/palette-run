@@ -98,20 +98,47 @@ export const useListingStore = create((set, get) => ({
 
   setSelected: (listing) => set({ selected: listing }),
 
-  // Réserve une annonce (Gold uniquement)
+  // Réserve une annonce et crée une transaction pending
   reserveListing: async (listingId) => {
     const { data: { user } } = await supabase.auth.getUser()
 
-    const { error } = await supabase
+    // Récupère l'annonce
+    const { data: listing } = await supabase
+      .from('listings')
+      .select('*, companies(id, owner_id)')
+      .eq('id', listingId)
+      .single()
+
+    if (!listing) return false
+
+    // Met à jour la réservation
+    const { error: resError } = await supabase
       .from('listings')
       .update({
         reserved_by: user.id,
         reserved_at: new Date().toISOString(),
+        reservation_expires_at: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
       })
       .eq('id', listingId)
-      .is('reserved_by', null) // vérifie qu'elle n'est pas déjà réservée
+      .is('reserved_by', null)
 
-    if (error) { set({ error: error.message }); return false }
+    if (resError) { set({ error: resError.message }); return false }
+
+    // Crée une transaction pending visible dans "Achats"
+    const { error: txError } = await supabase
+      .from('transactions')
+      .insert({
+        listing_id:           listingId,
+        company_id:           listing.company_id,
+        driver_id:            user.id,
+        qty:                  listing.qty,
+        buy_price:            listing.current_bid || listing.price,
+        status:               'pending',
+        company_validated_at: null,
+        had_active_bid:       listing.current_bid !== null,
+      })
+
+    if (txError) { set({ error: txError.message }); return false }
     return true
   },
 

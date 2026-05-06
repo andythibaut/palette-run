@@ -2,7 +2,21 @@ import { useState } from 'react'
 import { useListingStore } from '@/store/useListingStore'
 import { profitColor }     from '@/lib/mapbox'
 
-const TIER_LIMIT = { free: 2, premium: 10, gold: Infinity }
+const TIER_LIMIT = { free: 2, gold: Infinity }
+
+// Ouvre l'adresse dans Google Maps ou Apple Maps
+const openGPS = (address, lat, lng) => {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const query = address
+    ? encodeURIComponent(address)
+    : `${lat},${lng}`
+
+  if (isIOS) {
+    window.open(`maps://maps.apple.com/?q=${query}&ll=${lat},${lng}`, '_blank')
+  } else {
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
+  }
+}
 
 export default function ListingBottomSheet({ listing, profile, onClose }) {
   const { reserveListing, placeBid } = useListingStore()
@@ -13,7 +27,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   const resalePrice   = profile?.resale_price  || null
   const goldThreshold = profile?.gold_threshold || 20
   const canBook       = userTier === 'gold'
-  const canFav        = userTier === 'premium' || userTier === 'gold'
+  const canFav        = userTier === 'gold'
   const isHidden      = listing.qty > (TIER_LIMIT[userTier] || 2)
   const isReserved    = listing.reserved_by !== null
   const color         = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold)
@@ -106,7 +120,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
             <div className="flex items-center gap-2 mb-4 bg-blue/10 border border-blue/30 rounded-xl px-3 py-2">
               <span>🕐</span>
               <p className="text-blue text-sm">
-                Récupérer avant <strong>{listing.pickup_before}</strong>
+                Récupérer avant <strong>{listing.pickup_before.slice(0, 5)}</strong>
               </p>
             </div>
           )}
@@ -116,7 +130,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
             <div className="mb-4 rounded-xl px-4 py-3"
               style={{ background: userTier === 'free' ? '#F5A62318' : '#FFD16618', border: `1px solid ${userTier === 'free' ? '#F5A62333' : '#FFD16633'}` }}>
               <p className="text-sm font-semibold" style={{ color: userTier === 'free' ? '#F5A623' : '#FFD166' }}>
-                🔒 {userTier === 'free' ? 'Annonce > 2 palettes — passez Premium' : 'Annonce > 10 palettes — réservé Gold'}
+                🔒 {userTier === 'free' ? 'Annonce > 2 palettes — passez Gold' : 'Annonce > 10 palettes — réservé Gold'}
               </p>
             </div>
           )}
@@ -128,7 +142,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                 {userTier === 'free' && (
                   <button className="w-full py-4 rounded-2xl font-bold text-bg"
                     style={{ background: 'linear-gradient(135deg,#F5A623,#E8940F)', boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}>
-                    ⭐ Premium — 9,90€/mois
+                    ⭐ Gold — 24,90€/mois
                   </button>
                 )}
                 <button className="w-full py-3 rounded-2xl font-bold border text-gold"
@@ -144,10 +158,23 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
               <>
                 {!booked ? (
                   <>
+                    <div className="bg-amber/10 border border-amber/30 rounded-xl px-4 py-3 mb-1">
+                      <p className="text-amber text-xs leading-relaxed">
+                        ⚠️ En réservant, vous vous engagez à venir récupérer ces palettes <strong>aujourd'hui</strong>. Les no-shows répétés entraînent une suspension de votre compte.
+                      </p>
+                    </div>
                     <button onClick={handleReserve}
                       className="w-full py-4 rounded-2xl font-bold text-bg"
                       style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)', boxShadow: '0 6px 20px rgba(255,209,102,0.4)' }}>
                       🥇 Réserver ces palettes
+                    </button>
+                    <button onClick={() => openGPS(
+                      listing.companies?.address,
+                      listing.companies?._lat,
+                      listing.companies?._lng
+                    )}
+                      className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2">
+                      🗺 Y aller
                     </button>
                     {/* Enchère si déjà réservée par quelqu'un d'autre */}
                     {listing.reserved_by && (
@@ -173,6 +200,14 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                 <div className="w-full py-4 rounded-2xl bg-green/10 border border-green/30 text-center text-green text-sm font-semibold">
                   ✅ Rendez-vous directement en vendeur
                 </div>
+                <button onClick={() => openGPS(
+                  listing.companies?.address,
+                  listing.companies?._lat,
+                  listing.companies?._lng
+                )}
+                  className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2">
+                  🗺 Y aller
+                </button>
                 <button className="w-full py-3 rounded-2xl border font-bold text-gold text-sm"
                   style={{ borderColor: '#FFD16666', background: '#FFD16618' }}>
                   🥇 Gold — réserver en priorité

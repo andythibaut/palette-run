@@ -16,8 +16,8 @@ export default function DriverProfile() {
     if (profile?.gold_threshold !== undefined) setGoldThreshold(profile.gold_threshold || 20)
   }, [profile?.resale_price, profile?.gold_threshold])
 
-  const tierColor = { free: '#3B82F6', premium: '#F5A623', gold: '#FFD166' }
-  const tierLabel = { free: 'Gratuit', premium: 'Premium ⭐', gold: 'Gold 🥇' }
+  const tierColor = { free: '#3B82F6', gold: '#FFD166' }
+  const tierLabel = { free: 'Gratuit', gold: 'Gold 🥇' }
 
   const save = async (field) => {
     setLoading(true)

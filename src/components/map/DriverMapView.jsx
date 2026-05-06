@@ -7,9 +7,9 @@ import ListingBottomSheet from '@/components/listing/ListingBottomSheet'
 
 // ─── Marqueur ─────────────────────────────────────────────────────────────────
 const ListingMarker = ({ listing, selected, onClick, resalePrice, goldThreshold, userTier }) => {
-  const TIER_LIMIT = { free: 2, premium: 10, gold: Infinity }
+  const TIER_LIMIT = { free: 2, gold: Infinity }
   const isHidden   = listing.qty > (TIER_LIMIT[userTier] || 2)
-  const color      = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold)
+  const color      = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
   const isReserved = listing.reserved_by !== null
   const size       = selected ? 48 : 38
 
@@ -48,13 +48,13 @@ const ListingMarker = ({ listing, selected, onClick, resalePrice, goldThreshold,
             </>
           )}
         </div>
-        {/* Tag prix / bénéfice */}
+        {/* Tag bénéfice total */}
         {!isHidden && (
           <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 bg-surface border rounded px-1 py-0.5 text-[9px] whitespace-nowrap font-mono"
             style={{ borderColor: `${color}44`, color }}
           >
             {resalePrice && resalePrice > listing.price
-              ? `+${(resalePrice - listing.price).toFixed(2)}€`
+              ? `+${((resalePrice - listing.price) * listing.qty).toFixed(0)}€`
               : `${listing.price.toFixed(2)}€`}
           </div>
         )}
@@ -112,7 +112,7 @@ export default function DriverMapView({ profile }) {
   // Totaux
   const totalQty   = visibleListings.filter(l => !l.reserved_by).reduce((s, l) => s + l.qty, 0)
   const visibleQty = visibleListings.filter(l => !l.reserved_by && l.qty <= (
-    userTier === 'free' ? 2 : userTier === 'premium' ? 10 : Infinity
+    userTier === 'free' ? 2 : userTier === 'gold' ? 10 : Infinity
   )).reduce((s, l) => s + l.qty, 0)
 
   return (
@@ -145,63 +145,19 @@ export default function DriverMapView({ profile }) {
         {userPos && <UserMarker lng={userPos.longitude} lat={userPos.latitude} />}
       </Map>
 
-      {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 z-20 p-3 flex items-center gap-2">
-        <div className="flex-1 flex items-center gap-2 bg-bg/90 backdrop-blur-md border border-border rounded-2xl px-4 py-2.5">
-          <span className="text-muted text-sm">🔍</span>
-          <span className="text-muted text-sm">Rechercher une zone…</span>
-        </div>
-        {/* Fav filter */}
-        {(userTier === 'premium' || userTier === 'gold') && (
-          <button className="w-10 h-10 rounded-xl bg-bg/90 backdrop-blur-md border border-border flex items-center justify-center text-lg text-muted">
-            ☆
-          </button>
-        )}
-        {/* Géolocalisation */}
+      {/* Top bar — seulement le bouton géolocalisation */}
+      <div className="absolute top-0 right-0 z-20 p-3">
         <button onClick={handleGeolocate}
           className="w-10 h-10 rounded-xl bg-bg/90 backdrop-blur-md border border-border flex items-center justify-center text-lg">
           🎯
         </button>
       </div>
 
-      {/* Légende couleurs */}
-      <div className="absolute bottom-32 left-3 z-20 bg-bg/90 backdrop-blur-md border border-border rounded-xl p-2.5 flex flex-col gap-1.5">
-        {[
-          { c: '#FFD166', l: `≥ ${goldThreshold}€/pal.` },
-          { c: '#2ECC71', l: '2€ à seuil doré'  },
-          { c: '#F97316', l: '0,10–1,90€'        },
-          { c: '#EF4444', l: 'Perte'              },
-          { c: '#4A5568', l: 'Non config.'        },
-          { c: '#6366F1', l: 'Réservée'           },
-        ].map((x, i) => (
-          <div key={i} className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: x.c }}/>
-            <span className="text-[9px] text-muted font-mono">{x.l}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Compteur stock */}
+      {/* Compteur stock — discret en bas à gauche */}
       {!selected && (
-        <div className="absolute bottom-20 left-3 right-3 z-20 bg-bg/95 backdrop-blur-md border border-border rounded-2xl px-4 py-3 flex items-center justify-between">
-          <div className="flex items-baseline gap-2">
-            <span className="font-bebas text-4xl text-amber">{totalQty}</span>
-            <div>
-              <p className="text-sm font-semibold text-white leading-none">palettes dispo</p>
-              <p className="text-xs text-sub mt-0.5">toutes vendeurs</p>
-            </div>
-          </div>
-          <div className="w-px h-8 bg-border" />
-          <div className="flex gap-3">
-            <div className="text-center">
-              <p className="font-bebas text-xl text-amber">{visibleQty}</p>
-              <p className="text-[10px] text-muted">visibles</p>
-            </div>
-            <div className="text-center">
-              <p className="font-bebas text-xl text-muted">{totalQty - visibleQty}</p>
-              <p className="text-[10px] text-muted">masquées</p>
-            </div>
-          </div>
+        <div className="absolute bottom-20 left-3 z-20 bg-bg/70 backdrop-blur-md border border-border/50 rounded-xl px-3 py-1.5 flex items-center gap-2">
+          <span className="font-bebas text-lg text-amber leading-none">{totalQty}</span>
+          <span className="text-xs text-sub">palettes</span>
         </div>
       )}
 
