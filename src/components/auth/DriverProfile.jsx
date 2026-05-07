@@ -47,9 +47,6 @@ export default function DriverProfile() {
     setSaved('vehicle')
     setTimeout(() => setSaved(null), 2000)
   }
-    setSaved(field)
-    setTimeout(() => setSaved(null), 2000)
-  }
 
   const previewColor = (buyPrice) => {
     if (!resalePrice) return '#4A5568'
@@ -210,4 +207,4 @@ export default function DriverProfile() {
       </div>
     </div>
   )
-
+}
