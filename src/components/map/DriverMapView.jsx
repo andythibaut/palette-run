@@ -13,10 +13,18 @@ const ListingMarker = ({ listing, selected, onClick, resalePrice, goldThreshold,
   const isReserved = listing.reserved_by !== null
   const size       = selected ? 48 : 38
 
+  // Décale le marqueur de ~500m aléatoirement (déterministe par listing.id)
+  const seed  = listing.id ? listing.id.charCodeAt(0) + listing.id.charCodeAt(4) : 0
+  const offsetLat = ((seed % 100) - 50) / 100000 * 5  // ~500m max
+  const offsetLng = ((seed % 137) - 68) / 100000 * 5
+
+  const baseLat = listing.companies?._lat  || listing.companies?.location?.coordinates?.[1] || 48.8566
+  const baseLng = listing.companies?._lng  || listing.companies?.location?.coordinates?.[0] || 2.3522
+
   return (
     <Marker
-      longitude={listing.companies?._lng || listing.companies?.location?.coordinates?.[0] || 2.3522}
-      latitude={listing.companies?._lat  || listing.companies?.location?.coordinates?.[1] || 48.8566}
+      longitude={baseLng + offsetLng}
+      latitude={baseLat + offsetLat}
       anchor="center"
       onClick={onClick}
     >

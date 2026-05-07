@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useListingStore } from '@/store/useListingStore'
+import { useAuthStore }    from '@/store/useAuthStore'
 import { profitColor }     from '@/lib/mapbox'
 
 const TIER_LIMIT = { free: 2, gold: Infinity }
@@ -7,10 +8,7 @@ const TIER_LIMIT = { free: 2, gold: Infinity }
 // Ouvre l'adresse dans Google Maps ou Apple Maps
 const openGPS = (address, lat, lng) => {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-  const query = address
-    ? encodeURIComponent(address)
-    : `${lat},${lng}`
-
+  const query = address ? encodeURIComponent(address) : `${lat},${lng}`
   if (isIOS) {
     window.open(`maps://maps.apple.com/?q=${query}&ll=${lat},${lng}`, '_blank')
   } else {
@@ -20,17 +18,17 @@ const openGPS = (address, lat, lng) => {
 
 export default function ListingBottomSheet({ listing, profile, onClose }) {
   const { reserveListing, placeBid } = useListingStore()
+  const { user } = useAuthStore()
   const [booked,  setBooked]  = useState(false)
   const [bidding, setBidding] = useState(false)
 
-  const userTier      = profile?.tier          || 'free'
-  const resalePrice   = profile?.resale_price  || null
-  const goldThreshold = profile?.gold_threshold || 20
-  const canBook       = userTier === 'gold'
-  const canFav        = userTier === 'gold'
-  const isHidden      = listing.qty > (TIER_LIMIT[userTier] || 2)
-  const isReserved    = listing.reserved_by !== null
-  const color         = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold)
+  const userTier       = profile?.tier          || 'free'
+  const resalePrice    = profile?.resale_price  || null
+  const goldThreshold  = profile?.gold_threshold || 20
+  const canBook        = userTier === 'gold'
+  const isHidden       = listing.qty > (TIER_LIMIT[userTier] || 2)
+  const isReservedByMe = listing.reserved_by === user?.id
+  const color          = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
 
   const profit = resalePrice && resalePrice > listing.price && !isHidden
     ? (resalePrice - listing.price) * listing.qty
@@ -68,19 +66,27 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
           {/* Header */}
           <div className="flex items-start gap-2 mb-4">
             <div className="flex-1">
+              {/* Nom flou avant réservation */}
               <h2 className="font-bebas text-2xl leading-tight"
-                style={{ color: isHidden ? '#4A5568' : '#E8EDF5', fontStyle: isHidden ? 'italic' : 'normal' }}>
-                {isHidden ? 'Nom masqué' : isReserved ? '🔒 Réservée' : listing.companies?.name}
+                style={{ color: isHidden ? '#4A5568' : '#E8EDF5' }}>
+                {isHidden
+                  ? 'Nom masqué'
+                  : isReservedByMe
+                    ? listing.companies?.name
+                    : <span style={{ filter: 'blur(6px)', userSelect: 'none' }}>{listing.companies?.name || 'Vendeur'}</span>
+                }
               </h2>
               <p className="text-sub text-sm mt-0.5">
                 {listing.companies?.city}
-                {listing.companies?.city && ' · '}
-                {listing.distance_km ? `${listing.distance_km.toFixed(1)} km` : ''}
+                {/* Adresse masquée avant réservation */}
+                {isReservedByMe && listing.companies?.address && (
+                  <span className="block text-xs text-muted mt-0.5">📍 {listing.companies.address}</span>
+                )}
+                {!isReservedByMe && (
+                  <span className="block text-xs text-muted/50 mt-0.5 italic">Adresse visible après réservation</span>
+                )}
               </p>
             </div>
-            {canFav && (
-              <button className="w-9 h-9 rounded-xl bg-hi border border-border flex items-center justify-center text-lg text-sub">☆</button>
-            )}
             <button onClick={onClose}
               className="w-9 h-9 rounded-xl bg-hi border border-border flex items-center justify-center text-xl text-sub">×</button>
           </div>
@@ -167,14 +173,6 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                       className="w-full py-4 rounded-2xl font-bold text-bg"
                       style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)', boxShadow: '0 6px 20px rgba(255,209,102,0.4)' }}>
                       🥇 Réserver ces palettes
-                    </button>
-                    <button onClick={() => openGPS(
-                      listing.companies?.address,
-                      listing.companies?._lat,
-                      listing.companies?._lng
-                    )}
-                      className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2">
-                      🗺 Y aller
                     </button>
                     {/* Enchère si déjà réservée par quelqu'un d'autre */}
                     {listing.reserved_by && (
