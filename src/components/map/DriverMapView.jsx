@@ -82,9 +82,9 @@ const UserMarker = ({ lng, lat }) => (
 )
 
 // ─── Vue principale ───────────────────────────────────────────────────────────
-export default function DriverMapView({ profile }) {
+export default function DriverMapView({ profile, savedViewport, onViewportChange }) {
   const { listings, selected, setSelected } = useListingStore()
-  const [viewport, setViewport] = useState(DEFAULT_CENTER)
+  const [viewport, setViewport] = useState(savedViewport || DEFAULT_CENTER)
   const [userPos,  setUserPos]  = useState(null)
   const mapRef = useRef(null)
 
@@ -92,17 +92,16 @@ export default function DriverMapView({ profile }) {
   const goldThreshold = profile?.gold_threshold || 20
   const userTier      = profile?.tier           || 'free'
 
-  // Géolocalisation automatique au chargement
+  // Géolocalisation automatique — seulement au premier chargement
   useEffect(() => {
+    if (savedViewport) return  // restaure le dernier viewport
     if (!navigator.geolocation) return
     navigator.geolocation.getCurrentPosition(pos => {
       const { longitude, latitude } = pos.coords
       setUserPos({ longitude, latitude })
       setViewport(v => ({ ...v, longitude, latitude, zoom: 13 }))
       mapRef.current?.flyTo({ center: [longitude, latitude], zoom: 13, duration: 1200 })
-    }, () => {
-      // Si refus géoloc → reste sur DEFAULT_CENTER
-    })
+    }, () => {})
   }, [])
 
   // Géolocalisation manuelle (bouton 🎯)
@@ -129,7 +128,7 @@ export default function DriverMapView({ profile }) {
       <Map
         ref={mapRef}
         {...viewport}
-        onMove={e => setViewport(e.viewState)}
+        onMove={e => { setViewport(e.viewState); onViewportChange?.(e.viewState) }}
         mapStyle={MAP_STYLE}
         mapboxAccessToken={MAPBOX_TOKEN}
         style={{ width: '100%', height: '100%' }}

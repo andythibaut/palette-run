@@ -15,6 +15,7 @@ const TABS = [
 
 export default function DriverApp() {
   const [tab, setTab] = useState('map')
+  const [mapViewport, setMapViewport] = useState(null) // persiste entre onglets
   const { fetchListings, subscribeRealtime, unsubscribeRealtime } = useListingStore()
   const { profile } = useAuthStore()
 
@@ -28,7 +29,14 @@ export default function DriverApp() {
     <div className="flex flex-col h-screen bg-bg overflow-hidden">
       {/* Contenu principal */}
       <div className={`flex-1 relative ${tab === 'pickups' || tab === 'profile' ? 'overflow-auto' : 'overflow-hidden'}`}>
-        {tab === 'map'     && <DriverMapView  profile={profile} />}
+        {/* Carte — toujours montée, cachée via CSS */}
+        <div style={{ display: tab === 'map' ? 'block' : 'none', height: '100%' }}>
+          <DriverMapView
+            profile={profile}
+            savedViewport={mapViewport}
+            onViewportChange={setMapViewport}
+          />
+        </div>
         {tab === 'pickups' && <PickupList     profile={profile} />}
         {tab === 'alerts'  && (
           <div className="flex items-center justify-center h-full flex-col gap-4 text-muted">
