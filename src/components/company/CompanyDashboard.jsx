@@ -3,7 +3,13 @@ import { supabase } from '@/lib/supabase'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import { useAuthStore }    from '@/store/useAuthStore'
 
-const TABS = ['annonce', 'acheteurs', 'blacklist']
+const VEHICLE_OPTIONS = [
+  { id: 'vl',      label: 'VL uniquement',  icon: '🚗', sub: 'Petite cour, accès restreint' },
+  { id: 'porteur', label: 'Porteur et plus', icon: '🚚', sub: 'Accès standard' },
+  { id: 'semi',    label: 'Semi-remorque',   icon: '🚛', sub: 'Grand quai de chargement' },
+]
+
+const TABS = ['annonce', 'acheteurs', 'blacklist', 'site']
 
 // ─── Formulaire annonce ───────────────────────────────────────────────────────
 const ListingForm = ({ listing, onSave }) => {
@@ -107,6 +113,68 @@ const ListingForm = ({ listing, onSave }) => {
           Supprimer l'annonce
         </button>
       )}
+    </div>
+  )
+}
+
+// ─── Paramètres du site ───────────────────────────────────────────────────────
+const SiteSettings = ({ company }) => {
+  const [vehicleRequired, setVehicleRequired] = useState(company?.vehicle_required || 'semi')
+  const [hasLoader,       setHasLoader]       = useState(company?.has_loader       || false)
+  const [saved,           setSaved]           = useState(false)
+  const [loading,         setLoading]         = useState(false)
+
+  const handleSave = async () => {
+    setLoading(true)
+    await supabase.from('companies').update({
+      vehicle_required: vehicleRequired,
+      has_loader:       hasLoader,
+    }).eq('id', company.id)
+    setLoading(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  return (
+    <div className="flex flex-col gap-5 p-5">
+      <div>
+        <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Véhicule maximum accepté</p>
+        <div className="flex flex-col gap-2">
+          {VEHICLE_OPTIONS.map(v => (
+            <button key={v.id} onClick={() => setVehicleRequired(v.id)}
+              className="flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all text-left"
+              style={{ borderColor: vehicleRequired === v.id ? '#F5A623' : '#1C2330', background: vehicleRequired === v.id ? '#F5A62314' : '#13181F' }}>
+              <span className="text-3xl">{v.icon}</span>
+              <div className="flex-1">
+                <p className="font-semibold text-sm" style={{ color: vehicleRequired === v.id ? '#E8EDF5' : '#718096' }}>{v.label}</p>
+                <p className="text-xs text-muted mt-0.5">{v.sub}</p>
+              </div>
+              <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
+                style={{ borderColor: vehicleRequired === v.id ? '#F5A623' : '#1C2330', background: vehicleRequired === v.id ? '#F5A623' : 'transparent' }}>
+                {vehicleRequired === v.id && <span className="text-bg text-xs">✓</span>}
+              </div>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-muted mt-2 leading-relaxed">Les acheteurs avec un véhicule plus grand ne verront pas votre annonce.</p>
+      </div>
+
+      <div className="flex items-center justify-between bg-surface border border-border rounded-2xl px-4 py-4">
+        <div>
+          <p className="font-semibold text-sm text-white">Engin de chargement disponible</p>
+          <p className="text-xs text-sub mt-1">Fenwick, Gerbeur ou autre</p>
+        </div>
+        <button onClick={() => setHasLoader(h => !h)}
+          className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer border-none ${hasLoader ? 'bg-green' : 'bg-border'}`}>
+          <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${hasLoader ? 'translate-x-6' : 'translate-x-0.5'}`} />
+        </button>
+      </div>
+
+      <button onClick={handleSave} disabled={loading}
+        className="w-full py-4 rounded-2xl font-bold text-bg cursor-pointer disabled:opacity-40"
+        style={{ background: saved ? '#2ECC71' : 'linear-gradient(135deg,#F5A623,#E8940F)' }}>
+        {loading ? 'Sauvegarde…' : saved ? '✅ Sauvegardé !' : 'Sauvegarder'}
+      </button>
     </div>
   )
 }
@@ -286,7 +354,7 @@ export default function CompanyDashboard() {
 
         {/* Tabs */}
         <div className="flex border-b border-border">
-          {[['annonce','Mon annonce'],['acheteurs','Acheteurs'],['blacklist','🚫 Liste noire']].map(([id,label]) => (
+          {[['annonce','Annonce'],['acheteurs','Acheteurs'],['blacklist','🚫'],['site','🏭 Site']].map(([id,label]) => (
             <button key={id} onClick={() => setTab(id)}
               className={`flex-1 py-3 text-xs font-mono cursor-pointer border-none bg-transparent transition-colors ${tab === id ? 'text-amber border-b-2 border-amber' : 'text-muted'}`}>
               {label}
@@ -297,9 +365,10 @@ export default function CompanyDashboard() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto pb-20">
-        {tab === 'annonce'    && <ListingForm listing={listing} />}
+        {tab === 'annonce'   && <ListingForm listing={listing} />}
         {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
-        {tab === 'blacklist'  && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}
+        {tab === 'blacklist' && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}
+        {tab === 'site'      && <SiteSettings company={company} />}
       </div>
     </div>
   )

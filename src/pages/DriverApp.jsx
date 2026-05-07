@@ -20,10 +20,10 @@ export default function DriverApp() {
   const { profile } = useAuthStore()
 
   useEffect(() => {
-    fetchListings()
+    fetchListings(profile?.vehicle_type)
     subscribeRealtime()
     return () => unsubscribeRealtime()
-  }, [])
+  }, [profile?.vehicle_type])
 
   return (
     <div className="flex flex-col h-screen bg-bg overflow-hidden">

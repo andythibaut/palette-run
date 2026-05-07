@@ -1,20 +1,27 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
 
+const VEHICLES = [
+  { id: 'vl',      label: 'VL',      icon: '🚗', sub: 'Véhicule léger — accès partout' },
+  { id: 'porteur', label: 'Porteur', icon: '🚚', sub: 'Porteur — accès sites Porteur et Semi' },
+  { id: 'semi',    label: 'Semi',    icon: '🚛', sub: 'Semi-remorque — grands accès uniquement' },
+]
+
 export default function DriverProfile() {
-  const { updateProfile, signOut, profile } = useAuthStore()
+  const { updateProfile, profile } = useAuthStore()
   const [resalePrice,   setResalePrice]   = useState(profile?.resale_price   || '')
   const [goldThreshold, setGoldThreshold] = useState(profile?.gold_threshold || 20)
+  const [vehicleType,   setVehicleType]   = useState(profile?.vehicle_type   || null)
   const [editResale,    setEditResale]    = useState(false)
   const [editGold,      setEditGold]      = useState(false)
   const [saved,         setSaved]         = useState(null)
   const [loading,       setLoading]       = useState(false)
 
-  // Synchronise les valeurs locales quand le profil change dans le store
   useEffect(() => {
     if (profile?.resale_price !== undefined)   setResalePrice(profile.resale_price || '')
     if (profile?.gold_threshold !== undefined) setGoldThreshold(profile.gold_threshold || 20)
-  }, [profile?.resale_price, profile?.gold_threshold])
+    if (profile?.vehicle_type !== undefined)   setVehicleType(profile.vehicle_type || null)
+  }, [profile?.resale_price, profile?.gold_threshold, profile?.vehicle_type])
 
   const tierColor = { free: '#3B82F6', gold: '#FFD166' }
   const tierLabel = { free: 'Gratuit', gold: 'Gold 🥇' }
@@ -23,11 +30,23 @@ export default function DriverProfile() {
     setLoading(true)
     const updates = field === 'resale'
       ? { resale_price: parseFloat(resalePrice) || null }
-      : { gold_threshold: parseFloat(goldThreshold) || 20 }
+      : field === 'gold'
+      ? { gold_threshold: parseFloat(goldThreshold) || 20 }
+      : { vehicle_type: vehicleType }
     await updateProfile(updates)
     setLoading(false)
     if (field === 'resale') setEditResale(false)
-    else setEditGold(false)
+    else if (field === 'gold') setEditGold(false)
+    setSaved(field)
+    setTimeout(() => setSaved(null), 2000)
+  }
+
+  const handleVehicleSelect = async (v) => {
+    setVehicleType(v)
+    await updateProfile({ vehicle_type: v })
+    setSaved('vehicle')
+    setTimeout(() => setSaved(null), 2000)
+  }
     setSaved(field)
     setTimeout(() => setSaved(null), 2000)
   }
@@ -58,7 +77,31 @@ export default function DriverProfile() {
 
       <div className="px-5 pt-5 flex flex-col gap-6">
 
-        {/* Prix de revente */}
+        {/* Mon véhicule */}
+        <div>
+          <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Mon véhicule</p>
+          <div className="flex flex-col gap-2">
+            {VEHICLES.map(v => (
+              <button key={v.id} onClick={() => handleVehicleSelect(v.id)}
+                className="flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all text-left"
+                style={{
+                  borderColor: vehicleType === v.id ? '#F5A623' : '#1C2330',
+                  background:  vehicleType === v.id ? '#F5A62314' : '#13181F',
+                }}>
+                <span className="text-3xl">{v.icon}</span>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm" style={{ color: vehicleType === v.id ? '#E8EDF5' : '#718096' }}>{v.label}</p>
+                  <p className="text-xs text-muted mt-0.5">{v.sub}</p>
+                </div>
+                <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
+                  style={{ borderColor: vehicleType === v.id ? '#F5A623' : '#1C2330', background: vehicleType === v.id ? '#F5A623' : 'transparent' }}>
+                  {vehicleType === v.id && <span className="text-bg text-xs">✓</span>}
+                </div>
+              </button>
+            ))}
+          </div>
+          {saved === 'vehicle' && <p className="text-xs text-green mt-2">✅ Véhicule sauvegardé</p>}
+        </div>
         <div>
           <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Prix de revente</p>
           <div className="bg-surface border border-green/40 rounded-2xl overflow-hidden">
@@ -164,11 +207,6 @@ export default function DriverProfile() {
           </div>
         </div>
 
-        {/* Déconnexion */}
-        <button onClick={signOut}
-          className="w-full py-3 rounded-2xl border border-border bg-hi text-muted text-sm font-semibold cursor-pointer hover:text-white transition-colors mt-2">
-          Se déconnecter
-        </button>
       </div>
     </div>
   )

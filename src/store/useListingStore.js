@@ -8,8 +8,8 @@ export const useListingStore = create((set, get) => ({
   error:       null,
   realtimeSub: null,
 
-  // Charge les annonces actives avec les infos de la company
-  fetchListings: async (userLocation) => {
+  // Charge les annonces actives filtrées par type de véhicule
+  fetchListings: async (vehicleType) => {
     set({ loading: true, error: null })
 
     const { data, error } = await supabase
@@ -18,15 +18,25 @@ export const useListingStore = create((set, get) => ({
         *,
         companies (
           id, name, city, address,
-          location
+          location, vehicle_required, has_loader
         )
       `)
       .eq('is_active', true)
 
     if (error) { set({ error: error.message, loading: false }); return }
 
+    // Hiérarchie véhicule : vl > porteur > semi
+    // Un VL voit tout, un porteur voit porteur+semi, un semi voit semi uniquement
+    const vehicleRank = { vl: 3, porteur: 2, semi: 1 }
+    const userRank    = vehicleRank[vehicleType] || 3 // défaut VL = voit tout
+
+    const filtered = (data || []).filter(l => {
+      const required = l.companies?.vehicle_required || 'semi'
+      return vehicleRank[required] <= userRank
+    })
+
     // Parse les coordonnées GPS depuis le format EWKB hex de Supabase
-    const listings = (data || []).map(l => {
+    const listings = (filtered || []).map(l => {
       if (l.companies?.location) {
         try {
           const hex = l.companies.location
