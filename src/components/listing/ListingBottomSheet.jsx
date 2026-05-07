@@ -27,6 +27,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   const goldThreshold  = profile?.gold_threshold || 20
   const canBook        = userTier === 'gold'
   const isHidden       = listing.qty > (TIER_LIMIT[userTier] || 2)
+  const isReserved     = listing.reserved_by !== null
   const isReservedByMe = listing.reserved_by === user?.id
   const color          = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
 
