@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
@@ -8,7 +8,7 @@ const ROLES = [
   {
     id:    'driver',
     emoji: '🚛',
-    title: "J'achète des palettes",
+    title: 'J'achète des palettes',
     sub:   'Je recherche des palettes à acheter',
     color: '#3B82F6',
   },
@@ -26,9 +26,16 @@ export default function OnboardingPage() {
   const { createCompany } = useCompanyStore()
   const navigate = useNavigate()
 
-  const [step,        setStep]        = useState(profile ? 'company-info' : 'role')
-  const [selectedRole,setSelectedRole]= useState(profile?.role || null)
-  const [fullName,    setFullName]    = useState(profile?.full_name || '')
+  // Si le profil existe déjà → rediriger immédiatement
+  useEffect(() => {
+    if (profile) {
+      navigate(profile.role === 'driver' ? '/app' : '/company', { replace: true })
+    }
+  }, [profile])
+
+  const [step,        setStep]        = useState('role')
+  const [selectedRole,setSelectedRole]= useState(null)
+  const [fullName,    setFullName]    = useState('')
   const [companyName, setCompanyName] = useState('')
   const [city,        setCity]        = useState('')
   const [address,     setAddress]     = useState('')
@@ -41,17 +48,6 @@ export default function OnboardingPage() {
       return
     }
     setLoading(true)
-
-    // Si le profil existe déjà → rediriger directement
-    if (profile) {
-      setLoading(false)
-      if (profile.role === 'company') {
-        setStep('company-info')
-      } else {
-        navigate('/app', { replace: true })
-      }
-      return
-    }
 
     const ok = await createProfile({ role: selectedRole, fullName: fullName.trim() })
     setLoading(false)
