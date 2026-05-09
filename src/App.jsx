@@ -3,14 +3,25 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 
 // Pages
-import SplashPage      from '@/pages/SplashPage'
-import AuthPage        from '@/pages/AuthPage'
+import SplashPage       from '@/pages/SplashPage'
+import AuthPage         from '@/pages/AuthPage'
 import AuthCallbackPage from '@/pages/AuthCallbackPage'
 import ResetPasswordPage from '@/pages/ResetPasswordPage'
-import OnboardingPage  from '@/pages/OnboardingPage'
-import DriverApp       from '@/pages/DriverApp'
-import CompanyApp      from '@/pages/CompanyApp'
-import LoadingScreen   from '@/components/shared/LoadingScreen'
+import OnboardingPage   from '@/pages/OnboardingPage'
+import DriverApp        from '@/pages/DriverApp'
+import CompanyApp       from '@/pages/CompanyApp'
+import PublicMapPage    from '@/pages/PublicMapPage'
+import LoadingScreen    from '@/components/shared/LoadingScreen'
+
+// Redirige les utilisateurs connectés vers leur app
+const PublicRoute = ({ children }) => {
+  const { user, profile, loading } = useAuthStore()
+  if (loading) return <LoadingScreen />
+  if (user && profile) {
+    return <Navigate to={profile.role === 'driver' ? '/app' : '/company'} replace />
+  }
+  return children
+}
 
 // Guard : redirige si non connecté
 const PrivateRoute = ({ children }) => {
@@ -40,8 +51,9 @@ export default function App() {
 
   return (
     <Routes>
-      {/* Public */}
-      <Route path="/"              element={<SplashPage />} />
+      {/* Public — carte démo sans auth */}
+      <Route path="/"              element={<PublicRoute><PublicMapPage /></PublicRoute>} />
+      <Route path="/splash"        element={<SplashPage />} />
       <Route path="/auth"          element={<AuthPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/auth/reset"    element={<ResetPasswordPage />} />
