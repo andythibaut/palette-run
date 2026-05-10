@@ -219,7 +219,8 @@ export default function PublicMapPage() {
 
       {/* Bandeau inscription */}
       {!selected && (
-        <div className="absolute bottom-0 left-0 right-0 z-20 bg-bg/95 backdrop-blur-md border-t border-border px-5 py-4 flex items-center gap-4">
+        <div className="absolute bottom-0 left-0 right-0 z-20 bg-bg/95 backdrop-blur-md border-t border-border px-5 pt-4 flex items-center gap-4"
+          style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
           <div className="flex-1">
             <p className="text-white text-sm font-semibold">Rejoignez Palette Run</p>
             <p className="text-muted text-xs mt-0.5">Gratuit — réservez en priorité</p>
