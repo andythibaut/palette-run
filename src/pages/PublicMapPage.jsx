@@ -99,9 +99,9 @@ const DemoBottomSheet = ({ listing, onClose, onSignup }) => (
 
         {/* CTA inscription */}
         <div className="bg-amber/10 border border-amber/30 rounded-2xl px-4 py-4 mb-3">
-          <p className="text-amber text-sm font-semibold mb-1">📲 Installez l'app pour réserver</p>
+          <p className="text-amber text-sm font-semibold mb-1">🔒 Créez un compte pour réserver</p>
           <p className="text-sub text-xs leading-relaxed">
-            Créez un compte gratuit et réservez ces palettes en priorité avant les autres acheteurs.
+            Gratuit et sans engagement. Réservez en priorité avant les autres acheteurs.
           </p>
         </div>
 
