@@ -99,9 +99,9 @@ const DemoBottomSheet = ({ listing, onClose, onSignup }) => (
 
         {/* CTA inscription */}
         <div className="bg-amber/10 border border-amber/30 rounded-2xl px-4 py-4 mb-3">
-          <p className="text-amber text-sm font-semibold mb-1">🔒 Créez un compte pour réserver</p>
+          <p className="text-amber text-sm font-semibold mb-1">📲 Installez l'app pour réserver</p>
           <p className="text-sub text-xs leading-relaxed">
-            Gratuit et sans engagement. Voyez le bénéfice potentiel, réservez en priorité.
+            Créez un compte gratuit et réservez ces palettes en priorité avant les autres acheteurs.
           </p>
         </div>
 
@@ -267,8 +267,8 @@ export default function PublicMapPage() {
                 📲
               </div>
               <div className="flex-1">
-                <p className="text-white text-sm font-semibold">Installer l'app</p>
-                <p className="text-muted text-xs mt-0.5">Accès rapide depuis votre écran d'accueil</p>
+                <p className="text-white text-sm font-semibold">Installez pour réserver</p>
+                <p className="text-muted text-xs mt-0.5">Installez l'app et créez un compte pour réserver des palettes</p>
               </div>
               <div className="flex gap-2">
                 <button onClick={() => setShowInstall(false)}
