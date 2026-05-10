@@ -57,6 +57,9 @@ const EmailForm = ({ mode, onBack }) => {
   const [loading,  setLoading]  = useState(false)
   const [formErr,  setFormErr]  = useState({})
 
+  const [emailSent, setEmailSent] = useState(false)
+  const [resending, setResending] = useState(false)
+
   const validate = () => {
     const e = {}
     if (!email.includes('@'))                        e.email    = 'Email invalide'
@@ -70,12 +73,48 @@ const EmailForm = ({ mode, onBack }) => {
     if (!validate()) return
     setLoading(true)
     clearError()
-    const ok = mode === 'login'
-      ? await signInWithEmail(email, password)
-      : await signUpWithEmail(email, password)
-    setLoading(false)
-    if (ok) navigate('/onboarding')
+    if (mode === 'login') {
+      const ok = await signInWithEmail(email, password)
+      setLoading(false)
+      if (ok) navigate('/onboarding')
+    } else {
+      const ok = await signUpWithEmail(email, password)
+      setLoading(false)
+      if (ok) setEmailSent(true)
+    }
   }
+
+  const handleResend = async () => {
+    setResending(true)
+    await signUpWithEmail(email, password)
+    setResending(false)
+  }
+
+  // Écran de confirmation email
+  if (emailSent) return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-bg px-6 text-center gap-6">
+      <div className="text-7xl">📬</div>
+      <div>
+        <h1 className="font-bebas text-4xl text-white leading-tight">Vérifiez</h1>
+        <h1 className="font-bebas text-4xl text-amber leading-tight">votre boîte mail</h1>
+      </div>
+      <p className="text-sub text-sm leading-relaxed">
+        Un lien de confirmation a été envoyé à <strong className="text-white">{email}</strong>.
+        Cliquez sur le lien pour activer votre compte.
+      </p>
+      <div className="bg-amber/10 border border-amber/30 rounded-2xl px-5 py-4 w-full text-left">
+        <p className="text-amber text-sm font-semibold mb-1">💡 Astuce</p>
+        <p className="text-sub text-xs leading-relaxed">Vérifiez vos spams si vous ne voyez pas l'email dans votre boîte principale.</p>
+      </div>
+      <button onClick={handleResend} disabled={resending}
+        className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer disabled:opacity-40">
+        {resending ? 'Envoi…' : '🔄 Renvoyer l\'email'}
+      </button>
+      <button onClick={onBack} className="text-muted text-sm cursor-pointer bg-transparent border-none">
+        ← Retour à la connexion
+      </button>
+    </div>
+  )
 
   return (
     <div className="flex flex-col gap-5 p-7 min-h-screen bg-bg">
@@ -236,12 +275,11 @@ const PhoneForm = ({ onBack }) => {
 
 // ─── Page principale ──────────────────────────────────────────────────────────
 export default function AuthPage() {
-  const { signInWithGoogle, signInWithApple, signInWithFacebook, error } = useAuthStore()
-  const [mode,   setMode]   = useState('login')   // login | signup
-  const [screen, setScreen] = useState('main')    // main | email | phone
+  const { signInWithGoogle, error } = useAuthStore()
+  const [mode,   setMode]   = useState('login')
+  const [screen, setScreen] = useState('main')
 
   if (screen === 'email') return <EmailForm mode={mode} onBack={() => setScreen('main')} />
-  if (screen === 'phone') return <PhoneForm onBack={() => setScreen('main')} />
 
   return (
     <div className="flex flex-col min-h-screen bg-bg px-6 pb-10">
@@ -263,24 +301,15 @@ export default function AuthPage() {
         ))}
       </div>
 
-      {/* SSO */}
+      {/* Google */}
       <div className="flex flex-col gap-3 mb-4">
-        <SSOBtn icon={<GoogleIcon />}   label="Continuer avec Google"   onClick={signInWithGoogle}   className="bg-white text-gray-900" />
-        <SSOBtn icon={<AppleIcon />}    label="Continuer avec Apple"    onClick={signInWithApple}    className="bg-black text-white border border-gray-700" />
-        <SSOBtn icon={<FacebookIcon />} label="Continuer avec Facebook" onClick={signInWithFacebook} className="bg-[#1877F2] text-white" />
+        <SSOBtn icon={<GoogleIcon />} label="Continuer avec Google" onClick={signInWithGoogle} className="bg-white text-gray-900" />
       </div>
 
       <Divider />
 
-      {/* Email + Phone */}
+      {/* Email */}
       <div className="flex flex-col gap-3 mb-6">
-        <button onClick={() => setScreen('phone')}
-          className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-hi border border-border text-white font-semibold text-sm cursor-pointer hover:opacity-90"
-        >
-          <span className="text-xl w-6 text-center">📱</span>
-          <span className="flex-1 text-left">Numéro de téléphone</span>
-          <span className="text-lg text-muted">→</span>
-        </button>
         <button onClick={() => setScreen('email')}
           className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-hi border border-border text-white font-semibold text-sm cursor-pointer hover:opacity-90"
         >
