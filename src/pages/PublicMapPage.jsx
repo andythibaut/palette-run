@@ -250,7 +250,7 @@ export default function PublicMapPage() {
 
       {/* Bandeau installation PWA */}
       {showInstall && !selected && (
-        <div className="absolute bottom-20 left-3 right-3 z-20 bg-surface border border-amber/40 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
+        <div className="fixed bottom-24 left-3 right-3 z-20 bg-surface border border-amber/40 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
           {installing ? (
             <>
               <div className="w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center shrink-0 animate-pulse">
@@ -288,7 +288,7 @@ export default function PublicMapPage() {
 
       {/* Bandeau inscription */}
       {!selected && (
-        <div className="absolute bottom-0 left-0 right-0 z-20 bg-bg/95 backdrop-blur-md border-t border-border px-5 pt-4 flex items-center gap-4"
+        <div className="fixed bottom-0 left-0 right-0 z-20 bg-bg/95 backdrop-blur-md border-t border-border px-5 pt-4 flex items-center gap-4"
           style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
           <div className="flex-1">
             <p className="text-white text-sm font-semibold">Rejoignez Palette Run</p>
