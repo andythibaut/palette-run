@@ -120,10 +120,30 @@ const DemoBottomSheet = ({ listing, onClose, onSignup }) => (
 export default function PublicMapPage() {
   const navigate  = useNavigate()
   const mapRef    = useRef(null)
-  const [viewport,  setViewport]  = useState(DEFAULT_CENTER)
-  const [listings,  setListings]  = useState([])
-  const [selected,  setSelected]  = useState(null)
-  const [totalQty,  setTotalQty]  = useState(0)
+  const [viewport,     setViewport]     = useState(DEFAULT_CENTER)
+  const [listings,     setListings]     = useState([])
+  const [selected,     setSelected]     = useState(null)
+  const [totalQty,     setTotalQty]     = useState(0)
+  const [installPrompt,setInstallPrompt]= useState(null)
+  const [showInstall,  setShowInstall]  = useState(false)
+
+  // Capture l'événement d'installation PWA
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault()
+      setInstallPrompt(e)
+      setShowInstall(true)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  const handleInstall = async () => {
+    if (!installPrompt) return
+    installPrompt.prompt()
+    const { outcome } = await installPrompt.userChoice
+    if (outcome === 'accepted') setShowInstall(false)
+  }
 
   // Charge les annonces sans auth
   useEffect(() => {
@@ -213,6 +233,30 @@ export default function PublicMapPage() {
           <div>
             <p className="text-xs text-white font-semibold leading-none">palettes dispo</p>
             <p className="text-[10px] text-muted">cliquez pour voir</p>
+          </div>
+        </div>
+      )}
+
+      {/* Bandeau installation PWA */}
+      {showInstall && !selected && (
+        <div className="absolute bottom-20 left-3 right-3 z-20 bg-surface border border-amber/40 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl">
+          <div className="w-10 h-10 rounded-xl bg-amber/10 flex items-center justify-center shrink-0">
+            📲
+          </div>
+          <div className="flex-1">
+            <p className="text-white text-sm font-semibold">Installer l'app</p>
+            <p className="text-muted text-xs mt-0.5">Accès rapide depuis votre écran d'accueil</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => setShowInstall(false)}
+              className="px-3 py-2 rounded-xl text-muted text-xs cursor-pointer bg-transparent border-none">
+              Plus tard
+            </button>
+            <button onClick={handleInstall}
+              className="px-3 py-2 rounded-xl font-bold text-bg text-xs cursor-pointer"
+              style={{ background: 'linear-gradient(135deg,#F5A623,#E8940F)' }}>
+              Installer
+            </button>
           </div>
         </div>
       )}
