@@ -293,6 +293,7 @@ export default function PublicMapPage() {
           <div className="flex-1">
             <p className="text-white text-sm font-semibold">Rejoignez Palette Run</p>
             <p className="text-muted text-xs mt-0.5">Gratuit — réservez en priorité</p>
+            <a href="/privacy" className="text-muted text-[10px] underline mt-0.5 block">Politique de confidentialité</a>
           </div>
           <button onClick={handleSignup}
             className="px-5 py-3 rounded-2xl font-bold text-bg text-sm cursor-pointer shrink-0"
