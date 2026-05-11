@@ -254,16 +254,17 @@ export default function PublicMapPage() {
 
       {/* Bandeau lancement */}
       {!selected && (
-        <div className="fixed top-0 left-0 right-0 z-30 bg-amber flex items-center justify-between px-4 py-2 gap-3">
+        <div className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 gap-3"
+          style={{ background: 'linear-gradient(135deg, #1a0a2e, #2d1b5e)', borderBottom: '2px solid #7C3AED' }}>
           <div className="flex-1">
-            <p className="text-bg text-xs font-bold leading-tight">🚀 Lancement officiel le 1er septembre 2026</p>
-            <p className="text-bg/70 text-[10px]">Inscrivez-vous maintenant — soyez parmi les premiers</p>
+            <p className="text-white font-bold text-sm leading-tight">🚀 Soyez parmi les premiers vendeurs visibles !</p>
+            <p className="text-purple-300 text-xs mt-0.5">Lancement le 1er septembre 2026 · Inscription gratuite</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {[{ v: countdown.d, l: 'j' }, { v: countdown.h, l: 'h' }, { v: countdown.m, l: 'm' }].map(({ v, l }) => (
               <div key={l} className="flex items-center gap-0.5">
-                <span className="bg-bg text-amber font-bebas text-lg w-8 h-7 flex items-center justify-center rounded">{v}</span>
-                <span className="text-bg/70 text-[10px]">{l}</span>
+                <span className="font-bebas text-lg w-8 h-7 flex items-center justify-center rounded" style={{ background: '#7C3AED', color: '#FFFFFF' }}>{v}</span>
+                <span className="text-xs" style={{ color: '#A78BFA' }}>{l}</span>
               </div>
             ))}
           </div>
