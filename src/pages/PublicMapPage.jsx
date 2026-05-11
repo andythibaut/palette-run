@@ -126,8 +126,23 @@ export default function PublicMapPage() {
   const [totalQty,     setTotalQty]     = useState(0)
   const [installPrompt,setInstallPrompt]= useState(null)
   const [showInstall,  setShowInstall]  = useState(false)
+  const [countdown,    setCountdown]    = useState({ d:'--', h:'--', m:'--' })
 
-  // Capture l'événement d'installation PWA
+  // Compte à rebours lancement 1er septembre 2026
+  useEffect(() => {
+    const launch = new Date('2026-09-01T09:00:00')
+    const tick = () => {
+      const diff = Math.max(0, launch - Date.now())
+      const d = Math.floor(diff / 86400000)
+      const h = Math.floor((diff % 86400000) / 3600000)
+      const m = Math.floor((diff % 3600000) / 60000)
+      const pad = n => String(n).padStart(2, '0')
+      setCountdown({ d: pad(d), h: pad(h), m: pad(m) })
+    }
+    tick()
+    const i = setInterval(tick, 60000)
+    return () => clearInterval(i)
+  }, [])
   useEffect(() => {
     const handler = (e) => {
       e.preventDefault()
@@ -237,7 +252,25 @@ export default function PublicMapPage() {
         </div>
       </div>
 
-      {/* Compteur */}
+      {/* Bandeau lancement */}
+      {!selected && (
+        <div className="fixed top-0 left-0 right-0 z-30 bg-amber flex items-center justify-between px-4 py-2 gap-3">
+          <div className="flex-1">
+            <p className="text-bg text-xs font-bold leading-tight">🚀 Lancement officiel le 1er septembre 2026</p>
+            <p className="text-bg/70 text-[10px]">Inscrivez-vous maintenant — soyez parmi les premiers</p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {[{ v: countdown.d, l: 'j' }, { v: countdown.h, l: 'h' }, { v: countdown.m, l: 'm' }].map(({ v, l }) => (
+              <div key={l} className="flex items-center gap-0.5">
+                <span className="bg-bg text-amber font-bebas text-lg w-8 h-7 flex items-center justify-center rounded">{v}</span>
+                <span className="text-bg/70 text-[10px]">{l}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Compteur palettes */}
       {!selected && (
         <div className="absolute bottom-20 left-3 z-20 bg-bg/80 backdrop-blur-md border border-border/50 rounded-xl px-3 py-2 flex items-center gap-2">
           <span className="font-bebas text-2xl text-amber leading-none">{totalQty}</span>
