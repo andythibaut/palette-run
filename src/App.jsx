@@ -11,6 +11,7 @@ import OnboardingPage   from '@/pages/OnboardingPage'
 import DriverApp        from '@/pages/DriverApp'
 import CompanyApp       from '@/pages/CompanyApp'
 import PublicMapPage    from '@/pages/PublicMapPage'
+import PrivacyPage      from '@/pages/PrivacyPage'
 import LoadingScreen    from '@/components/shared/LoadingScreen'
 
 // Redirige les utilisateurs connectés vers leur app
@@ -57,6 +58,7 @@ export default function App() {
       <Route path="/auth"          element={<AuthPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/auth/reset"    element={<ResetPasswordPage />} />
+      <Route path="/privacy"       element={<PrivacyPage />} />
 
       {/* Onboarding — connecté mais sans profil */}
       <Route path="/onboarding" element={
