@@ -234,7 +234,7 @@ export default function PublicMapPage() {
       </Map>
 
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 p-4 flex items-center justify-between">
+      <div className="absolute top-14 left-0 right-0 z-20 p-4 flex items-center justify-between">
         <div className="flex items-center gap-2 bg-bg/90 backdrop-blur-md border border-border rounded-2xl px-4 py-2.5">
           <PalletLogo size={20} color="#F5A623" />
           <span className="font-bebas text-lg tracking-widest text-amber">PALETTE RUN</span>
