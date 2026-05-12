@@ -168,7 +168,7 @@ const BidButtons = ({ listing, profile, onBidPlaced }) => {
       )}
     </div>
   )
-}
+
 
 // ─── Composant principal ───────────────────────────────────────────────────────
 export default function PickupList({ profile }) {
