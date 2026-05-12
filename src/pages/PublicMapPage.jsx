@@ -233,43 +233,48 @@ export default function PublicMapPage() {
         ))}
       </Map>
 
-      {/* Header */}
-      <div className="absolute top-14 left-0 right-0 z-20 p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2 bg-bg/90 backdrop-blur-md border border-border rounded-2xl px-4 py-2.5">
-          <PalletLogo size={20} color="#F5A623" />
-          <span className="font-bebas text-lg tracking-widest text-amber">PALETTE RUN</span>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={handleGeolocate}
-            className="w-10 h-10 rounded-xl bg-bg/90 backdrop-blur-md border border-border flex items-center justify-center text-lg">
-            🎯
-          </button>
-          <button onClick={handleSignup}
-            className="px-4 py-2 rounded-xl font-bold text-bg text-sm cursor-pointer"
-            style={{ background: 'linear-gradient(135deg,#F5A623,#E8940F)' }}>
-            Connexion
-          </button>
-        </div>
-      </div>
+      {/* Zone top : bandeau + header empilés */}
+      <div className="fixed top-0 left-0 right-0 z-30 flex flex-col">
 
-      {/* Bandeau lancement */}
-      {!selected && (
-        <div className="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 gap-3"
-          style={{ background: 'linear-gradient(135deg, #1a0a2e, #2d1b5e)', borderBottom: '2px solid #7C3AED' }}>
-          <div className="flex-1">
-            <p className="text-white font-bold text-sm leading-tight">🚀 Soyez parmi les premiers vendeurs visibles !</p>
-            <p className="text-xs mt-0.5" style={{ color: '#A78BFA' }}>Lancement le 1er septembre 2026 · 100% gratuit pour les commerçants</p>
+        {/* Bandeau lancement */}
+        {!selected && (
+          <div className="flex items-center justify-between px-4 py-3 gap-3"
+            style={{ background: 'linear-gradient(135deg, #1a0a2e, #2d1b5e)', borderBottom: '2px solid #7C3AED' }}>
+            <div className="flex-1">
+              <p className="text-white font-bold text-sm leading-tight">🚀 Soyez parmi les premiers vendeurs visibles !</p>
+              <p className="text-xs mt-0.5" style={{ color: '#A78BFA' }}>Lancement le 1er septembre 2026 · 100% gratuit pour les commerçants</p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {[{ v: countdown.d, l: 'j' }, { v: countdown.h, l: 'h' }, { v: countdown.m, l: 'm' }].map(({ v, l }) => (
+                <div key={l} className="flex items-center gap-0.5">
+                  <span className="font-bebas text-lg w-8 h-7 flex items-center justify-center rounded" style={{ background: '#7C3AED', color: '#FFFFFF' }}>{v}</span>
+                  <span className="text-xs" style={{ color: '#A78BFA' }}>{l}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            {[{ v: countdown.d, l: 'j' }, { v: countdown.h, l: 'h' }, { v: countdown.m, l: 'm' }].map(({ v, l }) => (
-              <div key={l} className="flex items-center gap-0.5">
-                <span className="font-bebas text-lg w-8 h-7 flex items-center justify-center rounded" style={{ background: '#7C3AED', color: '#FFFFFF' }}>{v}</span>
-                <span className="text-xs" style={{ color: '#A78BFA' }}>{l}</span>
-              </div>
-            ))}
+        )}
+
+        {/* Header logo + connexion */}
+        <div className="flex items-center justify-between px-4 py-3 bg-bg/90 backdrop-blur-md border-b border-border/30">
+          <div className="flex items-center gap-2">
+            <PalletLogo size={20} color="#F5A623" />
+            <span className="font-bebas text-lg tracking-widest text-amber">PALETTE RUN</span>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={handleGeolocate}
+              className="w-9 h-9 rounded-xl bg-surface border border-border flex items-center justify-center text-base">
+              🎯
+            </button>
+            <button onClick={handleSignup}
+              className="px-4 py-2 rounded-xl font-bold text-bg text-sm cursor-pointer"
+              style={{ background: 'linear-gradient(135deg,#F5A623,#E8940F)' }}>
+              Connexion
+            </button>
           </div>
         </div>
-      )}
+
+      </div>
 
       {/* Compteur palettes */}
       {!selected && (
