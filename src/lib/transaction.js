@@ -69,7 +69,7 @@ export const validateTransaction = async ({
   photoUrl = null,
 }) => {
   try {
-    // 1. Récupère position GPS du chauffeur
+    // 1. Récupère position GPS du acheteur
     let driverLat = null
     let driverLng = null
     try {
@@ -125,7 +125,7 @@ export const validateTransactionCompany = async ({
   listingId,
   driverId,
   companyId,
-  driverName,  // nom saisi par le commerçant pour identifier le chauffeur
+  driverName,  // nom saisi par le commerçant pour identifier le acheteur
 }) => {
   const companyDeviceId = getDeviceId()
   const companyDeviceFp = getDeviceFingerprint()
@@ -134,7 +134,7 @@ export const validateTransactionCompany = async ({
     p_listing_id:        listingId,
     p_driver_id:         driverId,
     p_company_id:        companyId,
-    p_driver_lat:        null,    // GPS déjà vérifié à l'étape chauffeur
+    p_driver_lat:        null,    // GPS déjà vérifié à l'étape acheteur
     p_driver_lng:        null,
     p_driver_device_id:  null,    // déjà stocké
     p_driver_device_fp:  null,
@@ -152,4 +152,36 @@ export const validateTransactionCompany = async ({
   }
 
   return { success: true, transactionId: data.transaction_id }
+}
+
+// ─── Calcul du délai d'enlèvement selon la quantité ───────────────────────────
+export const getPickupDeadline = (qty) => {
+  // 1 jour supplémentaire par tranche de 15 palettes, max J+4
+  const extraDays = Math.min(Math.floor(qty / 15), 4)
+  
+  let date = new Date()
+  date.setHours(0, 0, 0, 0)
+  
+  let daysAdded = 0
+  while (daysAdded < extraDays) {
+    date.setDate(date.getDate() + 1)
+    // Saute les week-ends
+    const day = date.getDay()
+    if (day !== 0 && day !== 6) daysAdded++
+  }
+  
+  return date
+}
+
+export const formatPickupDeadline = (qty) => {
+  const deadline = getPickupDeadline(qty)
+  const today    = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  const diff = Math.round((deadline - today) / 86400000)
+  
+  if (diff === 0) return "Aujourd'hui"
+  if (diff === 1) return 'Demain'
+  
+  return deadline.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
 }

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { formatPickupDeadline } from '@/lib/transaction'
 
 const statusStyles = {
   pending:   { color: '#F97316', bg: '#F9731618', label: 'En attente vendeur' },
@@ -251,6 +252,21 @@ export default function PickupList({ profile }) {
                   <div className="flex items-center gap-2 mb-3 rounded-xl px-3 py-2 bg-blue/10 border border-blue/30">
                     <span>🕐</span>
                     <p className="text-blue text-sm">Récupérer avant <strong>{listing.pickup_before.slice(0,5)}</strong></p>
+                  </div>
+                )}
+
+                {/* Délai d'enlèvement */}
+                {listing?.qty && (
+                  <div className="flex items-center gap-2 mb-3 rounded-xl px-3 py-2 bg-surface border border-border">
+                    <span>📅</span>
+                    <div>
+                      <p className="text-white text-sm font-semibold">
+                        Au plus tard : <span className="text-amber">{formatPickupDeadline(listing.qty)}</span>
+                      </p>
+                      <p className="text-muted text-xs mt-0.5">
+                        {listing.qty < 15 ? 'Aujourd\'hui' : `${Math.min(Math.floor(listing.qty / 15), 4)} jour(s) ouvrés accordés`}
+                      </p>
+                    </div>
                   </div>
                 )}
 

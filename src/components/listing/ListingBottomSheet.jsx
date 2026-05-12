@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useListingStore } from '@/store/useListingStore'
 import { useAuthStore }    from '@/store/useAuthStore'
 import { profitColor }     from '@/lib/mapbox'
+import { formatPickupDeadline } from '@/lib/transaction'
 
 const TIER_LIMIT = { free: 2, gold: Infinity }
 
@@ -129,6 +130,23 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
               <p className="text-blue text-sm">
                 Récupérer avant <strong>{listing.pickup_before.slice(0, 5)}</strong>
               </p>
+            </div>
+          )}
+
+          {/* Délai d'enlèvement selon quantité */}
+          {!isReserved && !isHidden && (
+            <div className="flex items-center gap-2 mb-4 bg-surface border border-border rounded-xl px-3 py-2">
+              <span>📅</span>
+              <div>
+                <p className="text-white text-sm font-semibold">
+                  Enlèvement au plus tard : <strong className="text-amber">{formatPickupDeadline(listing.qty)}</strong>
+                </p>
+                <p className="text-muted text-xs mt-0.5">
+                  {listing.qty < 15
+                    ? 'Moins de 15 palettes — enlèvement aujourd\'hui'
+                    : `${listing.qty} palettes — ${Math.min(Math.floor(listing.qty / 15), 4)} jour(s) ouvrés accordés`}
+                </p>
+              </div>
             </div>
           )}
 
