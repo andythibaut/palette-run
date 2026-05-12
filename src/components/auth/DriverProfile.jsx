@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
+import { supabase }     from '@/lib/supabase'
 
 const VEHICLES = [
   { id: 'vl',      label: 'VL',      icon: '🚗', sub: 'Véhicule léger — accès partout' },
@@ -205,6 +206,29 @@ export default function DriverProfile() {
         </div>
 
       </div>
+
+      {/* Supprimer le compte */}
+      <div className="px-5 pb-10 mt-6">
+        <div className="border-t border-border pt-6">
+          <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Zone dangereuse</p>
+          <button onClick={async () => {
+            if (!window.confirm('Supprimer définitivement votre compte ? Cette action est irréversible.')) return
+            if (!window.confirm('Êtes-vous vraiment sûr ? Toutes vos données seront perdues.')) return
+            const { user } = useAuthStore.getState()
+            // Supprime le profil en cascade (transactions, etc.)
+            await supabase.from('profiles').delete().eq('id', user.id)
+            // Déconnecte
+            await useAuthStore.getState().signOut()
+          }}
+            className="w-full py-3 rounded-2xl border border-red/30 bg-red/5 text-red text-sm font-semibold cursor-pointer">
+            🗑 Supprimer mon compte
+          </button>
+          <p className="text-muted text-xs text-center mt-2 leading-relaxed">
+            Cette action est irréversible. Toutes vos données seront supprimées.
+          </p>
+        </div>
+      </div>
+
     </div>
   )
 }

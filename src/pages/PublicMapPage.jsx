@@ -258,7 +258,7 @@ export default function PublicMapPage() {
           style={{ background: 'linear-gradient(135deg, #1a0a2e, #2d1b5e)', borderBottom: '2px solid #7C3AED' }}>
           <div className="flex-1">
             <p className="text-white font-bold text-sm leading-tight">🚀 Soyez parmi les premiers vendeurs visibles !</p>
-            <p className="text-purple-300 text-xs mt-0.5">Lancement le 1er septembre 2026 · Inscription gratuite</p>
+            <p className="text-xs mt-0.5" style={{ color: '#A78BFA' }}>Lancement le 1er septembre 2026 · 100% gratuit pour les commerçants</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             {[{ v: countdown.d, l: 'j' }, { v: countdown.h, l: 'h' }, { v: countdown.m, l: 'm' }].map(({ v, l }) => (

@@ -8,7 +8,7 @@ const ROLES = [
   {
     id:    'driver',
     emoji: '🚛',
-    title: "J'achète des palettes",
+    title: 'J'achète des palettes',
     sub:   'Je recherche des palettes à acheter',
     color: '#3B82F6',
   },
@@ -135,6 +135,16 @@ export default function OnboardingPage() {
       </div>
 
       {error && <p className="text-xs text-red mb-4">{error}</p>}
+
+      {/* Avertissement choix définitif */}
+      {selectedRole && (
+        <div className="bg-red/10 border border-red/30 rounded-2xl px-4 py-3 mb-4 flex items-start gap-3">
+          <span className="text-lg shrink-0">⚠️</span>
+          <p className="text-xs text-red leading-relaxed">
+            <strong>Ce choix est définitif.</strong> Si vous vous trompez, vous devrez supprimer votre compte et vous réinscrire.
+          </p>
+        </div>
+      )}
 
       <button onClick={handleRoleSelect} disabled={loading || !selectedRole || !fullName.trim()}
         className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40 mt-auto"

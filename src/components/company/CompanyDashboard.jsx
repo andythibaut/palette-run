@@ -368,7 +368,30 @@ export default function CompanyDashboard() {
         {tab === 'annonce'   && <ListingForm listing={listing} />}
         {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
         {tab === 'blacklist' && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}
-        {tab === 'site'      && <SiteSettings company={company} />}
+        {tab === 'site'      && (
+          <>
+            <SiteSettings company={company} />
+            {/* Supprimer le compte */}
+            <div className="px-5 pb-10 mt-2">
+              <div className="border-t border-border pt-6">
+                <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Zone dangereuse</p>
+                <button onClick={async () => {
+                  if (!window.confirm('Supprimer définitivement votre compte ? Cette action est irréversible.')) return
+                  if (!window.confirm('Êtes-vous vraiment sûr ? Toutes vos données seront perdues.')) return
+                  const state = useAuthStore.getState()
+                  await supabase.from('profiles').delete().eq('id', state.user.id)
+                  await state.signOut()
+                }}
+                  className="w-full py-3 rounded-2xl border border-red/30 bg-red/5 text-red text-sm font-semibold cursor-pointer">
+                  🗑 Supprimer mon compte
+                </button>
+                <p className="text-muted text-xs text-center mt-2 leading-relaxed">
+                  Cette action est irréversible. Toutes vos données seront supprimées.
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
