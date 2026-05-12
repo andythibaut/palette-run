@@ -63,8 +63,13 @@ const ListingForm = ({ listing, onSave }) => {
           <p className="text-xs text-sub mt-0.5">{isActive ? 'Visible sur la carte' : 'Masquée'}</p>
         </div>
         <button onClick={() => setIsActive(a => !a)}
-          className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer border-none ${isActive ? 'bg-green' : 'bg-border'}`}>
-          <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${isActive ? 'translate-x-6' : 'translate-x-0.5'}`} />
+          className="relative cursor-pointer border-none bg-transparent p-0"
+          style={{ width: 52, height: 28 }}>
+          <div className="w-full h-full rounded-full transition-colors duration-200"
+            style={{ background: isActive ? '#2ECC71' : '#1C2330', border: `2px solid ${isActive ? '#2ECC71' : '#2D3748'}` }}>
+            <div className="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-200"
+              style={{ transform: isActive ? 'translateX(26px)' : 'translateX(2px)' }} />
+          </div>
         </button>
       </div>
 
@@ -358,7 +363,7 @@ export default function CompanyDashboard() {
       <div className="px-5 pt-5 pb-0 shrink-0">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <p className="font-mono text-xs text-muted uppercase tracking-widest">Mes annonces</p>
+            <p className="font-mono text-xs text-muted uppercase tracking-widest">Mon espace vendeur</p>
             <h1 className="font-bebas text-2xl text-white leading-tight">{company?.name || 'Mon vendeur'}</h1>
           </div>
           <div className="w-10 h-10 rounded-xl bg-hi border border-border flex items-center justify-center text-xl">🏭</div>
@@ -376,16 +381,6 @@ export default function CompanyDashboard() {
             </p>
             <p className="text-xs text-sub">Blacklistés</p>
           </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex border-b border-border">
-          {[['annonce','📦 Annonce'],['acheteurs','🚛 Acheteurs'],['blacklist','🚫'],['profil','👤 Profil']].map(([id,label]) => (
-            <button key={id} onClick={() => setTab(id)}
-              className={`flex-1 py-3 text-xs font-mono cursor-pointer border-none bg-transparent transition-colors ${tab === id ? 'text-amber border-b-2 border-amber' : 'text-muted'}`}>
-              {label}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -419,6 +414,30 @@ export default function CompanyDashboard() {
           </>
         )}
       </div>
+
+      {/* Bottom nav */}
+      <div className="shrink-0 border-t border-border bg-bg"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex">
+          {[
+            { id: 'annonce',   icon: '📦', label: 'Annonce'   },
+            { id: 'acheteurs', icon: '🚛', label: 'Acheteurs' },
+            { id: 'blacklist', icon: '🚫', label: 'Blacklist' },
+            { id: 'profil',    icon: '👤', label: 'Profil'    },
+          ].map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className="flex-1 flex flex-col items-center justify-center py-3 gap-1 cursor-pointer border-none bg-transparent transition-colors"
+              style={{ color: tab === t.id ? '#F5A623' : '#4A5568' }}>
+              <span className="text-xl leading-none">{t.icon}</span>
+              <span className="text-[10px] font-mono">{t.label}</span>
+              {tab === t.id && (
+                <div className="absolute bottom-0 w-8 h-0.5 bg-amber rounded-full" />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
     </div>
   )
 }
