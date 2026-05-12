@@ -25,6 +25,7 @@ const ListingForm = ({ listing, onSave }) => {
 
   const handleSave = async () => {
     if (!price || qty < 1) { setError('Renseignez le prix et la quantité'); return }
+    if (!listing && !company?.id) { setError('Profil vendeur non chargé — réessayez'); return }
     setError('')
     setLoading(true)
     try {
@@ -386,6 +387,8 @@ export default function CompanyDashboard() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto pb-20">
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto pb-4">
         {tab === 'annonce'   && <ListingForm listing={listing} onSave={() => window.location.reload()} />}
         {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
         {tab === 'blacklist' && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}
