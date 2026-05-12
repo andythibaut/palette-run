@@ -380,7 +380,7 @@ export default function CompanyDashboard() {
 
         {/* Tabs */}
         <div className="flex border-b border-border">
-          {[['annonce','Annonce'],['acheteurs','Acheteurs'],['blacklist','🚫'],['profil','👤 Profil']].map(([id,label]) => (
+          {[['annonce','📦 Annonce'],['acheteurs','🚛 Acheteurs'],['blacklist','🚫'],['profil','👤 Profil']].map(([id,label]) => (
             <button key={id} onClick={() => setTab(id)}
               className={`flex-1 py-3 text-xs font-mono cursor-pointer border-none bg-transparent transition-colors ${tab === id ? 'text-amber border-b-2 border-amber' : 'text-muted'}`}>
               {label}
