@@ -385,8 +385,6 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-20">
-      {/* Content */}
       <div className="flex-1 overflow-y-auto pb-4">
         {tab === 'annonce'   && <ListingForm listing={listing} onSave={() => window.location.reload()} />}
         {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
