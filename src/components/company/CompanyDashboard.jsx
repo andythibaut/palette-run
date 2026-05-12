@@ -359,33 +359,29 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
 
   return (
     <div className="flex flex-col h-full bg-bg overflow-hidden">
-      {/* Header */}
-      <div className="px-5 pt-5 pb-0 shrink-0">
-        <div className="flex items-center justify-between mb-4">
+      {/* Header compact */}
+      <div className="px-4 pt-4 pb-0 shrink-0">
+        <div className="flex items-center justify-between mb-3">
           <div>
-            <p className="font-mono text-xs text-muted uppercase tracking-widest">Mon espace vendeur</p>
-            <h1 className="font-bebas text-2xl text-white leading-tight">{company?.name || 'Mon vendeur'}</h1>
+            <p className="font-mono text-[10px] text-muted uppercase tracking-widest">Mon espace vendeur</p>
+            <h1 className="font-bebas text-xl text-white leading-tight">{company?.name || 'Mon vendeur'}</h1>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-hi border border-border flex items-center justify-center text-xl">🏭</div>
-        </div>
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-surface border border-border rounded-2xl px-4 py-3">
-            <p className="font-bebas text-3xl text-blue">{totalViews}</p>
-            <p className="text-xs text-sub">Vues aujourd'hui</p>
-          </div>
-          <div className="bg-surface border border-red/30 rounded-2xl px-4 py-3">
-            <p className="font-bebas text-3xl" style={{ color: blacklist.length > 0 ? '#EF4444' : '#4A5568' }}>
-              {blacklist.length}
-            </p>
-            <p className="text-xs text-sub">Blacklistés</p>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-surface border border-border rounded-xl px-3 py-1.5">
+              <span className="font-bebas text-lg text-blue leading-none">{totalViews}</span>
+              <span className="text-[10px] text-muted">vues</span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-surface border rounded-xl px-3 py-1.5"
+              style={{ borderColor: blacklist.length > 0 ? '#EF444440' : '#1C2330' }}>
+              <span className="font-bebas text-lg leading-none" style={{ color: blacklist.length > 0 ? '#EF4444' : '#4A5568' }}>{blacklist.length}</span>
+              <span className="text-[10px] text-muted">🚫</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pb-4">
+      <div className="flex-1 overflow-y-auto pb-2">
         {tab === 'annonce'   && <ListingForm listing={listing} onSave={() => window.location.reload()} />}
         {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
         {tab === 'blacklist' && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}

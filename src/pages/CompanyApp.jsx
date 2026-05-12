@@ -32,8 +32,11 @@ export default function CompanyApp() {
         <div className="flex">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setTab(t.id)}
-              className="flex-1 flex flex-col items-center justify-center py-3 gap-1 cursor-pointer border-none bg-transparent transition-colors"
+              className="flex-1 flex flex-col items-center justify-center py-3 gap-1 cursor-pointer border-none bg-transparent transition-colors relative"
               style={{ color: tab === t.id ? '#F5A623' : '#4A5568' }}>
+              {tab === t.id && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber rounded-full" />
+              )}
               <span className="text-xl leading-none">{t.icon}</span>
               <span className="text-[10px] font-mono">{t.label}</span>
             </button>
