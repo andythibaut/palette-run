@@ -8,7 +8,7 @@ const ROLES = [
   {
     id:    'driver',
     emoji: '🚛',
-    title: 'J'achète des palettes',
+    title: "J'achète des palettes",
     sub:   'Je recherche des palettes à acheter',
     color: '#3B82F6',
   },
