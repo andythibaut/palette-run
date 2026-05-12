@@ -108,67 +108,6 @@ const BidButtons = ({ listing, profile, onBidPlaced }) => {
   )
 }
 
-  return (
-    <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
-      {/* Prix actuel */}
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-xs text-muted">Prix actuel</span>
-        <span className="font-bebas text-2xl text-gold">{(listing.current_bid || listing.price).toFixed(2)} €</span>
-        {isLeader && <span className="text-xs bg-green/20 text-green border border-green/30 rounded-full px-2 py-0.5">EN TÊTE ✓</span>}
-      </div>
-
-      {/* Timers */}
-      {timeLeft > 0 && (
-        <div className={`flex justify-between items-center rounded-lg px-3 py-1.5 text-xs font-mono ${timeLeft < 300 ? 'bg-red/10 text-red' : 'bg-indigo-500/10 text-indigo-300'}`}>
-          <span>⏱ Clôture auto</span>
-          <span className="font-bold">{fmt(timeLeft)}</span>
-        </div>
-      )}
-      {lockLeft > 0 && lockStep && (
-        <div className={`flex justify-between items-center rounded-lg px-3 py-1.5 text-xs font-mono ${lockStep === 0.50 ? 'bg-red/10 text-red' : 'bg-orange/10 text-orange'}`}>
-          <span>🔒 Gel {lockStep === 0.50 ? '2h' : '30min'}</span>
-          <span className="font-bold">{fmt(lockLeft)}</span>
-        </div>
-      )}
-
-      {/* Boutons enchère */}
-      <div className="flex gap-2">
-        {steps.map(s => {
-          const enabled = isEnabled(s.step)
-          return (
-            <button key={s.step} onClick={() => enabled && handleBid(s.step)}
-              disabled={!enabled}
-              className="flex-1 py-2.5 rounded-xl border-2 flex flex-col items-center cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-              style={{ borderColor: enabled ? `${s.color}66` : '#1C2330', background: enabled ? `${s.color}18` : '#1A2030' }}>
-              <span className="font-bebas text-lg leading-none" style={{ color: enabled ? s.color : '#4A5568' }}>{s.label}</span>
-              <span className="text-[9px] font-mono" style={{ color: enabled ? s.color : '#4A5568' }}>
-                {((listing.current_bid || listing.price) + s.step).toFixed(2)}€
-              </span>
-            </button>
-          )
-        })}
-      </div>
-
-      {/* Annuler +50¢ */}
-      {isLeader && lockStep === 0.50 && lockLeft > 0 && (
-        <button onClick={handleCancel} disabled={loading}
-          className="w-full py-2 rounded-xl border border-red/40 bg-red/10 text-red text-xs font-semibold cursor-pointer">
-          Annuler ma surenchère +50¢
-        </button>
-      )}
-
-      {isLeader && !loading && lockStep !== 0.50 && (
-        <p className="text-center text-xs text-muted">Vous êtes en tête — attendez qu'un autre acheteur surenchérisse</p>
-      )}
-
-      {result && (
-        <div className={`rounded-lg px-3 py-2 text-xs font-semibold text-center ${result.type === 'success' ? 'bg-green/10 text-green' : 'bg-red/10 text-red'}`}>
-          {result.type === 'success' ? `✅ Enchère à ${result.price.toFixed(2)}€` : `❌ ${result.msg}`}
-        </div>
-      )}
-    </div>
-  )
-
 
 // ─── Composant principal ───────────────────────────────────────────────────────
 export default function PickupList({ profile }) {
