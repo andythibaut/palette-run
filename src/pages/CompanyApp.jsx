@@ -3,7 +3,15 @@ import { useAuthStore }   from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import CompanyDashboard from '@/components/company/CompanyDashboard'
 
+const TABS = [
+  { id: 'annonce',   icon: '📦', label: 'Annonce'   },
+  { id: 'acheteurs', icon: '🚛', label: 'Acheteurs' },
+  { id: 'blacklist', icon: '🚫', label: 'Blacklist' },
+  { id: 'profil',    icon: '👤', label: 'Profil'    },
+]
+
 export default function CompanyApp() {
+  const [tab, setTab] = useState('annonce')
   const { user } = useAuthStore()
   const { fetchCompany } = useCompanyStore()
 
@@ -13,8 +21,24 @@ export default function CompanyApp() {
 
   return (
     <div className="flex flex-col h-screen bg-bg overflow-hidden">
+      {/* Contenu */}
       <div className="flex-1 overflow-hidden relative">
-        <CompanyDashboard />
+        <CompanyDashboard tab={tab} />
+      </div>
+
+      {/* Bottom nav fixe */}
+      <div className="shrink-0 border-t border-border bg-bg"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex">
+          {TABS.map(t => (
+            <button key={t.id} onClick={() => setTab(t.id)}
+              className="flex-1 flex flex-col items-center justify-center py-3 gap-1 cursor-pointer border-none bg-transparent transition-colors"
+              style={{ color: tab === t.id ? '#F5A623' : '#4A5568' }}>
+              <span className="text-xl leading-none">{t.icon}</span>
+              <span className="text-[10px] font-mono">{t.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

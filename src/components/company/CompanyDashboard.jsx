@@ -303,8 +303,7 @@ const BlacklistPanel = ({ blacklist, onUnblacklist }) => (
 )
 
 // ─── Dashboard principal ──────────────────────────────────────────────────────
-export default function CompanyDashboard() {
-  const [tab, setTab] = useState('annonce')
+export default function CompanyDashboard({ tab = 'annonce' }) {
   const [confirmDriver, setConfirmDriver] = useState(null)
   const { company, listing, drivers, blacklist, loading, blacklistDriver, unblacklistDriver } = useCompanyStore()
   const { profile } = useAuthStore()
@@ -418,30 +417,6 @@ export default function CompanyDashboard() {
         )}
       </div>
 
-      {/* Bottom nav */}
-      <div className="shrink-0 border-t border-border bg-bg"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="flex">
-          {[
-            { id: 'annonce',   icon: '📦', label: 'Annonce'   },
-            { id: 'acheteurs', icon: '🚛', label: 'Acheteurs' },
-            { id: 'blacklist', icon: '🚫', label: 'Blacklist' },
-            { id: 'profil',    icon: '👤', label: 'Profil'    },
-          ].map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)}
-              className="flex-1 flex flex-col items-center justify-center py-3 gap-1 cursor-pointer border-none bg-transparent transition-colors"
-              style={{ color: tab === t.id ? '#F5A623' : '#4A5568' }}>
-              <span className="text-xl leading-none">{t.icon}</span>
-              <span className="text-[10px] font-mono">{t.label}</span>
-              {tab === t.id && (
-                <div className="absolute bottom-0 w-8 h-0.5 bg-amber rounded-full" />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
-
-    </div>
     </div>
   )
 }
