@@ -9,10 +9,11 @@ const VEHICLE_OPTIONS = [
   { id: 'semi',    label: 'Semi-remorque',   icon: '🚛', sub: 'Grand quai de chargement' },
 ]
 
-const TABS = ['annonce', 'acheteurs', 'blacklist', 'site']
+const TABS = ['annonce', 'acheteurs', 'blacklist', 'profil']
 
 // ─── Formulaire annonce ───────────────────────────────────────────────────────
 const ListingForm = ({ listing, onSave }) => {
+  const { company } = useCompanyStore()
   const { publishListing, updateListing, deleteListing } = useCompanyStore()
   const [qty,          setQty]          = useState(listing?.qty    || 1)
   const [price,        setPrice]        = useState(listing?.price  || '')
@@ -20,19 +21,37 @@ const ListingForm = ({ listing, onSave }) => {
   const [isActive,     setIsActive]     = useState(listing?.is_active ?? true)
   const [saved,        setSaved]        = useState(false)
   const [loading,      setLoading]      = useState(false)
+  const [error,        setError]        = useState('')
 
   const handleSave = async () => {
-    if (!price || qty < 1) return
+    if (!price || qty < 1) { setError('Renseignez le prix et la quantité'); return }
+    setError('')
     setLoading(true)
-    const data = { qty, price: parseFloat(price), pickup_before: pickupBefore || null, is_active: isActive }
-    const ok = listing ? await updateListing(data) : await publishListing(data)
+    try {
+      const data = { qty, price: parseFloat(price), pickup_before: pickupBefore || null, is_active: isActive }
+      if (listing) {
+        const { error } = await supabase.from('listings').update(data).eq('id', listing.id)
+        if (error) throw error
+      } else {
+        const { error } = await supabase.from('listings').insert({
+          ...data,
+          company_id: company.id,
+        })
+        if (error) throw error
+      }
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+      onSave?.()
+    } catch (e) {
+      setError(e.message || 'Erreur lors de la sauvegarde')
+    }
     setLoading(false)
-    if (ok) { setSaved(true); setTimeout(() => setSaved(false), 2000) }
   }
 
   const handleDelete = async () => {
     if (!window.confirm('Supprimer cette annonce ?')) return
-    await deleteListing()
+    await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
+    onSave?.()
   }
 
   return (
@@ -99,12 +118,14 @@ const ListingForm = ({ listing, onSave }) => {
         </div>
       )}
 
+      {error && <p className="text-xs text-red text-center">{error}</p>}
+
       {/* Actions */}
       <button onClick={handleSave} disabled={loading || !price || qty < 1}
         className="w-full py-4 rounded-2xl font-bold text-bg text-base cursor-pointer disabled:opacity-40"
         style={{ background: saved ? '#2ECC71' : 'linear-gradient(135deg,#F5A623,#E8940F)', boxShadow: '0 6px 20px rgba(245,166,35,0.3)', transition: 'background 0.3s' }}
       >
-        {loading ? 'Sauvegarde…' : saved ? '✅ Sauvegardé !' : listing ? 'Mettre à jour' : '📦 Publier sur la carte →'}
+        {loading ? 'Sauvegarde…' : saved ? '✅ Publié sur la carte !' : listing ? 'Mettre à jour' : '📦 Publier sur la carte →'}
       </button>
 
       {listing && (
@@ -165,8 +186,13 @@ const SiteSettings = ({ company }) => {
           <p className="text-xs text-sub mt-1">Fenwick, Gerbeur ou autre</p>
         </div>
         <button onClick={() => setHasLoader(h => !h)}
-          className={`w-12 h-6 rounded-full transition-colors relative cursor-pointer border-none ${hasLoader ? 'bg-green' : 'bg-border'}`}>
-          <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${hasLoader ? 'translate-x-6' : 'translate-x-0.5'}`} />
+          className="relative cursor-pointer border-none bg-transparent p-0"
+          style={{ width: 52, height: 28 }}>
+          <div className="w-full h-full rounded-full transition-colors duration-200"
+            style={{ background: hasLoader ? '#2ECC71' : '#1C2330', border: `2px solid ${hasLoader ? '#2ECC71' : '#2D3748'}` }}>
+            <div className="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-200"
+              style={{ transform: hasLoader ? 'translateX(26px)' : 'translateX(2px)' }} />
+          </div>
         </button>
       </div>
 
@@ -354,7 +380,7 @@ export default function CompanyDashboard() {
 
         {/* Tabs */}
         <div className="flex border-b border-border">
-          {[['annonce','Annonce'],['acheteurs','Acheteurs'],['blacklist','🚫'],['site','🏭 Site']].map(([id,label]) => (
+          {[['annonce','Annonce'],['acheteurs','Acheteurs'],['blacklist','🚫'],['profil','👤 Profil']].map(([id,label]) => (
             <button key={id} onClick={() => setTab(id)}
               className={`flex-1 py-3 text-xs font-mono cursor-pointer border-none bg-transparent transition-colors ${tab === id ? 'text-amber border-b-2 border-amber' : 'text-muted'}`}>
               {label}
@@ -365,10 +391,10 @@ export default function CompanyDashboard() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto pb-20">
-        {tab === 'annonce'   && <ListingForm listing={listing} />}
+        {tab === 'annonce'   && <ListingForm listing={listing} onSave={() => window.location.reload()} />}
         {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
         {tab === 'blacklist' && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}
-        {tab === 'site'      && (
+        {tab === 'profil'    && (
           <>
             <SiteSettings company={company} />
             {/* Supprimer le compte */}
