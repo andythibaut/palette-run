@@ -8,22 +8,19 @@ const statusStyles = {
   bidding:   { color: '#FFD166', bg: '#FFD16618', label: 'Enchère en cours'   },
 }
 
-// ─── Mini bid panel ────────────────────────────────────────────────────────────
+// ─── Mini bid panel — +50¢ uniquement ────────────────────────────────────────
 const BidButtons = ({ listing, profile, onBidPlaced }) => {
-  const [loading,    setLoading]    = useState(false)
-  const [result,     setResult]     = useState(null)
-  const [timeLeft,   setTimeLeft]   = useState(0)
-  const [lockLeft,   setLockLeft]   = useState(0)
+  const [loading,  setLoading]  = useState(false)
+  const [result,   setResult]   = useState(null)
+  const [timeLeft, setTimeLeft] = useState(0)
+  const [lockLeft, setLockLeft] = useState(0)
 
-  const isLeader  = listing.bid_winner_id === profile?.id
-  const lockStep  = listing.bid_lock_step
-  const isCancelBlocked = profile?.bid_cancel_blocked_until &&
-    new Date(profile.bid_cancel_blocked_until) > new Date()
+  const isLeader = listing.bid_winner_id === profile?.id
 
   // Timers
   useEffect(() => {
     const tick = () => {
-      if (listing.bid_expires_at)  setTimeLeft(Math.max(0, Math.floor((new Date(listing.bid_expires_at)  - Date.now()) / 1000)))
+      if (listing.bid_expires_at)   setTimeLeft(Math.max(0, Math.floor((new Date(listing.bid_expires_at)   - Date.now()) / 1000)))
       if (listing.bid_locked_until) setLockLeft(Math.max(0, Math.floor((new Date(listing.bid_locked_until) - Date.now()) / 1000)))
     }
     tick()
@@ -45,32 +42,71 @@ const BidButtons = ({ listing, profile, onBidPlaced }) => {
     if (error || !data?.success) {
       setResult({ type: 'error', msg: data?.error || 'Erreur' })
     } else {
-      setResult({ type: 'success', price: data.new_price })
+      setResult({ type: 'success', price: data.new_price, step })
       onBidPlaced?.()
     }
     setTimeout(() => setResult(null), 3000)
   }
 
-  const handleCancel = async () => {
-    if (!window.confirm('Annuler votre surenchère +50¢ ?')) return
-    setLoading(true)
-    await supabase.rpc('cancel_bid', { p_listing_id: listing.id, p_driver_id: profile.id })
-    setLoading(false)
-    onBidPlaced?.()
-  }
+  const currentPrice = listing.current_bid || listing.price
 
-  const steps = [
-    { step: 0.10, label: '+10¢', color: '#2ECC71' },
-    { step: 0.20, label: '+20¢', color: '#F97316' },
-    { step: 0.50, label: '+50¢', color: '#EF4444' },
-  ]
+  return (
+    <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
+      {/* Prix actuel */}
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-xs text-muted">Prix actuel</span>
+        <span className="font-bebas text-2xl text-gold">{currentPrice.toFixed(2)} €</span>
+        {isLeader && <span className="text-xs bg-green/20 text-green border border-green/30 rounded-full px-2 py-0.5">EN TÊTE ✓</span>}
+      </div>
 
-  const isEnabled = (step) => {
-    if (loading || isLeader) return false
-    if (lockLeft > 0 && lockStep && step < lockStep) return false
-    if (step === 0.50 && isCancelBlocked) return false
-    return true
-  }
+      {/* Timers */}
+      {timeLeft > 0 && (
+        <div className={`flex justify-between items-center rounded-lg px-3 py-1.5 text-xs font-mono ${timeLeft < 300 ? 'bg-red/10 text-red' : 'bg-indigo-500/10 text-indigo-300'}`}>
+          <span>⏱ Confirmation auto dans</span>
+          <span className="font-bold">{fmt(timeLeft)}</span>
+        </div>
+      )}
+      {lockLeft > 0 && (
+        <div className="flex justify-between items-center rounded-lg px-3 py-1.5 text-xs font-mono bg-red/10 text-red">
+          <span>🔒 Réservation gelée 2h</span>
+          <span className="font-bold">{fmt(lockLeft)}</span>
+        </div>
+      )}
+
+      {/* Boutons enchère */}
+      {!isLeader && (
+        <div className="flex gap-2">
+          {[{ step: 0.50, label: '+50¢', color: '#F97316' }, { step: 1.00, label: '+1€', color: '#EF4444' }].map(({ step, label, color }) => (
+            <button key={step} onClick={() => handleBid(step)} disabled={loading}
+              className="flex-1 py-3 rounded-xl border-2 flex flex-col items-center justify-center cursor-pointer disabled:opacity-40 transition-all gap-0.5"
+              style={{ borderColor: `${color}66`, background: `${color}18` }}>
+              <span className="font-bebas text-xl leading-none" style={{ color }}>{label}</span>
+              <span className="text-xs font-mono" style={{ color }}>{(currentPrice + step).toFixed(2)} €</span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Annuler si leader avec gel */}
+      {isLeader && lockLeft > 0 && (
+        <button onClick={handleCancel} disabled={loading}
+          className="w-full py-2 rounded-xl border border-red/40 bg-red/10 text-red text-xs font-semibold cursor-pointer">
+          Annuler ma surenchère (pénalité)
+        </button>
+      )}
+
+      {isLeader && !loading && lockLeft === 0 && (
+        <p className="text-center text-xs text-muted">Vous êtes en tête — attendez qu'un autre acheteur surenchérisse</p>
+      )}
+
+      {result && (
+        <div className={`rounded-lg px-3 py-2 text-xs font-semibold text-center ${result.type === 'success' ? 'bg-green/10 text-green' : 'bg-red/10 text-red'}`}>
+          {result.type === 'success' ? `✅ Surenchère à ${result.price?.toFixed(2)}€ — réservation gelée 2h` : `❌ ${result.msg}`}
+        </div>
+      )}
+    </div>
+  )
+}
 
   return (
     <div className="flex flex-col gap-2 mt-3 pt-3 border-t border-border">
