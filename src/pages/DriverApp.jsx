@@ -15,10 +15,12 @@ const TABS = [
 
 export default function DriverApp() {
   const { profile } = useAuthStore()
+  const { fetchListings, subscribeRealtime, unsubscribeRealtime } = useListingStore()
 
   // Première connexion = pas de véhicule configuré → atterrir sur le profil
   const isFirstLogin = !profile?.vehicle_type
   const [tab, setTab] = useState(isFirstLogin ? 'profile' : 'map')
+  const [mapViewport, setMapViewport] = useState(null)
 
   useEffect(() => {
     fetchListings(profile?.vehicle_type)
