@@ -1,8 +1,116 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import PalletLogo from '@/components/shared/PalletLogo'
+
+// ─── Autocomplétion API Adresse (data.gouv.fr) ───────────────────────────────
+const useAddressSearch = () => {
+  const [query,       setQuery]       = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [selected,    setSelected]    = useState(null) // { label, city, postcode, lat, lng }
+  const [loading,     setLoading]     = useState(false)
+  const debounceRef = useRef(null)
+
+  const search = useCallback((q) => {
+    setQuery(q)
+    setSelected(null)
+    setSuggestions([])
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (q.length < 3) return
+    debounceRef.current = setTimeout(async () => {
+      setLoading(true)
+      try {
+        const res  = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&limit=5&type=housenumber,street,municipality`)
+        const data = await res.json()
+        setSuggestions(
+          (data.features || []).map(f => ({
+            label:    f.properties.label,
+            city:     f.properties.city,
+            postcode: f.properties.postcode,
+            lat:      f.geometry.coordinates[1],
+            lng:      f.geometry.coordinates[0],
+          }))
+        )
+      } catch {
+        setSuggestions([])
+      }
+      setLoading(false)
+    }, 300)
+  }, [])
+
+  const pick = (suggestion) => {
+    setSelected(suggestion)
+    setQuery(suggestion.label)
+    setSuggestions([])
+  }
+
+  return { query, search, suggestions, selected, pick, loading }
+}
+
+// ─── Composant champ adresse ─────────────────────────────────────────────────
+const AddressField = ({ onSelect }) => {
+  const { query, search, suggestions, selected, pick, loading } = useAddressSearch()
+  const [focused, setFocused] = useState(false)
+
+  const handlePick = (s) => {
+    pick(s)
+    onSelect(s)
+  }
+
+  return (
+    <div className="relative">
+      <label className="text-xs text-muted uppercase tracking-widest block mb-2">
+        Adresse du site <span className="text-amber">*</span>
+      </label>
+      <div className={`flex items-center bg-hi rounded-2xl border-2 overflow-hidden transition-colors ${
+        selected ? 'border-green' : focused ? 'border-amber' : 'border-border'
+      }`}>
+        <span className="pl-4 text-lg shrink-0">{selected ? '✅' : '📍'}</span>
+        <input
+          type="text"
+          value={query}
+          onChange={e => search(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setTimeout(() => setFocused(false), 150)}
+          placeholder="22 avenue d'Italie, Paris…"
+          className="flex-1 px-3 py-3 bg-transparent text-white text-sm outline-none"
+          autoComplete="off"
+        />
+        {loading && <span className="pr-4 text-muted text-xs animate-pulse">…</span>}
+      </div>
+
+      {/* Suggestions */}
+      {suggestions.length > 0 && focused && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-surface border border-border rounded-2xl overflow-hidden shadow-2xl">
+          {suggestions.map((s, i) => (
+            <button
+              key={i}
+              onMouseDown={() => handlePick(s)}
+              className="w-full px-4 py-3 text-left hover:bg-hi transition-colors border-none bg-transparent cursor-pointer border-b border-border/50 last:border-0"
+            >
+              <p className="text-white text-sm font-semibold leading-tight">{s.label}</p>
+              <p className="text-muted text-xs mt-0.5">{s.postcode} {s.city}</p>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Aucun résultat */}
+      {query.length >= 3 && !loading && suggestions.length === 0 && focused && !selected && (
+        <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-surface border border-border rounded-2xl px-4 py-3 shadow-2xl">
+          <p className="text-muted text-sm">Aucune adresse trouvée — vérifiez l'orthographe</p>
+        </div>
+      )}
+
+      {selected && (
+        <p className="text-xs text-green mt-1.5 ml-1">
+          📌 {selected.lat.toFixed(5)}, {selected.lng.toFixed(5)} — coordonnées confirmées
+        </p>
+      )}
+    </div>
+  )
+}
 
 const ROLES = [
   {
@@ -37,8 +145,7 @@ export default function OnboardingPage() {
   const [selectedRole,setSelectedRole]= useState(null)
   const [fullName,    setFullName]    = useState('')
   const [companyName, setCompanyName] = useState('')
-  const [city,        setCity]        = useState('')
-  const [address,     setAddress]     = useState('')
+  const [geoAddress,  setGeoAddress]  = useState(null) // { label, city, postcode, lat, lng }
   const [loading,     setLoading]     = useState(false)
   const [error,       setError]       = useState('')
 
@@ -61,18 +168,15 @@ export default function OnboardingPage() {
   }
 
   const handleCompanyCreate = async () => {
-    if (!companyName.trim() || !city.trim()) {
-      setError('Nom et ville sont obligatoires')
-      return
-    }
+    if (!companyName.trim()) { setError('Le nom du site est obligatoire'); return }
+    if (!geoAddress)         { setError('Veuillez sélectionner une adresse dans la liste'); return }
     setLoading(true)
-    // Coordonnées par défaut Paris — à remplacer par géocodage en production
     const ok = await createCompany({
       name:    companyName.trim(),
-      city:    city.trim(),
-      address: address.trim(),
-      lat:     48.8566,
-      lng:     2.3522,
+      city:    geoAddress.city,
+      address: geoAddress.label,
+      lat:     geoAddress.lat,
+      lng:     geoAddress.lng,
       ownerId: user.id,
     })
     setLoading(false)
@@ -159,32 +263,42 @@ export default function OnboardingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-bg px-6 py-10">
       <div className="mb-8">
-        <h1 className="font-bebas text-4xl text-white leading-tight">Votre vendeur</h1>
+        <h1 className="font-bebas text-4xl text-white leading-tight">Votre site</h1>
         <p className="text-sub text-sm mt-2">Ces informations seront visibles sur la carte.</p>
       </div>
 
       <div className="flex flex-col gap-5 mb-8">
-        {[
-          { label:'Nom de l\'vendeur', value:companyName, set:setCompanyName, placeholder:'SAS Logipro', required:true },
-          { label:'Ville',                value:city,        set:setCity,        placeholder:'Paris 13e',   required:true },
-          { label:'Adresse (optionnel)',  value:address,     set:setAddress,     placeholder:'22 av. d\'Italie' },
-        ].map(f => (
-          <div key={f.label}>
-            <label className="text-xs text-muted uppercase tracking-widest block mb-2">
-              {f.label}{f.required && <span className="text-amber ml-1">*</span>}
-            </label>
-            <input type="text" value={f.value} onChange={e => { f.set(e.target.value); setError('') }}
-              placeholder={f.placeholder}
-              className="w-full px-4 py-3 bg-hi border-2 border-border rounded-2xl text-white text-sm outline-none"
-            />
-          </div>
-        ))}
+        {/* Nom du site */}
+        <div>
+          <label className="text-xs text-muted uppercase tracking-widest block mb-2">
+            Nom du site <span className="text-amber">*</span>
+          </label>
+          <input
+            type="text" value={companyName}
+            onChange={e => { setCompanyName(e.target.value); setError('') }}
+            placeholder="SAS Logipro — Entrepôt Nord"
+            className="w-full px-4 py-3 bg-hi border-2 border-border rounded-2xl text-white text-sm outline-none focus:border-amber transition-colors"
+          />
+        </div>
+
+        {/* Adresse avec autocomplétion */}
+        <AddressField onSelect={(s) => { setGeoAddress(s); setError('') }} />
+
+        {/* Info */}
+        <div className="bg-blue/10 border border-blue/20 rounded-xl px-4 py-3 flex items-start gap-3">
+          <span className="text-base shrink-0">ℹ️</span>
+          <p className="text-xs text-blue/80 leading-relaxed">
+            Tapez votre adresse et <strong className="text-blue">sélectionnez-la dans la liste</strong>. Les coordonnées GPS sont récupérées automatiquement — les chauffeurs vous trouveront précisément sur la carte.
+          </p>
+        </div>
       </div>
 
-      {error && <p className="text-xs text-red mb-4">{error}</p>}
+      {error && <p className="text-xs text-red mb-4 bg-red/10 rounded-xl px-4 py-3">{error}</p>}
 
       <div className="flex flex-col gap-3 mt-auto">
-        <button onClick={handleCompanyCreate} disabled={loading}
+        <button
+          onClick={handleCompanyCreate}
+          disabled={loading || !companyName.trim() || !geoAddress}
           className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40"
           style={{ boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}
         >
