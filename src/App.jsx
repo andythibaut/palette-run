@@ -53,7 +53,7 @@ export default function App() {
   return (
     <Routes>
       {/* Public — carte démo sans auth */}
-      <Route path="/"              element={<PublicRoute><PublicMapPage /></PublicRoute>} />
+      <Route path="/"              element={<PublicMapPage />} />
       <Route path="/splash"        element={<SplashPage />} />
       <Route path="/auth"          element={<AuthPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
