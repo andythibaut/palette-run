@@ -10,16 +10,20 @@ export const useAuthStore = create((set, get) => ({
   // Initialise la session au démarrage
   init: async () => {
     const { data: { session } } = await supabase.auth.getSession()
+
     if (session?.user) {
-      await get().fetchProfile(session.user.id)
+      // On débloque l'UI immédiatement avec l'user, profil arrive en arrière-plan
+      set({ user: session.user, loading: false })
+      get().fetchProfile(session.user.id)
+    } else {
+      set({ loading: false })
     }
-    set({ loading: false })
 
     // Écoute les changements d'auth
     supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         set({ user: session.user })
-        await get().fetchProfile(session.user.id)
+        get().fetchProfile(session.user.id)
       } else {
         set({ user: null, profile: null })
       }

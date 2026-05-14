@@ -130,7 +130,7 @@ const ROLES = [
 ]
 
 export default function OnboardingPage() {
-  const { profile, createProfile, user } = useAuthStore()
+  const { profile, createProfile, user, error: authError, clearError } = useAuthStore()
   const { createCompany } = useCompanyStore()
   const navigate = useNavigate()
 
@@ -155,10 +155,23 @@ export default function OnboardingPage() {
       return
     }
     setLoading(true)
+    setError('')
+    clearError()
+
+    // Timeout de sécurité 10s
+    const timeout = setTimeout(() => {
+      setLoading(false)
+      setError('Délai dépassé — vérifiez votre connexion et réessayez')
+    }, 10000)
 
     const ok = await createProfile({ role: selectedRole, fullName: fullName.trim() })
+    clearTimeout(timeout)
     setLoading(false)
-    if (!ok) return
+
+    if (!ok) {
+      setError(authError || 'Erreur lors de la création du profil — réessayez')
+      return
+    }
 
     if (selectedRole === 'company') {
       setStep('company-info')
