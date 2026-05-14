@@ -4,6 +4,7 @@ import Map, { Marker, NavigationControl } from 'react-map-gl'
 import { supabase } from '@/lib/supabase'
 import { MAPBOX_TOKEN, MAP_STYLE, profitColor } from '@/lib/mapbox'
 import PalletLogo from '@/components/shared/PalletLogo'
+import { useAuthStore } from '@/store/useAuthStore'
 
 const DEFAULT_CENTER = { longitude: 1.4442, latitude: 43.6047, zoom: 11 }
 
@@ -120,6 +121,14 @@ const DemoBottomSheet = ({ listing, onClose, onSignup }) => (
 export default function PublicMapPage() {
   const navigate  = useNavigate()
   const mapRef    = useRef(null)
+  const { user, profile } = useAuthStore()
+
+  // Redirige si déjà connecté
+  useEffect(() => {
+    if (user && profile) navigate(profile.role === 'driver' ? '/app' : '/company', { replace: true })
+    else if (user && !profile) navigate('/onboarding', { replace: true })
+  }, [user, profile])
+
   const [viewport,     setViewport]     = useState(DEFAULT_CENTER)
   const [listings,     setListings]     = useState([])
   const [selected,     setSelected]     = useState(null)
