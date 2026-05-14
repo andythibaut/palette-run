@@ -19,6 +19,8 @@ const ListingForm = ({ listing, onSave }) => {
   const [price,        setPrice]        = useState(listing?.price  || '')
   const [pickupBefore, setPickupBefore] = useState(listing?.pickup_before || '')
   const [isActive,     setIsActive]     = useState(listing?.is_active ?? true)
+  const [auctionMode,  setAuctionMode]  = useState(listing?.auction_mode  || false)
+  const [auctionDays,  setAuctionDays]  = useState(1)
   const [saved,        setSaved]        = useState(false)
   const [loading,      setLoading]      = useState(false)
   const [error,        setError]        = useState('')
@@ -29,15 +31,22 @@ const ListingForm = ({ listing, onSave }) => {
     setError('')
     setLoading(true)
     try {
-      const data = { qty, price: parseFloat(price), pickup_before: pickupBefore || null, is_active: isActive }
+      const auctionEndsAt = auctionMode
+        ? new Date(Date.now() + auctionDays * 24 * 60 * 60 * 1000).toISOString()
+        : null
+      const data = {
+        qty,
+        price:           parseFloat(price),
+        pickup_before:   pickupBefore || null,
+        is_active:       isActive,
+        auction_mode:    auctionMode,
+        auction_ends_at: auctionEndsAt,
+      }
       if (listing) {
         const { error } = await supabase.from('listings').update(data).eq('id', listing.id)
         if (error) throw error
       } else {
-        const { error } = await supabase.from('listings').insert({
-          ...data,
-          company_id: company.id,
-        })
+        const { error } = await supabase.from('listings').insert({ ...data, company_id: company.id })
         if (error) throw error
       }
       setSaved(true)
@@ -72,6 +81,51 @@ const ListingForm = ({ listing, onSave }) => {
               style={{ transform: isActive ? 'translateX(26px)' : 'translateX(2px)' }} />
           </div>
         </button>
+      </div>
+
+      {/* Mode enchère */}
+      <div className="bg-surface border rounded-2xl overflow-hidden"
+        style={{ borderColor: auctionMode ? '#A855F744' : '#1C2330' }}>
+        <div className="flex items-center justify-between px-4 py-3">
+          <div>
+            <p className="font-semibold text-sm text-white">⚡ Mettre aux enchères</p>
+            <p className="text-xs text-sub mt-0.5">
+              {auctionMode ? 'Les acheteurs surenchérissent pendant la durée choisie' : 'Réservation directe — premier arrivé premier servi'}
+            </p>
+          </div>
+          <button onClick={() => setAuctionMode(a => !a)}
+            className="relative cursor-pointer border-none bg-transparent p-0"
+            style={{ width: 52, height: 28 }}>
+            <div className="w-full h-full rounded-full transition-colors duration-200"
+              style={{ background: auctionMode ? '#A855F7' : '#1C2330', border: `2px solid ${auctionMode ? '#A855F7' : '#2D3748'}` }}>
+              <div className="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-200"
+                style={{ transform: auctionMode ? 'translateX(26px)' : 'translateX(2px)' }} />
+            </div>
+          </button>
+        </div>
+
+        {/* Durée enchère */}
+        {auctionMode && (
+          <div className="px-4 pb-4 border-t border-border/50 pt-3">
+            <p className="text-xs text-muted mb-2">Durée de l'enchère</p>
+            <div className="flex gap-2">
+              {[1, 2, 3].map(d => (
+                <button key={d} onClick={() => setAuctionDays(d)}
+                  className="flex-1 py-2.5 rounded-xl border-2 text-sm font-bold cursor-pointer transition-all"
+                  style={{
+                    borderColor: auctionDays === d ? '#A855F7' : '#1C2330',
+                    background:  auctionDays === d ? '#A855F722' : '#13181F',
+                    color:       auctionDays === d ? '#A855F7' : '#4A5568',
+                  }}>
+                  {d} jour{d > 1 ? 's' : ''}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-muted mt-2 leading-relaxed">
+              Le gagnant aura <strong className="text-white">{auctionDays} jour{auctionDays > 1 ? 's' : ''}</strong> après la fin des enchères pour venir récupérer.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Quantité */}
