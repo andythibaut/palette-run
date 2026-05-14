@@ -199,72 +199,72 @@ export default function OnboardingPage() {
 
   // ─── Étape 1 : Choix du rôle ──────────────────────────────────────────────
   if (step === 'role') return (
-    <div className="flex flex-col min-h-screen bg-bg px-6 py-10">
-      <div className="flex items-center gap-3 mb-10">
-        <PalletLogo size={28} color="#F5A623" />
-        <span className="font-bebas text-2xl tracking-widest text-amber">PALETTE RUN</span>
+    <div className="flex flex-col h-screen bg-bg px-5 overflow-hidden"
+      style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+
+      {/* Logo */}
+      <div className="flex items-center gap-2 mb-4 shrink-0">
+        <PalletLogo size={22} color="#F5A623" />
+        <span className="font-bebas text-xl tracking-widest text-amber">PALETTE RUN</span>
       </div>
 
-      <div className="mb-8">
-        <h1 className="font-bebas text-4xl text-white leading-tight">Vous êtes…</h1>
-        <p className="text-sub text-sm mt-2">Choisissez votre profil pour commencer.</p>
+      {/* Titre */}
+      <div className="mb-4 shrink-0">
+        <h1 className="font-bebas text-3xl text-white leading-tight">Vous êtes…</h1>
+        <p className="text-sub text-xs mt-1">Choisissez votre profil pour commencer.</p>
       </div>
 
       {/* Nom */}
-      <div className="mb-6">
-        <label className="text-xs text-muted uppercase tracking-widest block mb-2">Votre nom</label>
+      <div className="mb-4 shrink-0">
+        <label className="text-xs text-muted uppercase tracking-widest block mb-1.5">
+          Votre nom <span className="text-amber">*</span>
+        </label>
         <input
           type="text" value={fullName}
           onChange={e => { setFullName(e.target.value); setError('') }}
-          placeholder="Jean-Pierre Martin"
-          className="w-full px-4 py-3 bg-hi border-2 border-border rounded-2xl text-white text-sm outline-none"
+          placeholder=""
+          className="w-full px-4 py-3 bg-hi border-2 border-border rounded-2xl text-white text-sm outline-none focus:border-amber transition-colors"
         />
       </div>
 
       {/* Rôles */}
-      <div className="flex flex-col gap-4 mb-8">
+      <div className="flex flex-col gap-3 mb-4 shrink-0">
         {ROLES.map(r => (
           <button key={r.id} onClick={() => { setSelectedRole(r.id); setError('') }}
-            className={`flex items-center gap-5 p-5 rounded-2xl border-2 cursor-pointer transition-all text-left ${
-              selectedRole === r.id
-                ? 'border-current bg-opacity-10'
-                : 'border-border bg-hi'
-            }`}
+            className="flex items-center gap-4 px-4 py-4 rounded-2xl border-2 cursor-pointer transition-all text-left"
             style={{
-              borderColor: selectedRole === r.id ? r.color : undefined,
-              background:  selectedRole === r.id ? `${r.color}14` : undefined,
+              borderColor: selectedRole === r.id ? r.color : '#1C2330',
+              background:  selectedRole === r.id ? `${r.color}14` : '#111827',
             }}
           >
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl shrink-0"
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
               style={{ background: selectedRole === r.id ? `${r.color}22` : '#1A2030' }}
             >{r.emoji}</div>
             <div className="flex-1">
-              <p className="font-semibold text-base" style={{ color: selectedRole === r.id ? '#E8EDF5' : '#718096' }}>{r.title}</p>
-              <p className="text-xs text-muted mt-1">{r.sub}</p>
+              <p className="font-semibold text-sm" style={{ color: selectedRole === r.id ? '#E8EDF5' : '#718096' }}>{r.title}</p>
+              <p className="text-xs text-muted mt-0.5">{r.sub}</p>
             </div>
-            <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0"
+            <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
               style={{ borderColor: selectedRole === r.id ? r.color : '#1C2330', background: selectedRole === r.id ? r.color : 'transparent' }}
             >
-              {selectedRole === r.id && <span className="text-white text-xs">✓</span>}
+              {selectedRole === r.id && <span className="text-white text-[10px]">✓</span>}
             </div>
           </button>
         ))}
       </div>
 
-      {error && <p className="text-xs text-red mb-4">{error}</p>}
+      {/* Avertissement */}
+      <div className="bg-red/10 border border-red/30 rounded-xl px-3 py-2.5 mb-3 flex items-start gap-2 shrink-0">
+        <span className="text-sm shrink-0">⚠️</span>
+        <p className="text-xs text-red leading-relaxed">
+          <strong>Ce choix est définitif.</strong> Si vous vous trompez, vous devrez supprimer votre compte et vous réinscrire.
+        </p>
+      </div>
 
-      {/* Avertissement choix définitif */}
-      {selectedRole && (
-        <div className="bg-red/10 border border-red/30 rounded-2xl px-4 py-3 mb-4 flex items-start gap-3">
-          <span className="text-lg shrink-0">⚠️</span>
-          <p className="text-xs text-red leading-relaxed">
-            <strong>Ce choix est définitif.</strong> Si vous vous trompez, vous devrez supprimer votre compte et vous réinscrire.
-          </p>
-        </div>
-      )}
+      {error && <p className="text-xs text-red mb-2 shrink-0 bg-red/10 rounded-xl px-3 py-2">{error}</p>}
 
       <button onClick={handleRoleSelect} disabled={loading || !selectedRole || !fullName.trim()}
-        className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40 mt-auto"
+        className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40 mt-auto shrink-0"
         style={{ boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}
       >
         {loading ? 'Création…' : 'Continuer →'}

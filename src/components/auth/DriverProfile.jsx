@@ -60,6 +60,19 @@ export default function DriverProfile() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto pb-20 bg-bg">
+
+      {/* Bannière première connexion */}
+      {!profile?.vehicle_type && (
+        <div className="mx-5 mt-5 bg-amber/10 border border-amber/40 rounded-2xl px-4 py-4 flex items-start gap-3">
+          <span className="text-2xl shrink-0">👋</span>
+          <div>
+            <p className="text-amber font-bold text-sm">Bienvenue sur Palette Run !</p>
+            <p className="text-amber/80 text-xs mt-1 leading-relaxed">
+              Configurez votre profil pour accéder à la carte et voir les annonces adaptées à votre véhicule.
+            </p>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center gap-4 px-5 pt-6 pb-5 border-b border-border">
         <div className="w-16 h-16 rounded-2xl bg-amber/10 border-2 border-amber/30 flex items-center justify-center text-4xl">🚛</div>
