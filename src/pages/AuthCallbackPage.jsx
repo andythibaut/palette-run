@@ -7,11 +7,26 @@ export default function AuthCallbackPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         navigate('/auth/reset', { replace: true })
-      } else if (event === 'SIGNED_IN' && session) {
-        navigate('/onboarding', { replace: true })
+        return
+      }
+      if (event === 'SIGNED_IN' && session) {
+        // Vérifie si le profil existe déjà
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single()
+
+        if (!profile) {
+          navigate('/onboarding', { replace: true })
+        } else if (profile.role === 'driver') {
+          navigate('/app', { replace: true })
+        } else {
+          navigate('/company', { replace: true })
+        }
       }
     })
   }, [navigate])
