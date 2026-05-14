@@ -17,8 +17,9 @@ export default function DriverApp() {
   const { profile } = useAuthStore()
   const { fetchListings, subscribeRealtime, unsubscribeRealtime } = useListingStore()
 
-  // Première connexion = pas de véhicule configuré → atterrir sur le profil
-  const isFirstLogin = !profile?.vehicle_type
+  // Première connexion = profil créé il y a moins de 2 minutes OU pas de véhicule
+  const isFirstLogin = !profile?.vehicle_type ||
+    (profile?.created_at && (Date.now() - new Date(profile.created_at).getTime()) < 120000)
   const [tab, setTab] = useState(isFirstLogin ? 'profile' : 'map')
   const [mapViewport, setMapViewport] = useState(null)
 
