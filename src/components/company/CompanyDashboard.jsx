@@ -502,9 +502,11 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
 
                     // 7. Supprime les notifications du user
                     await supabase.from('notifications').delete().eq('user_id', userId)
-                    // 8. Supprime le profil
+                    // 8. Reset du store company
+                    useCompanyStore.getState().reset()
+                    // 9. Supprime le profil
                     await supabase.from('profiles').delete().eq('id', userId)
-                    // 9. Déconnexion
+                    // 10. Déconnexion
                     await state.signOut()
                   } catch (e) {
                     alert('Erreur lors de la suppression : ' + e.message)

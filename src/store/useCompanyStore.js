@@ -9,6 +9,9 @@ export const useCompanyStore = create((set, get) => ({
   loading:  false,
   error:    null,
 
+  // Réinitialise le store (après déconnexion/suppression)
+  reset: () => set({ company: null, listing: null, drivers: [], blacklist: [], loading: false, error: null }),
+
   // Charge les données de l'entreprise
   fetchCompany: async (ownerId) => {
     set({ loading: true })
@@ -28,6 +31,9 @@ export const useCompanyStore = create((set, get) => ({
       set({ company })
       await get().fetchActiveListing(company.id)
       await get().fetchBlacklist(company.id)
+    } else {
+      // Aucune company trouvée — reset propre
+      set({ company: null, listing: null, drivers: [], blacklist: [] })
     }
 
     set({ loading: false })
