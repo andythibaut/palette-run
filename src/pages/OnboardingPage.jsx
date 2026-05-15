@@ -150,34 +150,37 @@ export default function OnboardingPage() {
 
   // ─── Étape 1 : Choix du rôle uniquement ──────────────────────────────────
   if (step === 'role') return (
-    <div className="flex flex-col h-screen bg-bg px-5 overflow-hidden"
-      style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+    <div className="flex flex-col bg-bg px-5"
+      style={{
+        minHeight: '100dvh',
+        paddingTop: 'max(1rem, env(safe-area-inset-top))',
+        paddingBottom: 'calc(80px + max(1rem, env(safe-area-inset-bottom)))'
+      }}>
 
-      <div className="flex items-center gap-2 mb-4 shrink-0">
-        <PalletLogo size={22} color="#F5A623" />
-        <span className="font-bebas text-xl tracking-widest text-amber">PALETTE RUN</span>
+      <div className="flex items-center gap-2 mb-3">
+        <PalletLogo size={20} color="#F5A623" />
+        <span className="font-bebas text-lg tracking-widest text-amber">PALETTE RUN</span>
       </div>
 
-      <div className="mb-4 shrink-0">
+      <div className="mb-4">
         <h1 className="font-bebas text-3xl text-white leading-tight">Vous êtes…</h1>
-        <p className="text-sub text-xs mt-1">Choisissez votre profil pour commencer.</p>
+        <p className="text-sub text-xs mt-0.5">Choisissez votre profil pour commencer.</p>
       </div>
 
-      {/* Rôles — flex-1 pour occuper l'espace disponible */}
-      <div className="flex flex-col gap-3 flex-1 justify-center shrink-0">
+      <div className="flex flex-col gap-3 mb-4">
         {ROLES.map(r => (
           <button key={r.id} onClick={() => { setSelectedRole(r.id); setError('') }}
-            className="flex items-center gap-4 px-4 py-5 rounded-2xl border-2 cursor-pointer transition-all text-left"
+            className="flex items-center gap-3 px-4 py-4 rounded-2xl border-2 cursor-pointer transition-all text-left w-full"
             style={{
               borderColor: selectedRole === r.id ? r.color : '#1C2330',
               background:  selectedRole === r.id ? `${r.color}14` : '#111827',
             }}
           >
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl shrink-0"
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
               style={{ background: selectedRole === r.id ? `${r.color}22` : '#1A2030' }}
             >{r.emoji}</div>
             <div className="flex-1">
-              <p className="font-bold text-base" style={{ color: selectedRole === r.id ? '#E8EDF5' : '#718096' }}>{r.title}</p>
+              <p className="font-bold text-sm" style={{ color: selectedRole === r.id ? '#E8EDF5' : '#718096' }}>{r.title}</p>
               <p className="text-xs text-muted mt-0.5">{r.sub}</p>
             </div>
             <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
@@ -189,27 +192,31 @@ export default function OnboardingPage() {
         ))}
       </div>
 
-      <div className="bg-red/10 border border-red/30 rounded-xl px-3 py-2.5 my-4 flex items-start gap-2 shrink-0">
-        <span className="text-sm shrink-0">⚠️</span>
+      <div className="bg-red/10 border border-red/30 rounded-xl px-3 py-2 flex items-start gap-2">
+        <span className="text-xs shrink-0">⚠️</span>
         <p className="text-xs text-red leading-relaxed">
           <strong>Ce choix est définitif.</strong> Si vous vous trompez, vous devrez supprimer votre compte et vous réinscrire.
         </p>
       </div>
 
-      {error && <p className="text-xs text-red mb-2 shrink-0 bg-red/10 rounded-xl px-3 py-2">{error}</p>}
+      {error && <p className="text-xs text-red mt-2 bg-red/10 rounded-xl px-3 py-2">{error}</p>}
 
-      <button
-        onClick={() => {
-          if (!selectedRole) { setError('Choisissez un profil pour continuer'); return }
-          setError('')
-          setStep(selectedRole === 'driver' ? 'driver-info' : 'company-info')
-        }}
-        disabled={!selectedRole}
-        className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40 shrink-0"
-        style={{ boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}
-      >
-        Continuer →
-      </button>
+      {/* Bouton fixe en bas */}
+      <div className="fixed bottom-0 left-0 right-0 px-5 bg-bg border-t border-border/30"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', paddingTop: '0.75rem' }}>
+        <button
+          onClick={() => {
+            if (!selectedRole) { setError('Choisissez un profil pour continuer'); return }
+            setError('')
+            setStep(selectedRole === 'driver' ? 'driver-info' : 'company-info')
+          }}
+          disabled={!selectedRole}
+          className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40"
+          style={{ boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}
+        >
+          Continuer →
+        </button>
+      </div>
     </div>
   )
 
