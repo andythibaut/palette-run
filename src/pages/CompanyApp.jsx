@@ -11,13 +11,21 @@ const TABS = [
 ]
 
 export default function CompanyApp() {
-  const [tab, setTab] = useState('annonce')
   const { user } = useAuthStore()
-  const { fetchCompany } = useCompanyStore()
+  const { fetchCompany, company } = useCompanyStore()
 
   useEffect(() => {
     if (user?.id) fetchCompany(user.id)
   }, [user?.id])
+
+  // Première connexion = pas de véhicule configuré → atterrir sur profil
+  const isFirstLogin = !company?.vehicle_required
+  const [tab, setTab] = useState('annonce') // sera mis à jour dès que company charge
+
+  // Redirige vers profil si première connexion
+  useEffect(() => {
+    if (company && !company.vehicle_required) setTab('profil')
+  }, [company])
 
   return (
     <div className="flex flex-col h-screen bg-bg overflow-hidden">

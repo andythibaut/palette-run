@@ -25,6 +25,9 @@ const ListingForm = ({ listing, onSave }) => {
   const [loading,      setLoading]      = useState(false)
   const [error,        setError]        = useState('')
 
+  // Considéré comme sauvegardé si l'annonce existe déjà en base
+  const isSaved = saved || !!listing
+
   const handleSave = async () => {
     if (!price || qty < 1) { setError('Renseignez le prix et la quantité'); return }
     if (!listing && !company?.id) { setError('Profil vendeur non chargé — réessayez'); return }
@@ -183,9 +186,9 @@ const ListingForm = ({ listing, onSave }) => {
       {/* Actions */}
       <button onClick={handleSave} disabled={loading || !price || qty < 1}
         className="w-full py-4 rounded-2xl font-bold text-bg text-base cursor-pointer disabled:opacity-40"
-        style={{ background: saved ? '#2ECC71' : 'linear-gradient(135deg,#F5A623,#E8940F)', boxShadow: '0 6px 20px rgba(245,166,35,0.3)', transition: 'background 0.3s' }}
+        style={{ background: isSaved ? '#2ECC71' : 'linear-gradient(135deg,#F5A623,#E8940F)', boxShadow: isSaved ? '0 6px 20px rgba(46,204,113,0.3)' : '0 6px 20px rgba(245,166,35,0.3)', transition: 'background 0.3s' }}
       >
-        {loading ? 'Sauvegarde…' : saved ? '✅ Publié sur la carte !' : listing ? 'Mettre à jour' : '📦 Publier sur la carte →'}
+        {loading ? 'Sauvegarde…' : isSaved ? '✅ Publié sur la carte !' : listing ? 'Mettre à jour' : '📦 Publier sur la carte →'}
       </button>
 
       {listing && (
@@ -258,8 +261,8 @@ const SiteSettings = ({ company }) => {
 
       <button onClick={handleSave} disabled={loading}
         className="w-full py-4 rounded-2xl font-bold text-bg cursor-pointer disabled:opacity-40"
-        style={{ background: saved ? '#2ECC71' : 'linear-gradient(135deg,#F5A623,#E8940F)' }}>
-        {loading ? 'Sauvegarde…' : saved ? '✅ Sauvegardé !' : 'Sauvegarder'}
+        style={{ background: saved ? '#2ECC71' : 'linear-gradient(135deg,#F5A623,#E8940F)', boxShadow: saved ? '0 6px 20px rgba(46,204,113,0.3)' : '0 6px 20px rgba(245,166,35,0.3)', transition: 'background 0.3s' }}>
+        {loading ? 'Sauvegarde…' : saved ? '✅ Profil sauvegardé !' : 'Sauvegarder'}
       </button>
     </div>
   )
@@ -436,11 +439,30 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto pb-2">
-        {tab === 'annonce'   && <ListingForm listing={listing} onSave={() => window.location.reload()} />}
+        {tab === 'annonce'   && (
+          company?.vehicle_required
+            ? <ListingForm listing={listing} onSave={() => window.location.reload()} />
+            : <div className="flex flex-col items-center justify-center h-64 gap-4 px-8 text-center">
+                <span className="text-5xl">⚙️</span>
+                <p className="font-bebas text-2xl text-white">Profil incomplet</p>
+                <p className="text-sm text-sub leading-relaxed">Configurez d'abord votre profil (onglet Profil) pour pouvoir publier une annonce.</p>
+              </div>
+        )}
         {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
         {tab === 'blacklist' && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}
         {tab === 'profil'    && (
           <>
+            {!company?.vehicle_required && (
+              <div className="mx-5 mt-5 bg-amber/10 border border-amber/40 rounded-2xl px-4 py-4 flex items-start gap-3">
+                <span className="text-2xl shrink-0">👋</span>
+                <div>
+                  <p className="text-amber font-bold text-sm">Bienvenue sur Palette Run !</p>
+                  <p className="text-amber/80 text-xs mt-1 leading-relaxed">
+                    Configurez votre profil pour pouvoir publier votre première annonce sur la carte.
+                  </p>
+                </div>
+              </div>
+            )}
             <SiteSettings company={company} />
             {/* Supprimer le compte */}
             <div className="px-5 pb-10 mt-2">
