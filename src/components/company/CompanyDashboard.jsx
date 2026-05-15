@@ -474,7 +474,7 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
                   const state  = useAuthStore.getState()
                   const userId = state.user?.id
                   try {
-                    const { error } = await supabase.rpc('delete_company_account', { user_id: userId })
+                    const { error } = await supabase.rpc('delete_company_account', { input_id: userId })
                     if (error) throw error
                     useCompanyStore.getState().reset()
                     await state.signOut()
