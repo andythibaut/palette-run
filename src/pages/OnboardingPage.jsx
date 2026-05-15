@@ -134,114 +134,49 @@ export default function OnboardingPage() {
   const { createCompany } = useCompanyStore()
   const navigate = useNavigate()
 
-  // Si le profil existe déjà → rediriger immédiatement
   useEffect(() => {
     if (profile) {
       navigate(profile.role === 'driver' ? '/app' : '/company', { replace: true })
     }
   }, [profile])
 
-  const [step,        setStep]        = useState('role')
+  const [step,        setStep]        = useState('role')      // 'role' | 'driver-info' | 'company-info'
   const [selectedRole,setSelectedRole]= useState(null)
   const [fullName,    setFullName]    = useState('')
   const [companyName, setCompanyName] = useState('')
-  const [geoAddress,  setGeoAddress]  = useState(null) // { label, city, postcode, lat, lng }
+  const [geoAddress,  setGeoAddress]  = useState(null)
   const [loading,     setLoading]     = useState(false)
   const [error,       setError]       = useState('')
 
-  const handleRoleSelect = async () => {
-    if (!selectedRole || !fullName.trim()) {
-      setError('Veuillez renseigner votre nom et choisir un profil')
-      return
-    }
-    setLoading(true)
-    setError('')
-    clearError()
-
-    // Timeout de sécurité 10s
-    const timeout = setTimeout(() => {
-      setLoading(false)
-      setError('Délai dépassé — vérifiez votre connexion et réessayez')
-    }, 10000)
-
-    const ok = await createProfile({ role: selectedRole, fullName: fullName.trim() })
-    clearTimeout(timeout)
-    setLoading(false)
-
-    if (!ok) {
-      setError(authError || 'Erreur lors de la création du profil — réessayez')
-      return
-    }
-
-    if (selectedRole === 'company') {
-      setStep('company-info')
-    } else {
-      navigate('/app', { replace: true })
-    }
-  }
-
-  const handleCompanyCreate = async () => {
-    if (!companyName.trim()) { setError('Le nom du site est obligatoire'); return }
-    if (!geoAddress)         { setError('Veuillez sélectionner une adresse dans la liste'); return }
-    setLoading(true)
-    const ok = await createCompany({
-      name:    companyName.trim(),
-      city:    geoAddress.city,
-      address: geoAddress.label,
-      lat:     geoAddress.lat,
-      lng:     geoAddress.lng,
-      ownerId: user.id,
-    })
-    setLoading(false)
-    if (!ok) return
-    navigate('/company', { replace: true })
-  }
-
-  // ─── Étape 1 : Choix du rôle ──────────────────────────────────────────────
+  // ─── Étape 1 : Choix du rôle uniquement ──────────────────────────────────
   if (step === 'role') return (
     <div className="flex flex-col h-screen bg-bg px-5 overflow-hidden"
       style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
 
-      {/* Logo */}
-      <div className="flex items-center gap-2 mb-4 shrink-0">
+      <div className="flex items-center gap-2 mb-6 shrink-0">
         <PalletLogo size={22} color="#F5A623" />
         <span className="font-bebas text-xl tracking-widest text-amber">PALETTE RUN</span>
       </div>
 
-      {/* Titre */}
-      <div className="mb-4 shrink-0">
-        <h1 className="font-bebas text-3xl text-white leading-tight">Vous êtes…</h1>
-        <p className="text-sub text-xs mt-1">Choisissez votre profil pour commencer.</p>
+      <div className="mb-6 shrink-0">
+        <h1 className="font-bebas text-4xl text-white leading-tight">Vous êtes…</h1>
+        <p className="text-sub text-sm mt-1">Choisissez votre profil pour commencer.</p>
       </div>
 
-      {/* Nom */}
-      <div className="mb-4 shrink-0">
-        <label className="text-xs text-muted uppercase tracking-widest block mb-1.5">
-          Votre nom <span className="text-amber">*</span>
-        </label>
-        <input
-          type="text" value={fullName}
-          onChange={e => { setFullName(e.target.value); setError('') }}
-          placeholder=""
-          className="w-full px-4 py-3 bg-hi border-2 border-border rounded-2xl text-white text-sm outline-none focus:border-amber transition-colors"
-        />
-      </div>
-
-      {/* Rôles */}
-      <div className="flex flex-col gap-3 mb-4 shrink-0">
+      <div className="flex flex-col gap-4 mb-6 shrink-0">
         {ROLES.map(r => (
           <button key={r.id} onClick={() => { setSelectedRole(r.id); setError('') }}
-            className="flex items-center gap-4 px-4 py-4 rounded-2xl border-2 cursor-pointer transition-all text-left"
+            className="flex items-center gap-4 px-4 py-5 rounded-2xl border-2 cursor-pointer transition-all text-left"
             style={{
               borderColor: selectedRole === r.id ? r.color : '#1C2330',
               background:  selectedRole === r.id ? `${r.color}14` : '#111827',
             }}
           >
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl shrink-0"
               style={{ background: selectedRole === r.id ? `${r.color}22` : '#1A2030' }}
             >{r.emoji}</div>
             <div className="flex-1">
-              <p className="font-semibold text-sm" style={{ color: selectedRole === r.id ? '#E8EDF5' : '#718096' }}>{r.title}</p>
+              <p className="font-bold text-base" style={{ color: selectedRole === r.id ? '#E8EDF5' : '#718096' }}>{r.title}</p>
               <p className="text-xs text-muted mt-0.5">{r.sub}</p>
             </div>
             <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
@@ -253,8 +188,7 @@ export default function OnboardingPage() {
         ))}
       </div>
 
-      {/* Avertissement */}
-      <div className="bg-red/10 border border-red/30 rounded-xl px-3 py-2.5 mb-3 flex items-start gap-2 shrink-0">
+      <div className="bg-red/10 border border-red/30 rounded-xl px-3 py-2.5 mb-4 flex items-start gap-2 shrink-0">
         <span className="text-sm shrink-0">⚠️</span>
         <p className="text-xs text-red leading-relaxed">
           <strong>Ce choix est définitif.</strong> Si vous vous trompez, vous devrez supprimer votre compte et vous réinscrire.
@@ -263,45 +197,144 @@ export default function OnboardingPage() {
 
       {error && <p className="text-xs text-red mb-2 shrink-0 bg-red/10 rounded-xl px-3 py-2">{error}</p>}
 
-      <button onClick={handleRoleSelect} disabled={loading || !selectedRole || !fullName.trim()}
+      <button
+        onClick={() => {
+          if (!selectedRole) { setError('Choisissez un profil pour continuer'); return }
+          setError('')
+          setStep(selectedRole === 'driver' ? 'driver-info' : 'company-info')
+        }}
+        disabled={!selectedRole}
         className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40 mt-auto shrink-0"
         style={{ boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}
       >
-        {loading ? 'Création…' : 'Continuer →'}
+        Continuer →
       </button>
     </div>
   )
 
-  // ─── Étape 2 : Infos vendeur ───────────────────────────────────────────
+  // ─── Étape 2a : Infos chauffeur ──────────────────────────────────────────
+  if (step === 'driver-info') {
+    const handleDriverCreate = async () => {
+      if (!fullName.trim()) { setError('Votre nom est obligatoire'); return }
+      setLoading(true)
+      setError('')
+      clearError()
+      const timeout = setTimeout(() => {
+        setLoading(false)
+        setError('Délai dépassé — vérifiez votre connexion et réessayez')
+      }, 10000)
+      const ok = await createProfile({ role: 'driver', fullName: fullName.trim() })
+      clearTimeout(timeout)
+      setLoading(false)
+      if (!ok) { setError(authError || 'Erreur lors de la création — réessayez'); return }
+      navigate('/app', { replace: true })
+    }
+
+    return (
+      <div className="flex flex-col h-screen bg-bg px-5 overflow-hidden"
+        style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+
+        <button onClick={() => setStep('role')} className="flex items-center gap-2 text-muted text-sm mb-6 bg-transparent border-none cursor-pointer shrink-0">
+          ← Retour
+        </button>
+
+        <div className="mb-8 shrink-0">
+          <span className="text-4xl">🚛</span>
+          <h1 className="font-bebas text-4xl text-white leading-tight mt-2">Votre nom</h1>
+          <p className="text-sub text-sm mt-1">Ce nom sera visible par les vendeurs.</p>
+        </div>
+
+        <div className="mb-6 shrink-0">
+          <label className="text-xs text-muted uppercase tracking-widest block mb-2">
+            Nom du chauffeur <span className="text-amber">*</span>
+          </label>
+          <input
+            type="text" value={fullName}
+            onChange={e => { setFullName(e.target.value); setError('') }}
+            placeholder=""
+            autoFocus
+            className="w-full px-4 py-4 bg-hi border-2 border-border rounded-2xl text-white text-lg outline-none focus:border-blue transition-colors"
+          />
+        </div>
+
+        {error && <p className="text-xs text-red mb-4 bg-red/10 rounded-xl px-3 py-2">{error}</p>}
+
+        <button onClick={handleDriverCreate} disabled={loading || !fullName.trim()}
+          className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40 mt-auto shrink-0"
+          style={{ boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}
+        >
+          {loading ? 'Création…' : '🚛 Accéder à la carte →'}
+        </button>
+      </div>
+    )
+  }
+
+  // ─── Étape 2b : Infos vendeur ─────────────────────────────────────────────
+  const handleCompanyCreate = async () => {
+    if (!companyName.trim()) { setError("Le nom de l'enseigne est obligatoire"); return }
+    if (!geoAddress)         { setError('Veuillez sélectionner une adresse dans la liste'); return }
+    setLoading(true)
+    setError('')
+    clearError()
+    const timeout = setTimeout(() => {
+      setLoading(false)
+      setError('Délai dépassé — vérifiez votre connexion et réessayez')
+    }, 10000)
+    const profileOk = await createProfile({ role: 'company', fullName: companyName.trim() })
+    if (!profileOk) {
+      clearTimeout(timeout)
+      setLoading(false)
+      setError(authError || 'Erreur lors de la création — réessayez')
+      return
+    }
+    const companyOk = await createCompany({
+      name:    companyName.trim(),
+      city:    geoAddress.city,
+      address: geoAddress.label,
+      lat:     geoAddress.lat,
+      lng:     geoAddress.lng,
+      ownerId: user.id,
+    })
+    clearTimeout(timeout)
+    setLoading(false)
+    if (!companyOk) { setError('Erreur lors de la création du site — réessayez'); return }
+    navigate('/company', { replace: true })
+  }
+
   return (
-    <div className="flex flex-col min-h-screen bg-bg px-6 py-10">
-      <div className="mb-8">
-        <h1 className="font-bebas text-4xl text-white leading-tight">Votre site</h1>
-        <p className="text-sub text-sm mt-2">Ces informations seront visibles sur la carte.</p>
+    <div className="flex flex-col min-h-screen bg-bg px-5"
+      style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+
+      <button onClick={() => setStep('role')} className="flex items-center gap-2 text-muted text-sm mb-6 bg-transparent border-none cursor-pointer shrink-0">
+        ← Retour
+      </button>
+
+      <div className="mb-6">
+        <span className="text-4xl">🏭</span>
+        <h1 className="font-bebas text-4xl text-white leading-tight mt-2">Votre enseigne</h1>
+        <p className="text-sub text-sm mt-1">Ces informations seront visibles sur la carte.</p>
       </div>
 
-      <div className="flex flex-col gap-5 mb-8">
-        {/* Nom du site */}
+      <div className="flex flex-col gap-5 mb-6">
         <div>
           <label className="text-xs text-muted uppercase tracking-widest block mb-2">
-            Nom du site <span className="text-amber">*</span>
+            Nom de l'enseigne <span className="text-amber">*</span>
           </label>
           <input
             type="text" value={companyName}
             onChange={e => { setCompanyName(e.target.value); setError('') }}
-            placeholder="SAS Logipro — Entrepôt Nord"
-            className="w-full px-4 py-3 bg-hi border-2 border-border rounded-2xl text-white text-sm outline-none focus:border-amber transition-colors"
+            placeholder=""
+            autoFocus
+            className="w-full px-4 py-4 bg-hi border-2 border-border rounded-2xl text-white text-lg outline-none focus:border-green transition-colors"
           />
         </div>
 
-        {/* Adresse avec autocomplétion */}
         <AddressField onSelect={(s) => { setGeoAddress(s); setError('') }} />
 
-        {/* Info */}
         <div className="bg-blue/10 border border-blue/20 rounded-xl px-4 py-3 flex items-start gap-3">
           <span className="text-base shrink-0">ℹ️</span>
           <p className="text-xs text-blue/80 leading-relaxed">
-            Tapez votre adresse et <strong className="text-blue">sélectionnez-la dans la liste</strong>. Les coordonnées GPS sont récupérées automatiquement — les chauffeurs vous trouveront précisément sur la carte.
+            Tapez votre adresse et <strong className="text-blue">sélectionnez-la dans la liste</strong>. Les coordonnées GPS sont récupérées automatiquement.
           </p>
         </div>
       </div>
@@ -315,7 +348,7 @@ export default function OnboardingPage() {
           className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40"
           style={{ boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}
         >
-          {loading ? 'Création…' : '📦 Publier mon premier stock →'}
+          {loading ? 'Création…' : '📦 Créer mon enseigne →'}
         </button>
         <p className="text-center text-xs text-muted">100% gratuit — toujours</p>
       </div>
