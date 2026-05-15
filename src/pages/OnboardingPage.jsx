@@ -72,7 +72,7 @@ const AddressField = ({ onSelect }) => {
           value={query}
           onChange={e => search(e.target.value)}
           onFocus={() => setFocused(true)}
-          onBlur={() => setTimeout(() => setFocused(false), 150)}
+          onBlur={() => setTimeout(() => setFocused(false), 300)}
           placeholder="22 avenue d'Italie, Paris…"
           className="flex-1 px-3 py-3 bg-transparent text-white text-sm outline-none"
           autoComplete="off"
