@@ -114,18 +114,18 @@ const AddressField = ({ onSelect }) => {
 
 const ROLES = [
   {
-    id:    'driver',
-    emoji: '🚛',
-    title: "J'achète des palettes",
-    sub:   'Je recherche des palettes à acheter',
-    color: '#3B82F6',
-  },
-  {
     id:    'company',
     emoji: '🏭',
-    title: 'Je vends des palettes',
-    sub:   'Je mets mes palettes en vente',
+    title: 'Vous êtes commerçant',
+    sub:   'Vous vendez des palettes',
     color: '#2ECC71',
+  },
+  {
+    id:    'driver',
+    emoji: '🚛',
+    title: 'Vous êtes chauffeur',
+    sub:   'Vous achetez des palettes',
+    color: '#3B82F6',
   },
 ]
 
@@ -153,17 +153,18 @@ export default function OnboardingPage() {
     <div className="flex flex-col h-screen bg-bg px-5 overflow-hidden"
       style={{ paddingTop: 'max(1.5rem, env(safe-area-inset-top))', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
 
-      <div className="flex items-center gap-2 mb-6 shrink-0">
+      <div className="flex items-center gap-2 mb-4 shrink-0">
         <PalletLogo size={22} color="#F5A623" />
         <span className="font-bebas text-xl tracking-widest text-amber">PALETTE RUN</span>
       </div>
 
-      <div className="mb-6 shrink-0">
-        <h1 className="font-bebas text-4xl text-white leading-tight">Vous êtes…</h1>
-        <p className="text-sub text-sm mt-1">Choisissez votre profil pour commencer.</p>
+      <div className="mb-4 shrink-0">
+        <h1 className="font-bebas text-3xl text-white leading-tight">Vous êtes…</h1>
+        <p className="text-sub text-xs mt-1">Choisissez votre profil pour commencer.</p>
       </div>
 
-      <div className="flex flex-col gap-4 mb-6 shrink-0">
+      {/* Rôles — flex-1 pour occuper l'espace disponible */}
+      <div className="flex flex-col gap-3 flex-1 justify-center shrink-0">
         {ROLES.map(r => (
           <button key={r.id} onClick={() => { setSelectedRole(r.id); setError('') }}
             className="flex items-center gap-4 px-4 py-5 rounded-2xl border-2 cursor-pointer transition-all text-left"
@@ -188,7 +189,7 @@ export default function OnboardingPage() {
         ))}
       </div>
 
-      <div className="bg-red/10 border border-red/30 rounded-xl px-3 py-2.5 mb-4 flex items-start gap-2 shrink-0">
+      <div className="bg-red/10 border border-red/30 rounded-xl px-3 py-2.5 my-4 flex items-start gap-2 shrink-0">
         <span className="text-sm shrink-0">⚠️</span>
         <p className="text-xs text-red leading-relaxed">
           <strong>Ce choix est définitif.</strong> Si vous vous trompez, vous devrez supprimer votre compte et vous réinscrire.
@@ -204,7 +205,7 @@ export default function OnboardingPage() {
           setStep(selectedRole === 'driver' ? 'driver-info' : 'company-info')
         }}
         disabled={!selectedRole}
-        className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40 mt-auto shrink-0"
+        className="w-full py-4 rounded-2xl bg-amber text-bg font-bold text-base cursor-pointer disabled:opacity-40 shrink-0"
         style={{ boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}
       >
         Continuer →
