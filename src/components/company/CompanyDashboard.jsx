@@ -473,40 +473,10 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
                   if (!window.confirm('Êtes-vous vraiment sûr ? Toutes vos données seront perdues.')) return
                   const state  = useAuthStore.getState()
                   const userId = state.user?.id
-                  const { company: myCompany } = useCompanyStore.getState()
-                  const companyId = myCompany?.id
-
                   try {
-                    if (companyId) {
-                      // 1. Récupère les IDs des annonces
-                      const { data: listingIds } = await supabase
-                        .from('listings')
-                        .select('id')
-                        .eq('company_id', companyId)
-                      const ids = (listingIds || []).map(l => l.id)
-
-                      if (ids.length > 0) {
-                        // 2. Supprime les transactions liées aux annonces
-                        await supabase.from('transactions').delete().in('listing_id', ids)
-                        // 3. Supprime les bids liés aux annonces
-                        await supabase.from('bids').delete().in('listing_id', ids)
-                        // 4. Supprime les annonces
-                        await supabase.from('listings').delete().eq('company_id', companyId)
-                      }
-
-                      // 5. Supprime la blacklist du site
-                      await supabase.from('blacklist').delete().eq('company_id', companyId)
-                      // 6. Supprime la company
-                      await supabase.from('companies').delete().eq('id', companyId)
-                    }
-
-                    // 7. Supprime les notifications du user
-                    await supabase.from('notifications').delete().eq('user_id', userId)
-                    // 8. Reset du store company
+                    const { error } = await supabase.rpc('delete_company_account', { user_id: userId })
+                    if (error) throw error
                     useCompanyStore.getState().reset()
-                    // 9. Supprime le profil
-                    await supabase.from('profiles').delete().eq('id', userId)
-                    // 10. Déconnexion
                     await state.signOut()
                   } catch (e) {
                     alert('Erreur lors de la suppression : ' + e.message)
