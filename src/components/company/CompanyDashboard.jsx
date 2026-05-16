@@ -335,7 +335,7 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate }) =
               <button onClick={() => onValidate(d.bidder_id, driverName)}
                 className="w-full py-3 font-bold text-bg text-sm cursor-pointer border-t border-amber/30"
                 style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)' }}>
-                ✅ Valider — {driverName} est arrivé
+                ✅ Autoriser {driverName} à venir chercher les palettes
               </button>
             )}
           </div>
@@ -391,38 +391,34 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
   }
 
   const handleValidate = async (driverId, driverName) => {
-    if (!window.confirm(`Valider la transaction avec ${driverName} ?`)) return
+    if (!window.confirm(`Autoriser ${driverName} à venir chercher les palettes ?`)) return
     if (!listing) return
 
     const { error } = await supabase
       .from('transactions')
-      .insert({
-        listing_id:           listing.id,
-        company_id:           company.id,
-        driver_id:            driverId,
-        qty:                  listing.qty,
-        buy_price:            listing.current_bid || listing.price,
+      .update({
         status:               'confirmed',
         company_validated_at: new Date().toISOString(),
-        driver_confirmed_at:  new Date().toISOString(),
-        had_active_bid:       listing.current_bid !== null,
       })
+      .eq('listing_id', listing.id)
+      .eq('driver_id',  driverId)
+      .eq('status',     'pending')
 
     if (error) { alert('Erreur lors de la validation'); return }
 
-    // Désactive l'annonce
+    // Désactive l'annonce — invisible pour les autres chauffeurs
     await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
 
-    // Notification au acheteur
+    // Notification au chauffeur avec les détails du commerçant
     await supabase.from('notifications').insert({
       user_id: driverId,
       type:    'transaction_confirmed',
-      title:   '✅ Transaction confirmée !',
-      body:    `Votre transaction chez ${company.name} a été validée.`,
-      data:    { listing_id: listing.id },
+      title:   '🎉 Votre demande a été acceptée !',
+      body:    `${company.name} vous autorise à venir chercher les palettes. Rendez-vous au ${company.address}, ${company.city}.`,
+      data:    { listing_id: listing.id, company_name: company.name, company_address: company.address, company_lat: company.lat, company_lng: company.lng },
     })
 
-    alert(`✅ Transaction validée avec ${driverName} !`)
+    alert(`✅ ${driverName} a été autorisé à venir. Une notification lui a été envoyée avec l'adresse.`)
     window.location.reload()
   }
 
