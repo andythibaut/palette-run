@@ -140,19 +140,22 @@ export default function OnboardingPage() {
   const { createCompany } = useCompanyStore()
   const navigate = useNavigate()
 
+  const [step,           setStep]           = useState('role')
+  const [selectedRole,   setSelectedRole]   = useState(null)
+  const [fullName,       setFullName]       = useState('')
+  const [companyName,    setCompanyName]    = useState('')
+  const [geoAddress,     setGeoAddress]     = useState(null)
+  const [loading,        setLoading]        = useState(false)
+  const [error,          setError]          = useState('')
+  // Guard : on bloque la redirection auto pendant la création company
+  // car createProfile() met à jour `profile` avant que createCompany() soit appelé
+  const [creatingCompany, setCreatingCompany] = useState(false)
+
   useEffect(() => {
-    if (profile) {
+    if (profile && !creatingCompany) {
       navigate(profile.role === 'driver' ? '/app' : '/company', { replace: true })
     }
-  }, [profile])
-
-  const [step,        setStep]        = useState('role')      // 'role' | 'driver-info' | 'company-info'
-  const [selectedRole,setSelectedRole]= useState(null)
-  const [fullName,    setFullName]    = useState('')
-  const [companyName, setCompanyName] = useState('')
-  const [geoAddress,  setGeoAddress]  = useState(null)
-  const [loading,     setLoading]     = useState(false)
-  const [error,       setError]       = useState('')
+  }, [profile, creatingCompany])
 
   // ─── Étape 1 : Choix du rôle uniquement ──────────────────────────────────
   if (step === 'role') return (
@@ -288,16 +291,19 @@ export default function OnboardingPage() {
     if (!companyName.trim()) { setError("Le nom de l'enseigne est obligatoire"); return }
     if (!geoAddress)         { setError('Veuillez sélectionner une adresse dans la liste'); return }
     setLoading(true)
+    setCreatingCompany(true)  // bloque le useEffect pendant les deux appels
     setError('')
     clearError()
     const timeout = setTimeout(() => {
       setLoading(false)
+      setCreatingCompany(false)
       setError('Délai dépassé — vérifiez votre connexion et réessayez')
     }, 10000)
     const profileOk = await createProfile({ role: 'company', fullName: companyName.trim() })
     if (!profileOk) {
       clearTimeout(timeout)
       setLoading(false)
+      setCreatingCompany(false)
       setError(authError || 'Erreur lors de la création — réessayez')
       return
     }
@@ -311,6 +317,7 @@ export default function OnboardingPage() {
     })
     clearTimeout(timeout)
     setLoading(false)
+    setCreatingCompany(false)  // libère le guard avant de naviguer
     if (!companyOk) { setError('Erreur lors de la création du site — réessayez'); return }
     navigate('/company', { replace: true })
   }
