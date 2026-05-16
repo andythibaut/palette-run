@@ -135,7 +135,14 @@ export const useCompanyStore = create((set, get) => ({
 
   // Récupère les chauffeurs qui ont consulté
   fetchDrivers: async (listingId, reservedBy) => {
-    // 1. Chauffeurs ayant enchéri
+    // 1. Chauffeurs ayant une transaction pending (réservation)
+    const { data: txData } = await supabase
+      .from('transactions')
+      .select('*, profiles(*)')
+      .eq('listing_id', listingId)
+      .eq('status', 'pending')
+
+    // 2. Chauffeurs ayant enchéri
     const { data: bidsData } = await supabase
       .from('bids')
       .select('*, profiles(*)')
@@ -143,25 +150,25 @@ export const useCompanyStore = create((set, get) => ({
       .order('created_at', { ascending: false })
 
     const seen = new Set()
-    const unique = ((bidsData || []).filter(b => {
-      if (seen.has(b.bidder_id)) return false
-      seen.add(b.bidder_id)
-      return true
-    }))
+    const result = []
 
-    // 2. Chauffeur ayant réservé (s'il n'est pas déjà dans les bids)
-    if (reservedBy && !seen.has(reservedBy)) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', reservedBy)
-        .single()
-      if (profile) {
-        unique.unshift({ bidder_id: reservedBy, profiles: profile, isReservation: true, created_at: new Date().toISOString() })
+    // Priorité aux réservations
+    for (const tx of (txData || [])) {
+      if (!seen.has(tx.driver_id)) {
+        seen.add(tx.driver_id)
+        result.push({ bidder_id: tx.driver_id, profiles: tx.profiles, isReservation: true, created_at: tx.created_at, transaction_id: tx.id })
       }
     }
 
-    set({ drivers: unique })
+    // Puis les enchères
+    for (const bid of (bidsData || [])) {
+      if (!seen.has(bid.bidder_id)) {
+        seen.add(bid.bidder_id)
+        result.push(bid)
+      }
+    }
+
+    set({ drivers: result })
   },
 
   // Récupère la liste noire
