@@ -51,11 +51,12 @@ const useAddressSearch = () => {
 // ─── Composant champ adresse ─────────────────────────────────────────────────
 const AddressField = ({ onSelect }) => {
   const { query, search, suggestions, selected, pick, loading } = useAddressSearch()
-  const [focused, setFocused] = useState(false)
+  const [open, setOpen] = useState(false)
 
   const handlePick = (s) => {
     pick(s)
     onSelect(s)
+    setOpen(false)
   }
 
   return (
@@ -64,29 +65,34 @@ const AddressField = ({ onSelect }) => {
         Adresse du site <span className="text-amber">*</span>
       </label>
       <div className={`flex items-center bg-hi rounded-2xl border-2 overflow-hidden transition-colors ${
-        selected ? 'border-green' : focused ? 'border-amber' : 'border-border'
+        selected ? 'border-green' : open ? 'border-amber' : 'border-border'
       }`}>
         <span className="pl-4 text-lg shrink-0">{selected ? '✅' : '📍'}</span>
         <input
           type="text"
           value={query}
-          onChange={e => search(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setTimeout(() => setFocused(false), 300)}
+          onChange={e => { search(e.target.value); setOpen(true) }}
+          onFocus={() => setOpen(true)}
           placeholder="22 avenue d'Italie, Paris…"
           className="flex-1 px-3 py-3 bg-transparent text-white text-sm outline-none"
           autoComplete="off"
+          autoCorrect="off"
+          spellCheck="false"
         />
         {loading && <span className="pr-4 text-muted text-xs animate-pulse">…</span>}
+        {query.length > 0 && !loading && (
+          <button onPointerDown={() => { search(''); setOpen(false) }}
+            className="pr-4 text-muted text-sm cursor-pointer bg-transparent border-none">✕</button>
+        )}
       </div>
 
       {/* Suggestions */}
-      {suggestions.length > 0 && focused && (
+      {open && suggestions.length > 0 && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-surface border border-border rounded-2xl overflow-hidden shadow-2xl">
           {suggestions.map((s, i) => (
             <button
               key={i}
-              onMouseDown={() => handlePick(s)}
+              onPointerDown={() => handlePick(s)}
               className="w-full px-4 py-3 text-left hover:bg-hi transition-colors border-none bg-transparent cursor-pointer border-b border-border/50 last:border-0"
             >
               <p className="text-white text-sm font-semibold leading-tight">{s.label}</p>
@@ -97,7 +103,7 @@ const AddressField = ({ onSelect }) => {
       )}
 
       {/* Aucun résultat */}
-      {query.length >= 3 && !loading && suggestions.length === 0 && focused && !selected && (
+      {open && query.length >= 3 && !loading && suggestions.length === 0 && !selected && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-surface border border-border rounded-2xl px-4 py-3 shadow-2xl">
           <p className="text-muted text-sm">Aucune adresse trouvée — vérifiez l'orthographe</p>
         </div>
