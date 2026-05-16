@@ -30,7 +30,7 @@ export default function DriverApp() {
   }, [profile?.vehicle_type])
 
   return (
-    <div className="flex flex-col h-screen bg-bg overflow-hidden">
+    <div className="flex flex-col bg-bg overflow-hidden" style={{ height: '100dvh' }}>
       {/* Contenu principal */}
       <div className={`flex-1 relative ${tab === 'pickups' || tab === 'profile' ? 'overflow-auto' : 'overflow-hidden'}`}>
         {/* Carte — toujours montée, cachée via CSS */}

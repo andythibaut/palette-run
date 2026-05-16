@@ -28,7 +28,7 @@ export default function CompanyApp() {
   }, [company])
 
   return (
-    <div className="flex flex-col h-screen bg-bg overflow-hidden">
+    <div className="flex flex-col bg-bg overflow-hidden" style={{ height: '100dvh' }}>
       {/* Contenu */}
       <div className="flex-1 overflow-hidden relative">
         <CompanyDashboard tab={tab} />
