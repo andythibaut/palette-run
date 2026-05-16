@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useAuthStore }   from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
+import { useListingStore } from '@/store/useListingStore'
 import CompanyDashboard from '@/components/company/CompanyDashboard'
+import DriverMapView    from '@/components/map/DriverMapView'
 
 const TABS = [
   { id: 'annonce',   icon: '📦', label: 'Annonce'   },
   { id: 'acheteurs', icon: '🚛', label: 'Acheteurs' },
+  { id: 'carte',     icon: '🗺',  label: 'Carte'     },
   { id: 'blacklist', icon: '🚫', label: 'Blacklist' },
   { id: 'profil',    icon: '👤', label: 'Profil'    },
 ]
@@ -13,16 +16,21 @@ const TABS = [
 export default function CompanyApp() {
   const { user } = useAuthStore()
   const { fetchCompany, company } = useCompanyStore()
+  const { fetchListings, subscribeRealtime, unsubscribeRealtime } = useListingStore()
+  const [tab, setTab] = useState('annonce')
+  const [mapViewport, setMapViewport] = useState(null)
 
   useEffect(() => {
     if (user?.id) fetchCompany(user.id)
   }, [user?.id])
 
-  // Première connexion = pas de véhicule configuré → atterrir sur profil
-  const isFirstLogin = !company?.vehicle_required
-  const [tab, setTab] = useState('annonce') // sera mis à jour dès que company charge
+  useEffect(() => {
+    fetchListings()
+    subscribeRealtime()
+    return () => unsubscribeRealtime()
+  }, [])
 
-  // Redirige vers profil si première connexion
+  // Première connexion → onglet profil
   useEffect(() => {
     if (company && !company.vehicle_required) setTab('profil')
   }, [company])
@@ -31,10 +39,19 @@ export default function CompanyApp() {
     <div className="flex flex-col bg-bg overflow-hidden" style={{ height: '100dvh' }}>
       {/* Contenu */}
       <div className="flex-1 overflow-hidden relative">
-        <CompanyDashboard tab={tab} />
+        {/* Carte — toujours montée, cachée via CSS */}
+        <div style={{ display: tab === 'carte' ? 'block' : 'none', height: '100%' }}>
+          <DriverMapView
+            profile={{ tier: 'free' }}
+            savedViewport={mapViewport}
+            onViewportChange={setMapViewport}
+            readOnly
+          />
+        </div>
+        {tab !== 'carte' && <CompanyDashboard tab={tab} />}
       </div>
 
-      {/* Bottom nav fixe */}
+      {/* Bottom nav */}
       <div className="shrink-0 border-t border-border bg-bg"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex">

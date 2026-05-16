@@ -182,13 +182,13 @@ export default function DriverProfile() {
           <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Seuil couleur dorée 🥇</p>
           <div className="bg-surface border border-amber/40 rounded-2xl p-4">
             <p className="text-sub text-xs mb-3 leading-relaxed">
-              Annonces affichées en or quand le bénéfice dépasse ce seuil par palette.
+              Annonces affichées en or quand le bénéfice total (prix × quantité) dépasse ce seuil.
             </p>
             {!editGold ? (
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-bebas text-5xl text-amber leading-none">{goldThreshold} €</p>
-                  <p className="text-sub text-xs mt-1">/ palette</p>
+                  <p className="text-sub text-xs mt-1">bénéfice total</p>
                 </div>
                 <button onClick={() => setEditGold(true)}
                   className="px-4 py-2 rounded-xl bg-amber/10 border border-amber/40 text-amber text-sm font-semibold cursor-pointer">
@@ -204,7 +204,7 @@ export default function DriverProfile() {
                     autoFocus
                     className="flex-1 py-3 bg-transparent text-white font-bebas text-3xl outline-none"
                   />
-                  <span className="px-4 text-muted text-xs">/ pal.</span>
+                  <span className="px-4 text-muted text-xs">total</span>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => setEditGold(false)} className="flex-1 py-2.5 rounded-xl border border-border bg-transparent text-sub text-sm cursor-pointer">Annuler</button>
@@ -222,6 +222,12 @@ export default function DriverProfile() {
 
       {/* Supprimer le compte */}
       <div className="px-5 pb-10 mt-6">
+        {/* Déconnexion */}
+        <button onClick={() => useAuthStore.getState().signOut()}
+          className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer mb-4">
+          🚪 Se déconnecter
+        </button>
+
         <div className="border-t border-border pt-6">
           <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Zone dangereuse</p>
           <button onClick={async () => {

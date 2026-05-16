@@ -467,6 +467,12 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
             {/* Supprimer le compte */}
             <div className="px-5 pb-10 mt-2">
               <div className="border-t border-border pt-6">
+                {/* Déconnexion */}
+                <button onClick={() => useAuthStore.getState().signOut()}
+                  className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer mb-4">
+                  🚪 Se déconnecter
+                </button>
+
                 <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Zone dangereuse</p>
                 <button onClick={async () => {
                   if (!window.confirm('Supprimer définitivement votre compte ? Cette action est irréversible.')) return
