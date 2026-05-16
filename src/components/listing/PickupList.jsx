@@ -209,13 +209,23 @@ export default function PickupList({ profile }) {
               </div>
 
               <div className="px-4 pt-4 pb-4">
-                {/* Vendeur */}
+                {/* Vendeur — nom et adresse floutés tant que pending */}
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-amber/10 border border-amber/30 flex items-center justify-center text-xl shrink-0">🏭</div>
                   <div className="flex-1">
-                    <p className="font-bebas text-xl text-white leading-tight">{p.companies?.name}</p>
-                    <p className="text-sub text-xs">{p.companies?.city}</p>
-                    {p.companies?.address && <p className="text-muted text-xs mt-0.5">📍 {p.companies.address}</p>}
+                    {p.status === 'confirmed' ? (
+                      <>
+                        <p className="font-bebas text-xl text-white leading-tight">{p.companies?.name}</p>
+                        <p className="text-sub text-xs">{p.companies?.city}</p>
+                        {p.companies?.address && <p className="text-muted text-xs mt-0.5">📍 {p.companies.address}</p>}
+                      </>
+                    ) : (
+                      <>
+                        <p className="font-bebas text-xl text-white leading-tight" style={{ filter: 'blur(6px)', userSelect: 'none' }}>Vendeur</p>
+                        <p className="text-sub text-xs" style={{ filter: 'blur(4px)', userSelect: 'none' }}>Ville</p>
+                        <p className="text-muted text-xs mt-0.5 italic">⏳ Adresse visible après validation du commerçant</p>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -270,20 +280,22 @@ export default function PickupList({ profile }) {
                   </div>
                 )}
 
-                {/* Bouton GPS */}
-                <button onClick={() => {
-                  const addr = p.companies?.address
-                  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-                  const query = addr ? encodeURIComponent(addr) : ''
-                  if (isIOS) {
-                    window.open(`maps://maps.apple.com/?q=${query}`, '_blank')
-                  } else {
-                    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
-                  }
-                }}
-                  className="w-full py-3 rounded-xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2 mb-3">
-                  🗺 Y aller
-                </button>
+                {/* Bouton GPS — uniquement après confirmation */}
+                {p.status === 'confirmed' && (
+                  <button onClick={() => {
+                    const addr = p.companies?.address
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+                    const query = addr ? encodeURIComponent(addr) : ''
+                    if (isIOS) {
+                      window.open(`maps://maps.apple.com/?q=${query}`, '_blank')
+                    } else {
+                      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
+                    }
+                  }}
+                    className="w-full py-3 rounded-xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2 mb-3">
+                    🗺 Y aller
+                  </button>
+                )}
 
                 {/* Enchères si actives */}
                 {hasBid && listing && isPending && (
