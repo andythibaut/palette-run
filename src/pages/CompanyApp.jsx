@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuthStore }   from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import { useListingStore } from '@/store/useListingStore'
@@ -19,6 +19,11 @@ export default function CompanyApp() {
   const { fetchListings, subscribeRealtime, unsubscribeRealtime } = useListingStore()
   const [tab, setTab] = useState('annonce')
   const [mapViewport, setMapViewport] = useState(null)
+  const mapRef = useRef(null)
+
+  useEffect(() => {
+    if (tab === 'carte') setTimeout(() => mapRef.current?.resize(), 50)
+  }, [tab])
 
   useEffect(() => {
     if (user?.id) fetchCompany(user.id)
@@ -42,6 +47,7 @@ export default function CompanyApp() {
         {/* Carte — toujours montée, cachée via CSS */}
         <div style={{ display: tab === 'carte' ? 'block' : 'none', height: '100%' }}>
           <DriverMapView
+            ref={mapRef}
             profile={{ tier: 'free' }}
             savedViewport={mapViewport}
             onViewportChange={setMapViewport}

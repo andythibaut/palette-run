@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 import Map, { Marker, NavigationControl } from 'react-map-gl'
 import { useListingStore } from '@/store/useListingStore'
 import { useAuthStore }   from '@/store/useAuthStore'
@@ -82,11 +82,16 @@ const UserMarker = ({ lng, lat }) => (
 )
 
 // ─── Vue principale ───────────────────────────────────────────────────────────
-export default function DriverMapView({ profile, savedViewport, onViewportChange }) {
+const DriverMapView = forwardRef(function DriverMapView({ profile, savedViewport, onViewportChange }, ref) {
   const { listings, selected, setSelected } = useListingStore()
   const [viewport, setViewport] = useState(savedViewport || DEFAULT_CENTER)
   const [userPos,  setUserPos]  = useState(null)
   const mapRef = useRef(null)
+
+  // Expose resize() au parent
+  useImperativeHandle(ref, () => ({
+    resize: () => mapRef.current?.resize()
+  }))
 
   const resalePrice   = profile?.resale_price   || null
   const goldThreshold = profile?.gold_threshold || 20
@@ -178,4 +183,6 @@ export default function DriverMapView({ profile, savedViewport, onViewportChange
       )}
     </div>
   )
-}
+})
+
+export default DriverMapView

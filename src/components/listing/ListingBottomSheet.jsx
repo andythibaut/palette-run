@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useListingStore } from '@/store/useListingStore'
 import { useAuthStore }    from '@/store/useAuthStore'
+import { supabase }        from '@/lib/supabase'
 import { profitColor }     from '@/lib/mapbox'
 import { formatPickupDeadline } from '@/lib/transaction'
 
@@ -20,8 +21,22 @@ const openGPS = (address, lat, lng) => {
 export default function ListingBottomSheet({ listing, profile, onClose }) {
   const { reserveListing, placeBid } = useListingStore()
   const { user } = useAuthStore()
-  const [booked,  setBooked]  = useState(false)
-  const [bidding, setBidding] = useState(false)
+  const [booked,      setBooked]      = useState(false)
+  const [bidding,     setBidding]     = useState(false)
+  const [isConfirmed, setIsConfirmed] = useState(false) // transaction validée par le commerçant
+
+  // Vérifie si ce chauffeur a une transaction confirmée pour cette annonce
+  useEffect(() => {
+    if (!user?.id || !listing?.id) return
+    supabase
+      .from('transactions')
+      .select('id')
+      .eq('listing_id', listing.id)
+      .eq('driver_id', user.id)
+      .eq('status', 'confirmed')
+      .single()
+      .then(({ data }) => setIsConfirmed(!!data))
+  }, [listing?.id, user?.id])
 
   const userTier       = profile?.tier          || 'free'
   const resalePrice    = profile?.resale_price  || null
@@ -31,6 +46,9 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   const isReserved     = listing.reserved_by !== null
   const isReservedByMe = listing.reserved_by === user?.id
   const color          = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
+
+  // Nom et adresse visibles uniquement si le commerçant a validé la transaction
+  const canSeeDetails = isConfirmed
 
   const profit = resalePrice && resalePrice > listing.price && !isHidden
     ? (resalePrice - listing.price) * listing.qty
@@ -73,19 +91,20 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                 style={{ color: isHidden ? '#4A5568' : '#E8EDF5' }}>
                 {isHidden
                   ? 'Nom masqué'
-                  : isReservedByMe
+                  : canSeeDetails
                     ? listing.companies?.name
                     : <span style={{ filter: 'blur(6px)', userSelect: 'none' }}>{listing.companies?.name || 'Vendeur'}</span>
                 }
               </h2>
               <p className="text-sub text-sm mt-0.5">
                 {listing.companies?.city}
-                {/* Adresse masquée avant réservation */}
-                {isReservedByMe && listing.companies?.address && (
+                {canSeeDetails && listing.companies?.address && (
                   <span className="block text-xs text-muted mt-0.5">📍 {listing.companies.address}</span>
                 )}
-                {!isReservedByMe && (
-                  <span className="block text-xs text-muted/50 mt-0.5 italic">Adresse visible après réservation</span>
+                {!canSeeDetails && !isHidden && (
+                  <span className="block text-xs text-muted/50 mt-0.5 italic">
+                    {isReservedByMe ? 'En attente de validation du commerçant…' : 'Adresse visible après validation'}
+                  </span>
                 )}
               </p>
             </div>

@@ -134,21 +134,33 @@ export const useCompanyStore = create((set, get) => ({
   },
 
   // Récupère les chauffeurs qui ont consulté
-  fetchDrivers: async (listingId) => {
-    const { data, error } = await supabase
+  fetchDrivers: async (listingId, reservedBy) => {
+    // 1. Chauffeurs ayant enchéri
+    const { data: bidsData } = await supabase
       .from('bids')
       .select('*, profiles(*)')
       .eq('listing_id', listingId)
       .order('created_at', { ascending: false })
 
-    if (error) { set({ error: error.message }); return }
-    // Déduplique par chauffeur
     const seen = new Set()
-    const unique = (data || []).filter(b => {
+    const unique = ((bidsData || []).filter(b => {
       if (seen.has(b.bidder_id)) return false
       seen.add(b.bidder_id)
       return true
-    })
+    }))
+
+    // 2. Chauffeur ayant réservé (s'il n'est pas déjà dans les bids)
+    if (reservedBy && !seen.has(reservedBy)) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', reservedBy)
+        .single()
+      if (profile) {
+        unique.unshift({ bidder_id: reservedBy, profiles: profile, isReservation: true, created_at: new Date().toISOString() })
+      }
+    }
+
     set({ drivers: unique })
   },
 

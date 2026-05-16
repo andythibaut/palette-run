@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import { useAuthStore }    from '@/store/useAuthStore'
@@ -362,8 +362,13 @@ const BlacklistPanel = ({ blacklist, onUnblacklist }) => (
 // ─── Dashboard principal ──────────────────────────────────────────────────────
 export default function CompanyDashboard({ tab = 'annonce' }) {
   const [confirmDriver, setConfirmDriver] = useState(null)
-  const { company, listing, drivers, blacklist, loading, blacklistDriver, unblacklistDriver } = useCompanyStore()
+  const { company, listing, drivers, blacklist, loading, blacklistDriver, unblacklistDriver, fetchDrivers } = useCompanyStore()
   const { profile } = useAuthStore()
+
+  // Charge les acheteurs dès que l'annonce est disponible
+  useEffect(() => {
+    if (listing?.id) fetchDrivers(listing.id, listing.reserved_by)
+  }, [listing?.id, listing?.reserved_by])
 
   const totalViews = drivers.length
 

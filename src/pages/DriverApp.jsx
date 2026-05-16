@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuthStore }   from '@/store/useAuthStore'
 import { useListingStore } from '@/store/useListingStore'
 import DriverMapView   from '@/components/map/DriverMapView'
@@ -22,6 +22,14 @@ export default function DriverApp() {
     (profile?.created_at && (Date.now() - new Date(profile.created_at).getTime()) < 120000)
   const [tab, setTab] = useState(isFirstLogin ? 'profile' : 'map')
   const [mapViewport, setMapViewport] = useState(null)
+  const mapRef = useRef(null)
+
+  // Resize la carte quand on revient sur l'onglet map
+  useEffect(() => {
+    if (tab === 'map') {
+      setTimeout(() => mapRef.current?.resize(), 50)
+    }
+  }, [tab])
 
   useEffect(() => {
     fetchListings(profile?.vehicle_type)
@@ -36,6 +44,7 @@ export default function DriverApp() {
         {/* Carte — toujours montée, cachée via CSS */}
         <div style={{ display: tab === 'map' ? 'block' : 'none', height: '100%' }}>
           <DriverMapView
+            ref={mapRef}
             profile={profile}
             savedViewport={mapViewport}
             onViewportChange={setMapViewport}
