@@ -5,27 +5,20 @@ import PWAInstallBanner from '@/components/shared/PWAInstallBanner'
 export default function NotificationPrompt({ context, onGranted, onSkip }) {
   const [visible,     setVisible]     = useState(false)
   const [showInstall, setShowInstall] = useState(false)
+  const [done,        setDone]        = useState(false)
 
   useEffect(() => {
     const status = getNotificationStatus()
-    setVisible(status === 'default')
+    if (status === 'default') {
+      setVisible(true)
+    } else {
+      setDone(true) // permission déjà traitée → signal pour déclencher onGranted
+    }
   }, [])
 
-  if (!visible && !showInstall) {
-    // Permission déjà accordée → on continue directement
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => { onGranted?.() }, [])
-    return null
-  }
-
-  // Affiche le banner PWA après avoir accordé les notifs
-  if (showInstall) {
-    return (
-      <PWAInstallBanner
-        onDismiss={() => { setShowInstall(false); onGranted?.() }}
-      />
-    )
-  }
+  useEffect(() => {
+    if (done) onGranted?.()
+  }, [done])
 
   const CONTEXTS = {
     reservation: {
@@ -43,6 +36,16 @@ export default function NotificationPrompt({ context, onGranted, onSkip }) {
   }
 
   const ctx = CONTEXTS[context] || CONTEXTS.reservation
+
+  if (showInstall) {
+    return (
+      <PWAInstallBanner
+        onDismiss={() => { setShowInstall(false); onGranted?.() }}
+      />
+    )
+  }
+
+  if (!visible) return null
 
   const handleAllow = async () => {
     const granted = await requestNotificationPermission()
