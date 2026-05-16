@@ -289,8 +289,9 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate }) =
       )}
       <p className="text-xs text-muted">{drivers.length} acheteur{drivers.length > 1 ? 's' : ''} ont consulté votre annonce</p>
       {drivers.map(d => {
-        const isReserver  = d.bidder_id === reservedDriver
+        const isReserver    = d.isReservation === true
         const isBlacklisted = blacklistedIds.has(d.bidder_id)
+        const driverName    = d.profiles?.full_name || 'Un chauffeur'
         return (
           <div key={d.bidder_id}
             className="bg-surface border rounded-2xl overflow-hidden"
@@ -302,7 +303,7 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate }) =
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="font-semibold text-sm text-white">{d.profiles?.full_name || 'Acheteur'}</p>
+                  <p className="font-semibold text-sm text-white">{driverName}</p>
                   {isReserver && <span className="text-[10px] bg-amber/20 text-amber border border-amber/30 rounded-full px-2 py-0.5 font-mono">RÉSERVÉ</span>}
                 </div>
                 <p className="text-xs text-muted mt-0.5">
@@ -317,12 +318,24 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate }) =
                 </button>
               )}
             </div>
-            {/* Bouton validation — visible uniquement pour le acheteur réservant */}
+
+            {/* Message contextuel pour les réservations */}
             {isReserver && (
-              <button onClick={() => onValidate(d.bidder_id, d.profiles?.full_name)}
+              <div className="px-4 pb-3">
+                <div className="bg-amber/5 border border-amber/20 rounded-xl px-3 py-2.5">
+                  <p className="text-xs text-amber/80 leading-relaxed">
+                    <strong className="text-amber">{driverName}</strong> est intéressé par votre annonce. Validez la demande pour qu'il puisse venir chercher les palettes dans le délai prévu.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Bouton validation */}
+            {isReserver && (
+              <button onClick={() => onValidate(d.bidder_id, driverName)}
                 className="w-full py-3 font-bold text-bg text-sm cursor-pointer border-t border-amber/30"
                 style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)' }}>
-                ✅ Valider — {d.profiles?.full_name || 'Ce acheteur'} est arrivé
+                ✅ Valider — {driverName} est arrivé
               </button>
             )}
           </div>
