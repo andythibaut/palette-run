@@ -73,13 +73,18 @@ const ListingForm = ({ listing, onSave }) => {
 
   const handleDelete = async () => {
     if (!window.confirm('Supprimer cette annonce ?')) return
+    setLoading(true)
     // Annule les transactions pending liées à cette annonce
     await supabase.from('transactions')
       .update({ status: 'cancelled' })
       .eq('listing_id', listing.id)
       .eq('status', 'pending')
-    await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
-    onSave?.()
+    // Met à jour en base
+    const { error } = await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
+    if (error) { setError(error.message); setLoading(false); return }
+    // Met à jour le store immédiatement (listing → null), sans rechargement
+    await deleteListing()
+    setLoading(false)
   }
 
   return (
@@ -441,7 +446,9 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
     })
 
     alert(`✅ ${driverName} a été autorisé à venir. Une notification lui a été envoyée avec l'adresse.`)
-    window.location.reload()
+    // Mise à jour locale du store sans rechargement de page
+    useCompanyStore.getState().deleteListing()
+    useCompanyStore.setState({ drivers: [] })
   }
 
   if (loading) return (
