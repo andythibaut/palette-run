@@ -232,12 +232,15 @@ export default function DriverProfile() {
           <p className="font-mono text-xs text-muted uppercase tracking-widest mb-3">Zone dangereuse</p>
           <button onClick={async () => {
             if (!window.confirm('Supprimer définitivement votre compte ? Cette action est irréversible.')) return
-            if (!window.confirm('Êtes-vous vraiment sûr ? Toutes vos données seront perdues.')) return
+            if (!window.confirm('Êtes-vous vraiment sûr ? Toutes vos données seront supprimées.')) return
             const { user } = useAuthStore.getState()
-            // Supprime le profil en cascade (transactions, etc.)
-            await supabase.from('profiles').delete().eq('id', user.id)
-            // Déconnecte
-            await useAuthStore.getState().signOut()
+            try {
+              const { error } = await supabase.rpc('delete_driver_account', { input_id: user.id })
+              if (error) throw error
+              await useAuthStore.getState().signOut()
+            } catch (e) {
+              alert('Erreur lors de la suppression : ' + e.message)
+            }
           }}
             className="w-full py-3 rounded-2xl border border-red/30 bg-red/5 text-red text-sm font-semibold cursor-pointer">
             🗑 Supprimer mon compte

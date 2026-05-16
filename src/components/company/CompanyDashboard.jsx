@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import { useAuthStore }    from '@/store/useAuthStore'
+import NotificationPrompt  from '@/components/shared/NotificationPrompt'
 
 const VEHICLE_OPTIONS = [
   { id: 'vl',      label: 'VL uniquement',  icon: '🚗', sub: 'Petite cour, accès restreint' },
@@ -15,20 +16,20 @@ const TABS = ['annonce', 'acheteurs', 'blacklist', 'profil']
 const ListingForm = ({ listing, onSave }) => {
   const { company } = useCompanyStore()
   const { publishListing, updateListing, deleteListing } = useCompanyStore()
-  const [qty,          setQty]          = useState(listing?.qty    || 1)
-  const [price,        setPrice]        = useState(listing?.price  || '')
-  const [pickupBefore, setPickupBefore] = useState(listing?.pickup_before || '')
-  const [isActive,     setIsActive]     = useState(listing?.is_active ?? true)
-  const [auctionMode,  setAuctionMode]  = useState(listing?.auction_mode  || false)
-  const [auctionDays,  setAuctionDays]  = useState(1)
-  const [saved,        setSaved]        = useState(false)
-  const [loading,      setLoading]      = useState(false)
-  const [error,        setError]        = useState('')
+  const [qty,             setQty]             = useState(listing?.qty    || 1)
+  const [price,           setPrice]           = useState(listing?.price  || '')
+  const [pickupBefore,    setPickupBefore]    = useState(listing?.pickup_before || '')
+  const [isActive,        setIsActive]        = useState(listing?.is_active ?? true)
+  const [auctionMode,     setAuctionMode]     = useState(listing?.auction_mode  || false)
+  const [auctionDays,     setAuctionDays]     = useState(1)
+  const [saved,           setSaved]           = useState(false)
+  const [loading,         setLoading]         = useState(false)
+  const [error,           setError]           = useState('')
+  const [showNotifPrompt, setShowNotifPrompt] = useState(false)
 
-  // Considéré comme sauvegardé si l'annonce existe déjà en base
   const isSaved = saved || !!listing
 
-  const handleSave = async () => {
+  const doSave = async () => {
     if (!price || qty < 1) { setError('Renseignez le prix et la quantité'); return }
     if (!listing && !company?.id) { setError('Profil vendeur non chargé — réessayez'); return }
     setError('')
@@ -61,14 +62,35 @@ const ListingForm = ({ listing, onSave }) => {
     setLoading(false)
   }
 
+  const handleSave = () => {
+    // Première publication → on demande la permission de notif
+    if (!listing) {
+      const status = 'Notification' in window ? Notification.permission : 'unsupported'
+      if (status === 'default') { setShowNotifPrompt(true); return }
+    }
+    doSave()
+  }
+
   const handleDelete = async () => {
     if (!window.confirm('Supprimer cette annonce ?')) return
+    // Annule les transactions pending liées à cette annonce
+    await supabase.from('transactions')
+      .update({ status: 'cancelled' })
+      .eq('listing_id', listing.id)
+      .eq('status', 'pending')
     await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
     onSave?.()
   }
 
   return (
     <div className="flex flex-col gap-5 p-5">
+      {showNotifPrompt && (
+        <NotificationPrompt
+          context="listing"
+          onGranted={() => { setShowNotifPrompt(false); doSave() }}
+          onSkip={() => { setShowNotifPrompt(false); doSave() }}
+        />
+      )}
       {/* Toggle actif */}
       <div className="flex items-center justify-between bg-surface border border-border rounded-2xl px-4 py-3">
         <div>
