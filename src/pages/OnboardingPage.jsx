@@ -21,7 +21,7 @@ const useAddressSearch = () => {
     debounceRef.current = setTimeout(async () => {
       setLoading(true)
       try {
-        const res  = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&limit=5&type=housenumber,street,municipality`)
+        const res  = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(q)}&limit=6&autocomplete=1`)
         const data = await res.json()
         setSuggestions(
           (data.features || []).map(f => ({
