@@ -97,7 +97,12 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                 }
               </h2>
               <p className="text-sub text-sm mt-0.5">
-                {listing.companies?.city}
+                {isHidden
+                  ? '—'
+                  : canSeeDetails
+                    ? listing.companies?.city
+                    : <span style={{ filter: 'blur(5px)', userSelect: 'none' }}>{listing.companies?.city || 'Ville'}</span>
+                }
                 {canSeeDetails && listing.companies?.address && (
                   <span className="block text-xs text-muted mt-0.5">📍 {listing.companies.address}</span>
                 )}
@@ -252,17 +257,27 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
               </>
             ) : (
               <>
-                <div className="w-full py-4 rounded-2xl bg-green/10 border border-green/30 text-center text-green text-sm font-semibold">
-                  ✅ Rendez-vous directement en vendeur
-                </div>
-                <button onClick={() => openGPS(
-                  listing.companies?.address,
-                  listing.companies?._lat,
-                  listing.companies?._lng
+                {canSeeDetails ? (
+                  <>
+                    <div className="w-full py-4 rounded-2xl bg-green/10 border border-green/30 text-center text-green text-sm font-semibold">
+                      ✅ Rendez-vous directement en vendeur
+                    </div>
+                    <button onClick={() => openGPS(
+                      listing.companies?.address,
+                      listing.companies?.lat,
+                      listing.companies?.lng
+                    )}
+                      className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2">
+                      🗺 Y aller
+                    </button>
+                  </>
+                ) : (
+                  <div className="w-full py-4 rounded-2xl bg-hi border border-border text-center text-muted text-sm">
+                    {isReservedByMe
+                      ? '⏳ En attente de validation du commerçant…'
+                      : '🔒 Adresse visible après validation'}
+                  </div>
                 )}
-                  className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2">
-                  🗺 Y aller
-                </button>
                 <button className="w-full py-3 rounded-2xl border font-bold text-gold text-sm"
                   style={{ borderColor: '#FFD16666', background: '#FFD16618' }}>
                   🥇 Gold — réserver en priorité
