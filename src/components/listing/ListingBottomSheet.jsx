@@ -21,11 +21,12 @@ const openGPS = (address, lat, lng) => {
 export default function ListingBottomSheet({ listing, profile, onClose }) {
   const { reserveListing, placeBid } = useListingStore()
   const { user } = useAuthStore()
-  const [booked,      setBooked]      = useState(false)
-  const [bidding,     setBidding]     = useState(false)
-  const [isConfirmed, setIsConfirmed] = useState(false) // transaction validée par le commerçant
+  const [booked,       setBooked]       = useState(false)
+  const [bidding,      setBidding]      = useState(false)
+  const [isConfirmed,  setIsConfirmed]  = useState(false)
+  const [companyDetails, setCompanyDetails] = useState(null) // { name, address, lat, lng }
 
-  // Vérifie si ce chauffeur a une transaction confirmée pour cette annonce
+  // Vérifie si transaction confirmée et charge les détails défloutés via fonction SQL sécurisée
   useEffect(() => {
     if (!user?.id || !listing?.id) return
     supabase
@@ -35,7 +36,16 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
       .eq('driver_id', user.id)
       .eq('status', 'confirmed')
       .single()
-      .then(({ data }) => setIsConfirmed(!!data))
+      .then(async ({ data }) => {
+        const confirmed = !!data
+        setIsConfirmed(confirmed)
+        if (confirmed) {
+          // Récupère name + address uniquement si transaction confirmée
+          const { data: details } = await supabase
+            .rpc('get_confirmed_company_details', { p_listing_id: listing.id })
+          if (details?.[0]) setCompanyDetails(details[0])
+        }
+      })
   }, [listing?.id, user?.id])
 
   const userTier       = profile?.tier          || 'free'
@@ -92,8 +102,8 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                 {isHidden
                   ? 'Nom masqué'
                   : canSeeDetails
-                    ? listing.companies?.name
-                    : <span style={{ filter: 'blur(6px)', userSelect: 'none' }}>{listing.companies?.name || 'Vendeur'}</span>
+                    ? (companyDetails?.name || 'Vendeur')
+                    : <span style={{ filter: 'blur(6px)', userSelect: 'none' }}>Vendeur</span>
                 }
               </h2>
               <p className="text-sub text-sm mt-0.5">
@@ -101,10 +111,10 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                   ? '—'
                   : canSeeDetails
                     ? listing.companies?.city
-                    : <span style={{ filter: 'blur(5px)', userSelect: 'none' }}>{listing.companies?.city || 'Ville'}</span>
+                    : <span style={{ filter: 'blur(5px)', userSelect: 'none' }}>Ville</span>
                 }
-                {canSeeDetails && listing.companies?.address && (
-                  <span className="block text-xs text-muted mt-0.5">📍 {listing.companies.address}</span>
+                {canSeeDetails && companyDetails?.address && (
+                  <span className="block text-xs text-muted mt-0.5">📍 {companyDetails.address}</span>
                 )}
                 {!canSeeDetails && !isHidden && (
                   <span className="block text-xs text-muted/50 mt-0.5 italic">
@@ -263,9 +273,9 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                       ✅ Rendez-vous directement en vendeur
                     </div>
                     <button onClick={() => openGPS(
-                      listing.companies?.address,
-                      listing.companies?.lat,
-                      listing.companies?.lng
+                      companyDetails?.address,
+                      companyDetails?.lat,
+                      companyDetails?.lng
                     )}
                       className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2">
                       🗺 Y aller

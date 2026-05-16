@@ -17,7 +17,7 @@ export const useListingStore = create((set, get) => ({
       .select(`
         *,
         companies (
-          id, name, city, address,
+          id, city,
           location, vehicle_required, has_loader
         )
       `)
