@@ -53,6 +53,7 @@ const UserMarker = ({ lng, lat }) => (
 // ─── Vue carte commerçant ─────────────────────────────────────────────────────
 const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onViewportChange }, ref) {
   const { company, listing } = useCompanyStore()
+  console.log('listing:', JSON.stringify(listing, null, 2))
   const [viewport, setViewport] = useState(null)
   const [userPos,  setUserPos]  = useState(null)
   const mapRef = useRef(null)
