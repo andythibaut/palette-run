@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback } from 'react'
 import Map, { Marker, NavigationControl } from 'react-map-gl'
 import { useCompanyStore } from '@/store/useCompanyStore'
-import { MAPBOX_TOKEN, MAP_STYLE, DEFAULT_CENTER } from '@/lib/mapbox'
+import { useListingStore }  from '@/store/useListingStore'
+import { MAPBOX_TOKEN, MAP_STYLE, DEFAULT_CENTER, profitColor } from '@/lib/mapbox'
 
 const GOLD = '#FFD166'
 
@@ -53,6 +54,32 @@ const CompanyListingMarker = ({ listing }) => {
   )
 }
 
+// ─── Marqueur des autres annonces (grisées) ──────────────────────────────────
+const OtherListingMarker = ({ listing }) => {
+  // useListingStore décode déjà les coords dans _lat/_lng
+  const lat = listing.companies?._lat
+  const lng = listing.companies?._lng
+  if (!lat || !lng) return null
+  const GREY = '#4A5568'
+
+  // Décale de ~500m (même logique que DriverMapView)
+  const seed = listing.id ? listing.id.charCodeAt(0) + listing.id.charCodeAt(4) : 0
+  const offsetLat = ((seed % 100) - 50) / 100000 * 5
+  const offsetLng = ((seed % 137) - 68) / 100000 * 5
+
+  return (
+    <Marker longitude={lng + offsetLng} latitude={lat + offsetLat} anchor="center">
+      <div style={{ width: 34, height: 34 }}>
+        <div className="w-full h-full rounded-xl flex flex-col items-center justify-center shadow"
+          style={{ background: `${GREY}22`, border: `2px solid ${GREY}`, opacity: 0.6 }}>
+          <span className="font-bebas text-xs leading-none" style={{ color: GREY }}>{listing.qty}</span>
+          <span className="text-[7px] leading-none" style={{ color: `${GREY}99` }}>pal.</span>
+        </div>
+      </div>
+    </Marker>
+  )
+}
+
 // ─── Point position utilisateur ───────────────────────────────────────────────
 const UserMarker = ({ lng, lat }) => (
   <Marker longitude={lng} latitude={lat} anchor="center">
@@ -66,6 +93,7 @@ const UserMarker = ({ lng, lat }) => (
 // ─── Vue carte commerçant ─────────────────────────────────────────────────────
 const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onViewportChange }, ref) {
   const { company, listing } = useCompanyStore()
+  const { listings } = useListingStore()
   const [viewport, setViewport] = useState(null)
   const [userPos,  setUserPos]  = useState(null)
   const mapRef = useRef(null)
@@ -109,7 +137,13 @@ const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onVie
       >
         <NavigationControl position="bottom-right" showCompass={false} />
 
-        {/* Marqueur de l'annonce — position exacte, couleur or */}
+        {/* Autres annonces — grisées */}
+        {listings
+          .filter(l => l.is_active && l.id !== listing?.id)
+          .map(l => <OtherListingMarker key={l.id} listing={l} />)
+        }
+
+        {/* Mon annonce — position exacte, couleur or */}
         {hasListing && <CompanyListingMarker listing={listing} />}
 
         {/* Position GPS utilisateur */}
