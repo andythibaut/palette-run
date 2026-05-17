@@ -6,6 +6,7 @@ export function usePWAInstall() {
 
   const isIOS        = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
   const isAndroid    = /Android/.test(navigator.userAgent)
+  const isMobile     = isIOS || isAndroid
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
     || window.navigator.standalone === true
 
@@ -34,8 +35,8 @@ export function usePWAInstall() {
   }
 
   return {
-    // Visible tant que pas installé, sur iOS, Android et desktop
-    canInstall:    !isInstalled,
+    // Visible uniquement sur mobile tant que pas installé
+    canInstall:    !isInstalled && isMobile,
     isInstalled,
     isIOS,
     isAndroid,
