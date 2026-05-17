@@ -1,6 +1,6 @@
 export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 
-export const MAP_STYLE = 'mapbox://styles/mapbox/dark-v11'
+export const MAP_STYLE = 'mapbox://styles/mapbox/light-v11'
 
 export const DEFAULT_CENTER = {
   longitude: 2.3522,
