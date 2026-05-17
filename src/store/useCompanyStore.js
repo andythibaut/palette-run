@@ -63,7 +63,7 @@ export const useCompanyStore = create((set, get) => ({
       .select('*, bids(*), companies(id, city, location)')
       .eq('company_id', companyId)
       .eq('is_active', true)
-      .single()
+      .maybeSingle()
 
     if (error && error.code !== 'PGRST116') {
       set({ error: error.message })
@@ -129,7 +129,7 @@ export const useCompanyStore = create((set, get) => ({
       .eq('id', listing.id)
 
     if (error) { set({ error: error.message }); return false }
-    set({ listing: null })
+    set({ listing: null, drivers: [] })
     return true
   },
 
