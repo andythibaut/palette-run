@@ -107,7 +107,7 @@ const EmailForm = ({ mode, onBack }) => {
         <p className="text-sub text-xs leading-relaxed">Vérifiez vos spams si vous ne voyez pas l'email dans votre boîte principale.</p>
       </div>
       <button onClick={handleResend} disabled={resending}
-        className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer disabled:opacity-40">
+        className="w-full py-3 rounded-2xl border border-border bg-white text-gray-800 text-sm font-semibold cursor-pointer disabled:opacity-40 shadow-sm">
         {resending ? 'Envoi…' : '🔄 Renvoyer l\'email'}
       </button>
       <button onClick={onBack} className="text-muted text-sm cursor-pointer bg-transparent border-none">
@@ -120,7 +120,7 @@ const EmailForm = ({ mode, onBack }) => {
     <div className="flex flex-col gap-5 p-7 min-h-screen bg-bg">
       <button onClick={onBack} className="text-sub text-2xl self-start leading-none bg-transparent border-none cursor-pointer">←</button>
       <div>
-        <h1 className="font-bebas text-4xl text-white leading-tight">
+        <h1 className="font-bebas text-4xl text-gray-800 leading-tight">
           {mode === 'login' ? 'Se connecter' : 'Créer un'}
         </h1>
         <h1 className="font-bebas text-4xl text-amber leading-tight">
@@ -133,7 +133,7 @@ const EmailForm = ({ mode, onBack }) => {
           type="email" value={email}
           onChange={e => { setEmail(e.target.value); setFormErr({}) }}
           placeholder="votre@email.com"
-          className={`w-full px-4 py-3 bg-hi rounded-2xl text-white text-sm outline-none border-2 ${formErr.email ? 'border-red' : 'border-border'}`}
+          className={`w-full px-4 py-3 bg-white rounded-2xl text-gray-800 text-sm outline-none border-2 ${formErr.email ? 'border-red' : 'border-border'}`}
         />
         {formErr.email && <p className="text-xs text-red">{formErr.email}</p>}
       </div>
@@ -144,7 +144,7 @@ const EmailForm = ({ mode, onBack }) => {
             type={showPass ? 'text' : 'password'} value={password}
             onChange={e => { setPassword(e.target.value); setFormErr({}) }}
             placeholder={mode === 'login' ? 'Votre mot de passe' : 'Minimum 6 caractères'}
-            className={`w-full px-4 py-3 pr-12 bg-hi rounded-2xl text-white text-sm outline-none border-2 ${formErr.password ? 'border-red' : 'border-border'}`}
+            className={`w-full px-4 py-3 pr-12 bg-white rounded-2xl text-gray-800 text-sm outline-none border-2 ${formErr.password ? 'border-red' : 'border-border'}`}
           />
           <button onClick={() => setShowPass(s => !s)} className="absolute right-4 top-1/2 -translate-y-1/2 text-sub bg-transparent border-none cursor-pointer text-lg">
             {showPass ? '🙈' : '👁'}
@@ -160,7 +160,7 @@ const EmailForm = ({ mode, onBack }) => {
               type={showConf ? 'text' : 'password'} value={confirm}
               onChange={e => { setConfirm(e.target.value); setFormErr({}) }}
               placeholder="Répétez votre mot de passe"
-              className={`w-full px-4 py-3 pr-12 bg-hi rounded-2xl text-white text-sm outline-none border-2 ${formErr.confirm ? 'border-red' : confirm && confirm === password ? 'border-green' : 'border-border'}`}
+              className={`w-full px-4 py-3 pr-12 bg-white rounded-2xl text-gray-800 text-sm outline-none border-2 ${formErr.confirm ? 'border-red' : confirm && confirm === password ? 'border-green' : 'border-border'}`}
             />
             <button onClick={() => setShowConf(s => !s)} className="absolute right-4 top-1/2 -translate-y-1/2 text-sub bg-transparent border-none cursor-pointer text-lg">
               {showConf ? '🙈' : '👁'}
@@ -232,7 +232,7 @@ const PhoneForm = ({ onBack }) => {
           <input key={i} id={`otp-${i}`} type="text" inputMode="numeric" maxLength={1} value={d}
             onChange={e => handleDigit(i, e.target.value)}
             onKeyDown={e => { if (e.key === 'Backspace' && !d && i > 0) document.getElementById(`otp-${i-1}`)?.focus() }}
-            className={`w-11 h-14 rounded-2xl text-center text-2xl font-bebas bg-hi text-white outline-none border-2 ${d ? 'border-amber' : 'border-border'}`}
+            className={`w-11 h-14 rounded-2xl text-center text-2xl font-bebas bg-white text-gray-800 outline-none border-2 ${d ? 'border-amber' : 'border-border'}`}
           />
         ))}
       </div>
@@ -254,11 +254,11 @@ const PhoneForm = ({ onBack }) => {
         <h1 className="font-bebas text-4xl text-amber">de téléphone</h1>
         <p className="text-sub text-sm mt-3">Vous recevrez un code SMS pour vérifier votre numéro.</p>
       </div>
-      <div className={`flex items-center bg-hi rounded-2xl overflow-hidden border-2 ${phoneErr ? 'border-red' : 'border-border'}`}>
+      <div className={`flex items-center bg-white rounded-2xl overflow-hidden border-2 shadow-sm ${phoneErr ? 'border-red' : 'border-border'}`}>
         <div className="px-4 border-r border-border text-sub text-base h-full flex items-center py-4">🇫🇷 +33</div>
         <input type="tel" inputMode="tel" value={phone} onChange={e => { setPhone(e.target.value); setPhoneErr('') }}
           placeholder="06 12 34 56 78"
-          className="flex-1 px-4 py-4 bg-transparent text-white text-base outline-none font-mono"
+          className="flex-1 px-4 py-4 bg-transparent text-gray-800 text-base outline-none font-mono"
         />
       </div>
       {phoneErr && <p className="text-xs text-red">{phoneErr}</p>}
@@ -294,7 +294,7 @@ export default function AuthPage() {
       <div className="flex bg-hi rounded-2xl p-1 mb-7 border border-border">
         {['login', 'signup'].map(m => (
           <button key={m} onClick={() => setMode(m)}
-            className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer border-none ${mode === m ? 'bg-surface text-white' : 'bg-transparent text-muted'}`}
+            className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer border-none ${mode === m ? 'bg-white text-gray-800 shadow-sm' : 'bg-transparent text-sub'}`}
           >
             {m === 'login' ? 'Se connecter' : 'Créer un compte'}
           </button>
@@ -311,7 +311,7 @@ export default function AuthPage() {
       {/* Email */}
       <div className="flex flex-col gap-3 mb-6">
         <button onClick={() => setScreen('email')}
-          className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-hi border border-border text-white font-semibold text-sm cursor-pointer hover:opacity-90"
+          className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl bg-white border border-border text-gray-800 font-semibold text-sm cursor-pointer hover:opacity-90 shadow-sm"
         >
           <span className="text-xl w-6 text-center">✉️</span>
           <span className="flex-1 text-left">Email et mot de passe</span>
