@@ -13,11 +13,8 @@ export async function subscribeToPush(userId) {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false
 
   try {
-    console.log('subscribeToPush start', userId)
     const reg = await navigator.serviceWorker.ready
-    console.log('SW ready:', reg)
     const permission = await Notification.requestPermission()
-    console.log('permission:', permission)
     if (permission !== 'granted') return false
 
     const existing = await reg.pushManager.getSubscription()
@@ -27,15 +24,13 @@ export async function subscribeToPush(userId) {
     })
 
     // Sauvegarde la subscription en base
-    console.log('sub:', sub.toJSON())
     const { endpoint, keys } = sub.toJSON()
-    const { data, error } = await supabase.from('push_subscriptions').upsert({
+    await supabase.from('push_subscriptions').upsert({
       user_id:  userId,
       endpoint,
       p256dh:   keys.p256dh,
       auth:     keys.auth,
     }, { onConflict: 'user_id' })
-    console.log('upsert result:', data, error)
 
     return true
   } catch (err) {
