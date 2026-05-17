@@ -4,7 +4,7 @@
   "description": "Bourse aux palettes entre vendeurs et acheteurs",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0B0E13",
+  "background_color": "#F0F2F5",
   "theme_color": "#F5A623",
   "orientation": "portrait",
   "icons": [
