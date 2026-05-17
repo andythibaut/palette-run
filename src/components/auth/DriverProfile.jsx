@@ -19,9 +19,11 @@ export default function DriverProfile() {
   const [loading,       setLoading]       = useState(false)
 
   useEffect(() => {
-    if (profile?.resale_price !== undefined)   setResalePrice(profile.resale_price || '')
-    if (profile?.gold_threshold !== undefined) setGoldThreshold(profile.gold_threshold || 20)
-    if (profile?.vehicle_type !== undefined)   setVehicleType(profile.vehicle_type || null)
+    if (!loading) {
+      if (profile?.resale_price !== undefined)   setResalePrice(profile.resale_price || '')
+      if (profile?.gold_threshold !== undefined) setGoldThreshold(profile.gold_threshold || 20)
+      if (profile?.vehicle_type !== undefined)   setVehicleType(profile.vehicle_type || null)
+    }
   }, [profile?.resale_price, profile?.gold_threshold, profile?.vehicle_type])
 
   const tierColor = { free: '#3B82F6', gold: '#FFD166' }
@@ -44,7 +46,9 @@ export default function DriverProfile() {
 
   const handleVehicleSelect = async (v) => {
     setVehicleType(v)
+    setLoading(true)
     await updateProfile({ vehicle_type: v })
+    setLoading(false)
     setSaved('vehicle')
     setTimeout(() => setSaved(null), 2000)
   }
