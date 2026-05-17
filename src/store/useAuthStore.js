@@ -48,7 +48,8 @@ export const useAuthStore = create((set, get) => ({
     // Re-subscribe aux push à chaque connexion pour s'assurer que la subscription est en base
     console.log('Notification.permission:', Notification.permission)
     if (data && Notification.permission === 'granted') {
-      subscribeToPush(userId)
+      // Attend que le SW soit prêt avant de s'abonner
+      setTimeout(() => subscribeToPush(userId), 2000)
     }
   },
 
