@@ -46,6 +46,7 @@ export const useAuthStore = create((set, get) => ({
     }
     set({ user: { id: userId }, profile: data })
     // Re-subscribe aux push à chaque connexion pour s'assurer que la subscription est en base
+    console.log('Notification.permission:', Notification.permission)
     if (data && Notification.permission === 'granted') {
       subscribeToPush(userId)
     }
