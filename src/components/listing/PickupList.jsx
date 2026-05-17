@@ -148,18 +148,53 @@ export default function PickupList({ profile }) {
 
   const handleCancel = async (p) => {
     const isAuthorized = p.status === 'authorized'
-    const msg = isAuthorized
-      ? 'Annuler ? Le commerçant vous avait autorisé à venir — il sera notifié.'
-      : 'Annuler cette réservation ?'
+    const isConfirmed  = p.status === 'confirmed'
+    const msg = isConfirmed
+      ? 'Signaler un problème et annuler ? L\'annonce sera remise en ligne et le commerçant sera notifié.'
+      : isAuthorized
+        ? 'Annuler ? Le commerçant vous avait autorisé à venir — il sera notifié.'
+        : 'Annuler cette réservation ?'
     if (!window.confirm(msg)) return
     setCancelling(p.id)
+
+    // Annule la transaction
     await supabase.from('transactions').update({ status: 'cancelled' }).eq('id', p.id)
+
+    // Remet l'annonce en ligne
     await supabase.from('listings').update({
-      is_active:    true,   // remet l'annonce visible pour les autres
-      reserved_by: null, reserved_at: null, reservation_expires_at: null,
-      current_bid: null, bid_lock_step: null, bid_locked_until: null,
+      is_active:        true,
+      reserved_by:      null, reserved_at: null, reservation_expires_at: null,
+      current_bid:      null, bid_lock_step: null, bid_locked_until: null,
       bid_auto_confirm: false, bid_started_at: null, bid_expires_at: null, bid_winner_id: null,
     }).eq('id', p.listing_id)
+
+    // Notifie le commerçant si authorized ou confirmed
+    if (isAuthorized || isConfirmed) {
+      const { data: listing } = await supabase
+        .from('listings')
+        .select('company_id')
+        .eq('id', p.listing_id)
+        .single()
+      if (listing?.company_id) {
+        const { data: company } = await supabase
+          .from('companies')
+          .select('owner_id')
+          .eq('id', listing.company_id)
+          .single()
+        if (company?.owner_id) {
+          await supabase.from('notifications').insert({
+            user_id: company.owner_id,
+            type:    'driver_cancelled',
+            title:   '⚠️ Un chauffeur a annulé',
+            body:    isConfirmed
+              ? 'Un chauffeur a signalé un problème et annulé après confirmation. Votre annonce a été remise en ligne.'
+              : 'Un chauffeur autorisé a annulé sa venue. Votre annonce a été remise en ligne.',
+            data:    { listing_id: p.listing_id },
+          })
+        }
+      }
+    }
+
     setCancelling(null)
     fetchPickups()
   }
@@ -197,8 +232,9 @@ export default function PickupList({ profile }) {
           const profit    = profile?.resale_price
             ? (profile.resale_price - (listing?.current_bid || p.buy_price)) * listing?.qty
             : null
-          const isPending   = p.status === 'pending'
+          const isPending    = p.status === 'pending'
           const isAuthorized = p.status === 'authorized'
+          const isConfirmed  = p.status === 'confirmed'
 
           return (
             <div key={p.id} className="bg-surface rounded-2xl border overflow-hidden"
@@ -310,10 +346,10 @@ export default function PickupList({ profile }) {
                 )}
 
                 {/* Annuler */}
-                {(isPending || isAuthorized) && (
+                {(isPending || isAuthorized || isConfirmed) && (
                   <button onClick={() => handleCancel(p)} disabled={cancelling === p.id}
                     className="w-full py-2.5 rounded-xl border border-red/30 bg-red/10 text-red text-sm font-semibold cursor-pointer disabled:opacity-40 mt-3">
-                    {cancelling === p.id ? 'Annulation…' : isAuthorized ? '✕ Annuler — je ne peux plus venir' : '✕ Annuler la réservation'}
+                    {cancelling === p.id ? 'Annulation…' : isConfirmed ? '✕ Signaler un problème — annuler' : isAuthorized ? '✕ Annuler — je ne peux plus venir' : '✕ Annuler la réservation'}
                   </button>
                 )}
               </div>
