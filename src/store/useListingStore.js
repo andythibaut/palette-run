@@ -168,8 +168,8 @@ export const useListingStore = create((set, get) => ({
     const newPrice = parseFloat((currentPrice + step).toFixed(2))
 
     // Durée du gel selon le step
-    const lockDurations = { 0.10: null, 0.20: 30, 0.50: 120 } // minutes
-    const lockMin = lockDurations[step]
+    const lockDurations = { 0.50: 60, 1.00: 120 } // minutes
+    const lockMin = lockDurations[step] ?? null
     const lockedUntil = lockMin
       ? new Date(Date.now() + lockMin * 60 * 1000).toISOString()
       : null
@@ -194,7 +194,7 @@ export const useListingStore = create((set, get) => ({
         current_bid:      newPrice,
         bid_lock_step:    step,
         bid_locked_until: lockedUntil,
-        bid_auto_confirm: step === 0.50,
+        bid_auto_confirm: step >= 0.50,
         reserved_by:      user.id,
         reserved_at:      new Date().toISOString(),
       })

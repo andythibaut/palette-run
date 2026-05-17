@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuthStore }   from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import { useListingStore } from '@/store/useListingStore'
+import { supabase }        from '@/lib/supabase'
 import CompanyDashboard from '@/components/company/CompanyDashboard'
 import CompanyMapView   from '@/components/map/CompanyMapView'
 
@@ -34,6 +35,33 @@ export default function CompanyApp() {
     subscribeRealtime()
     return () => unsubscribeRealtime()
   }, [])
+
+  // Realtime sur bids et listings → rafraîchit la liste des acheteurs
+  useEffect(() => {
+    if (!company?.id) return
+    const { listing } = useCompanyStore.getState()
+    if (!listing?.id) return
+
+    const sub = supabase
+      .channel('company-bids-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bids',
+        filter: `listing_id=eq.${listing.id}` },
+        () => {
+          const { listing: l } = useCompanyStore.getState()
+          if (l?.id) useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+        }
+      )
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'listings',
+        filter: `id=eq.${listing.id}` },
+        () => {
+          const { listing: l } = useCompanyStore.getState()
+          if (l?.id) useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+        }
+      )
+      .subscribe()
+
+    return () => supabase.removeChannel(sub)
+  }, [company?.id])
 
   // Première connexion → onglet profil
   useEffect(() => {
