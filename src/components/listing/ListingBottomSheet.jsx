@@ -251,11 +251,11 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                           </p>
                         </div>
                         <div className="flex gap-2">
-                          {[0.10, 0.20, 0.50].map(step => (
+                          {[{ step: 0.50, label: '+50¢', color: '#F97316' }, { step: 1.00, label: '+1€', color: '#EF4444' }].map(({ step, label, color }) => (
                             <button key={step} onClick={() => handleBid(step)} disabled={bidding}
-                              className="flex-1 py-3 rounded-xl border font-bold text-sm disabled:opacity-40 cursor-pointer"
-                              style={{ borderColor: step===0.50?'#EF444466':step===0.20?'#F9731666':'#EC489966', background: step===0.50?'#EF444418':step===0.20?'#F9731618':'#EC489918', color: step===0.50?'#EF4444':step===0.20?'#F97316':'#EC4899' }}>
-                              +{Math.round(step*100)}¢
+                              className="flex-1 py-3 rounded-xl border-2 font-bold text-sm disabled:opacity-40 cursor-pointer"
+                              style={{ borderColor: `${color}66`, background: `${color}18`, color }}>
+                              {label}
                             </button>
                           ))}
                         </div>
