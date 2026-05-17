@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { supabase } from '@/lib/supabase'
+import { supabase }                    from '@/lib/supabase'
+import { subscribeToPush }             from '@/lib/notifications'
 
 export const useAuthStore = create((set, get) => ({
   user:    null,
@@ -44,6 +45,10 @@ export const useAuthStore = create((set, get) => ({
       return
     }
     set({ user: { id: userId }, profile: data })
+    // Re-subscribe aux push à chaque connexion pour s'assurer que la subscription est en base
+    if (data && Notification.permission === 'granted') {
+      subscribeToPush(userId)
+    }
   },
 
   // Connexion Google

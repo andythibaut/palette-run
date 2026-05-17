@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { requestNotificationPermission, getNotificationStatus } from '@/lib/notifications'
 import PWAInstallBanner from '@/components/shared/PWAInstallBanner'
+import { useAuthStore } from '@/store/useAuthStore'
 
 export default function NotificationPrompt({ context, onGranted, onSkip }) {
+  const { user } = useAuthStore()
   const [visible,     setVisible]     = useState(false)
   const [showInstall, setShowInstall] = useState(false)
   const [done,        setDone]        = useState(false)
@@ -48,7 +50,7 @@ export default function NotificationPrompt({ context, onGranted, onSkip }) {
   if (!visible) return null
 
   const handleAllow = async () => {
-    const granted = await requestNotificationPermission()
+    const granted = await requestNotificationPermission(user?.id)
     setVisible(false)
     if (granted) {
       setShowInstall(true) // Montre le banner PWA ensuite
