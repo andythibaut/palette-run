@@ -5,11 +5,24 @@ import { MAPBOX_TOKEN, MAP_STYLE, DEFAULT_CENTER } from '@/lib/mapbox'
 
 const GOLD = '#FFD166'
 
+// Décode un WKB hex (PostGIS) en { lat, lng }
+function wkbToLatLng(wkb) {
+  if (!wkb || typeof wkb !== 'string') return null
+  try {
+    const buf = new Uint8Array(wkb.match(/.{2}/g).map(b => parseInt(b, 16)))
+    const view = new DataView(buf.buffer)
+    const lng = view.getFloat64(5,  true)
+    const lat = view.getFloat64(13, true)
+    if (!isFinite(lat) || !isFinite(lng)) return null
+    return { lat, lng }
+  } catch { return null }
+}
+
 // ─── Marqueur de l'annonce du commerçant ──────────────────────────────────────
 const CompanyListingMarker = ({ listing }) => {
-  const lat = listing?.companies?.location?.coordinates?.[1]
-  const lng = listing?.companies?.location?.coordinates?.[0]
-  if (!lat || !lng) return null
+  const coords = wkbToLatLng(listing?.companies?.location)
+  if (!coords) return null
+  const { lat, lng } = coords
 
   return (
     <Marker longitude={lng} latitude={lat} anchor="center">
@@ -53,7 +66,6 @@ const UserMarker = ({ lng, lat }) => (
 // ─── Vue carte commerçant ─────────────────────────────────────────────────────
 const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onViewportChange }, ref) {
   const { company, listing } = useCompanyStore()
-  console.log('listing:', JSON.stringify(listing, null, 2))
   const [viewport, setViewport] = useState(null)
   const [userPos,  setUserPos]  = useState(null)
   const mapRef = useRef(null)
@@ -65,14 +77,13 @@ const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onVie
   // Centre la carte sur la position de la company dès qu'on a les coords
   useEffect(() => {
     if (savedViewport) { setViewport(savedViewport); return }
-    const lat = listing?.companies?.location?.coordinates?.[1]
-    const lng = listing?.companies?.location?.coordinates?.[0]
-    if (lat && lng) {
-      setViewport({ longitude: lng, latitude: lat, zoom: 15 })
+    const coords = wkbToLatLng(listing?.companies?.location)
+    if (coords) {
+      setViewport({ longitude: coords.lng, latitude: coords.lat, zoom: 15 })
     } else {
       setViewport(DEFAULT_CENTER)
     }
-  }, [company?.location])
+  }, [listing?.companies?.location])
 
   const handleGeolocate = useCallback(() => {
     navigator.geolocation.getCurrentPosition(pos => {
