@@ -6,9 +6,9 @@ import { MAPBOX_TOKEN, MAP_STYLE, DEFAULT_CENTER } from '@/lib/mapbox'
 const GOLD = '#FFD166'
 
 // ─── Marqueur de l'annonce du commerçant ──────────────────────────────────────
-const CompanyListingMarker = ({ company, listing }) => {
-  const lng = company?.location?.coordinates?.[0]
-  const lat = company?.location?.coordinates?.[1]
+const CompanyListingMarker = ({ listing }) => {
+  const lat = listing?.companies?.location?.coordinates?.[1]
+  const lng = listing?.companies?.location?.coordinates?.[0]
   if (!lat || !lng) return null
 
   return (
@@ -64,8 +64,8 @@ const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onVie
   // Centre la carte sur la position de la company dès qu'on a les coords
   useEffect(() => {
     if (savedViewport) { setViewport(savedViewport); return }
-    const lng = company?.location?.coordinates?.[0]
-    const lat = company?.location?.coordinates?.[1]
+    const lat = listing?.companies?.location?.coordinates?.[1]
+    const lng = listing?.companies?.location?.coordinates?.[0]
     if (lat && lng) {
       setViewport({ longitude: lng, latitude: lat, zoom: 15 })
     } else {
@@ -98,7 +98,7 @@ const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onVie
         <NavigationControl position="bottom-right" showCompass={false} />
 
         {/* Marqueur de l'annonce — position exacte, couleur or */}
-        {hasListing && <CompanyListingMarker company={company} listing={listing} />}
+        {hasListing && <CompanyListingMarker listing={listing} />}
 
         {/* Position GPS utilisateur */}
         {userPos && <UserMarker lng={userPos.longitude} lat={userPos.latitude} />}

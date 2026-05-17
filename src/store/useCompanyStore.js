@@ -60,7 +60,7 @@ export const useCompanyStore = create((set, get) => ({
   fetchActiveListing: async (companyId) => {
     const { data, error } = await supabase
       .from('listings')
-      .select('*, bids(*)')
+      .select('*, bids(*), companies(id, city, location)')
       .eq('company_id', companyId)
       .eq('is_active', true)
       .single()
