@@ -441,7 +441,7 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
       .eq('driver_id',  driverId)
       .eq('status',     'pending')
 
-    if (error) { alert('Erreur lors de l\'autorisation'); return }
+    if (error) { alert('Erreur : ' + JSON.stringify(error)); return }
 
     // Notification au chauffeur avec les détails défloutés
     await supabase.from('notifications').insert({
