@@ -23,6 +23,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   const { user } = useAuthStore()
   const [booked,       setBooked]       = useState(false)
   const [bidding,      setBidding]      = useState(false)
+  const [bidResult,    setBidResult]    = useState(null) // { success, price }
   const [isConfirmed,  setIsConfirmed]  = useState(false)
   const [companyDetails, setCompanyDetails] = useState(null) // { name, address, lat, lng }
 
@@ -80,8 +81,16 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
 
   const handleBid = async (step) => {
     setBidding(true)
-    await placeBid(listing.id, step, currentPrice, null)
+    setBidResult(null)
+    const ok = await placeBid(listing.id, step, currentPrice, null)
     setBidding(false)
+    if (ok) {
+      setBidResult({ success: true, price: parseFloat((currentPrice + step).toFixed(2)) })
+      setTimeout(() => setBidResult(null), 3000)
+    } else {
+      setBidResult({ success: false })
+      setTimeout(() => setBidResult(null), 3000)
+    }
   }
 
   return (
@@ -259,6 +268,11 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                             </button>
                           ))}
                         </div>
+                        {bidResult && (
+                          <div className={`w-full rounded-xl px-3 py-2 text-xs text-center font-semibold ${bidResult.success ? 'bg-green/10 border border-green/30 text-green' : 'bg-red/10 border border-red/30 text-red'}`}>
+                            {bidResult.success ? `✅ Enchère placée à ${bidResult.price.toFixed(2)} €` : '❌ Erreur — réessayez'}
+                          </div>
+                        )}
                       </>
                     ) : (
                       /* Mode réservation directe */

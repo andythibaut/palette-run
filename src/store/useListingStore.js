@@ -201,6 +201,19 @@ export const useListingStore = create((set, get) => ({
       .eq('id', listingId)
 
     if (listingError) { set({ error: listingError.message }); return false }
+
+    // Met à jour le listing dans le store local pour que le prix s'affiche immédiatement
+    set(state => ({
+      listings: state.listings.map(l =>
+        l.id === listingId
+          ? { ...l, current_bid: newPrice, bid_locked_until: lockedUntil, reserved_by: user.id }
+          : l
+      ),
+      selected: state.selected?.id === listingId
+        ? { ...state.selected, current_bid: newPrice, bid_locked_until: lockedUntil, reserved_by: user.id }
+        : state.selected
+    }))
+
     return true
   },
 
