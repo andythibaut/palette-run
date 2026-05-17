@@ -13,6 +13,7 @@ import CompanyApp       from '@/pages/CompanyApp'
 import PublicMapPage    from '@/pages/PublicMapPage'
 import PrivacyPage      from '@/pages/PrivacyPage'
 import LoadingScreen    from '@/components/shared/LoadingScreen'
+import PWAInstallBanner from '@/components/shared/PWAInstallBanner'
 
 // Redirige les utilisateurs connectés vers leur app
 const PublicRoute = ({ children }) => {
@@ -51,6 +52,8 @@ export default function App() {
   if (loading) return <LoadingScreen />
 
   return (
+    <>
+    <PWAInstallBanner />
     <Routes>
       {/* Public — carte démo sans auth */}
       <Route path="/"              element={<PublicMapPage />} />
@@ -86,5 +89,6 @@ export default function App() {
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   )
 }
