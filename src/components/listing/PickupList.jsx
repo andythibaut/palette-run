@@ -3,10 +3,11 @@ import { supabase } from '@/lib/supabase'
 import { formatPickupDeadline } from '@/lib/transaction'
 
 const statusStyles = {
-  pending:   { color: '#F97316', bg: '#F9731618', label: 'En attente vendeur' },
-  confirmed: { color: '#2ECC71', bg: '#2ECC7118', label: 'Confirmée'          },
-  cancelled: { color: '#4A5568', bg: '#4A556818', label: 'Annulée'            },
-  bidding:   { color: '#FFD166', bg: '#FFD16618', label: 'Enchère en cours'   },
+  pending:    { color: '#F97316', bg: '#F9731618', label: 'En attente vendeur' },
+  authorized: { color: '#3B82F6', bg: '#3B82F618', label: 'Autorisé — en route' },
+  confirmed:  { color: '#2ECC71', bg: '#2ECC7118', label: 'Confirmée'          },
+  cancelled:  { color: '#4A5568', bg: '#4A556818', label: 'Annulée'            },
+  bidding:    { color: '#FFD166', bg: '#FFD16618', label: 'Enchère en cours'   },
 }
 
 // ─── Mini bid panel — +50¢ uniquement ────────────────────────────────────────
@@ -123,7 +124,7 @@ export default function PickupList({ profile }) {
       .from('transactions')
       .select(`*, listings ( * ), companies ( name, city, address )`)
       .eq('driver_id', profile.id)
-      .in('status', ['pending', 'confirmed'])
+      .in('status', ['pending', 'authorized', 'confirmed'])
       .order('created_at', { ascending: false })
 
     setLoading(false)
@@ -146,10 +147,15 @@ export default function PickupList({ profile }) {
   }, [profile?.id])
 
   const handleCancel = async (p) => {
-    if (!window.confirm('Annuler cette réservation ?')) return
+    const isAuthorized = p.status === 'authorized'
+    const msg = isAuthorized
+      ? 'Annuler ? Le commerçant vous avait autorisé à venir — il sera notifié.'
+      : 'Annuler cette réservation ?'
+    if (!window.confirm(msg)) return
     setCancelling(p.id)
     await supabase.from('transactions').update({ status: 'cancelled' }).eq('id', p.id)
     await supabase.from('listings').update({
+      is_active:    true,   // remet l'annonce visible pour les autres
       reserved_by: null, reserved_at: null, reservation_expires_at: null,
       current_bid: null, bid_lock_step: null, bid_locked_until: null,
       bid_auto_confirm: false, bid_started_at: null, bid_expires_at: null, bid_winner_id: null,
@@ -191,7 +197,8 @@ export default function PickupList({ profile }) {
           const profit    = profile?.resale_price
             ? (profile.resale_price - (listing?.current_bid || p.buy_price)) * listing?.qty
             : null
-          const isPending = p.status === 'pending'
+          const isPending   = p.status === 'pending'
+          const isAuthorized = p.status === 'authorized'
 
           return (
             <div key={p.id} className="bg-surface rounded-2xl border overflow-hidden"
@@ -213,7 +220,7 @@ export default function PickupList({ profile }) {
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-amber/10 border border-amber/30 flex items-center justify-center text-xl shrink-0">🏭</div>
                   <div className="flex-1">
-                    {p.status === 'confirmed' ? (
+                    {(p.status === 'confirmed' || p.status === 'authorized') ? (
                       <>
                         <p className="font-bebas text-xl text-white leading-tight">{p.companies?.name}</p>
                         <p className="text-sub text-xs">{p.companies?.city}</p>
@@ -281,7 +288,7 @@ export default function PickupList({ profile }) {
                 )}
 
                 {/* Bouton GPS — uniquement après confirmation */}
-                {p.status === 'confirmed' && (
+                {(p.status === 'confirmed' || p.status === 'authorized') && (
                   <button onClick={() => {
                     const addr = p.companies?.address
                     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
@@ -303,10 +310,10 @@ export default function PickupList({ profile }) {
                 )}
 
                 {/* Annuler */}
-                {isPending && (
+                {(isPending || isAuthorized) && (
                   <button onClick={() => handleCancel(p)} disabled={cancelling === p.id}
                     className="w-full py-2.5 rounded-xl border border-red/30 bg-red/10 text-red text-sm font-semibold cursor-pointer disabled:opacity-40 mt-3">
-                    {cancelling === p.id ? 'Annulation…' : '✕ Annuler la réservation'}
+                    {cancelling === p.id ? 'Annulation…' : isAuthorized ? '✕ Annuler — je ne peux plus venir' : '✕ Annuler la réservation'}
                   </button>
                 )}
               </div>

@@ -296,7 +296,7 @@ const SiteSettings = ({ company }) => {
 }
 
 // ─── Liste acheteurs ─────────────────────────────────────────────────────────
-const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate }) => {
+const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate, onConfirm }) => {
   const blacklistedIds  = new Set(blacklist.map(b => b.driver_id))
   const reservedDriver  = listing?.reserved_by
 
@@ -357,13 +357,25 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate }) =
               </div>
             )}
 
-            {/* Bouton validation */}
-            {isReserver && (
+            {/* Boutons validation / confirmation */}
+            {isReserver && !d.isAuthorized && (
               <button onClick={() => onValidate(d.bidder_id, driverName)}
                 className="w-full py-3 font-bold text-bg text-sm cursor-pointer border-t border-amber/30"
                 style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)' }}>
                 ✅ Autoriser {driverName} à venir chercher les palettes
               </button>
+            )}
+            {isReserver && d.isAuthorized && (
+              <div className="border-t border-green/30">
+                <div className="px-4 py-2 bg-green/5 text-xs text-green text-center">
+                  🟢 {driverName} est en route — confirmez quand les palettes sont récupérées
+                </div>
+                <button onClick={() => onConfirm(d.bidder_id, driverName)}
+                  className="w-full py-3 font-bold text-white text-sm cursor-pointer"
+                  style={{ background: 'linear-gradient(135deg,#16A34A,#15803D)' }}>
+                  ✅ Confirmer la transaction — palettes récupérées
+                </button>
+              </div>
             )}
           </div>
         )
@@ -417,8 +429,36 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
     await blacklistDriver(driverId)
   }
 
+  // Étape 1 : autorise le chauffeur à venir — status → 'authorized' en base
   const handleValidate = async (driverId, driverName) => {
     if (!window.confirm(`Autoriser ${driverName} à venir chercher les palettes ?`)) return
+    if (!listing) return
+
+    const { error } = await supabase
+      .from('transactions')
+      .update({ status: 'authorized' })
+      .eq('listing_id', listing.id)
+      .eq('driver_id',  driverId)
+      .eq('status',     'pending')
+
+    if (error) { alert('Erreur lors de l\'autorisation'); return }
+
+    // Notification au chauffeur avec les détails défloutés
+    await supabase.from('notifications').insert({
+      user_id: driverId,
+      type:    'transaction_authorized',
+      title:   '🎉 Votre demande a été acceptée !',
+      body:    `${company.name} vous autorise à venir chercher les palettes. Rendez-vous au ${company.address}, ${company.city}.`,
+      data:    { listing_id: listing.id, company_name: company.name, company_address: company.address },
+    })
+
+    // Rafraîchit la liste pour refléter le nouveau statut
+    fetchDrivers(listing.id, listing.reserved_by)
+  }
+
+  // Étape 2 : confirme que les palettes ont été récupérées
+  const handleConfirm = async (driverId, driverName) => {
+    if (!window.confirm(`Confirmer que ${driverName} a bien récupéré les palettes ?`)) return
     if (!listing) return
 
     const { error } = await supabase
@@ -431,22 +471,12 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
       .eq('driver_id',  driverId)
       .eq('status',     'pending')
 
-    if (error) { alert('Erreur lors de la validation'); return }
+    if (error) { alert('Erreur lors de la confirmation'); return }
 
-    // Désactive l'annonce — invisible pour les autres chauffeurs
+    // Désactive l'annonce
     await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
 
-    // Notification au chauffeur avec les détails du commerçant
-    await supabase.from('notifications').insert({
-      user_id: driverId,
-      type:    'transaction_confirmed',
-      title:   '🎉 Votre demande a été acceptée !',
-      body:    `${company.name} vous autorise à venir chercher les palettes. Rendez-vous au ${company.address}, ${company.city}.`,
-      data:    { listing_id: listing.id, company_name: company.name, company_address: company.address, company_lat: company.lat, company_lng: company.lng },
-    })
-
-    alert(`✅ ${driverName} a été autorisé à venir. Une notification lui a été envoyée avec l'adresse.`)
-    // Mise à jour locale du store sans rechargement de page
+    alert(`✅ Transaction confirmée avec ${driverName}.`)
     useCompanyStore.getState().deleteListing()
     useCompanyStore.setState({ drivers: [] })
   }
@@ -491,7 +521,7 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
                 <p className="text-sm text-sub leading-relaxed">Configurez d'abord votre profil (onglet Profil) pour pouvoir publier une annonce.</p>
               </div>
         )}
-        {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} />}
+        {tab === 'acheteurs' && <DriversList drivers={drivers} blacklist={blacklist} listing={listing} onBlacklist={handleBlacklist} onValidate={handleValidate} onConfirm={handleConfirm} />}
         {tab === 'blacklist' && <BlacklistPanel blacklist={blacklist} onUnblacklist={unblacklistDriver} />}
         {tab === 'profil'    && (
           <>

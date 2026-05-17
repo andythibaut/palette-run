@@ -135,12 +135,12 @@ export const useCompanyStore = create((set, get) => ({
 
   // Récupère les chauffeurs qui ont consulté
   fetchDrivers: async (listingId, reservedBy) => {
-    // 1. Chauffeurs ayant une transaction pending (réservation)
+    // 1. Chauffeurs ayant une transaction pending ou authorized
     const { data: txData } = await supabase
       .from('transactions')
       .select('*, profiles(*)')
       .eq('listing_id', listingId)
-      .eq('status', 'pending')
+      .in('status', ['pending', 'authorized'])
 
     // 2. Chauffeurs ayant enchéri
     const { data: bidsData } = await supabase
@@ -156,7 +156,7 @@ export const useCompanyStore = create((set, get) => ({
     for (const tx of (txData || [])) {
       if (!seen.has(tx.driver_id)) {
         seen.add(tx.driver_id)
-        result.push({ bidder_id: tx.driver_id, profiles: tx.profiles, isReservation: true, created_at: tx.created_at, transaction_id: tx.id })
+        result.push({ bidder_id: tx.driver_id, profiles: tx.profiles, isReservation: true, isAuthorized: tx.status === 'authorized', created_at: tx.created_at, transaction_id: tx.id })
       }
     }
 
