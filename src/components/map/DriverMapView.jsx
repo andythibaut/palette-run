@@ -6,11 +6,21 @@ import { MAPBOX_TOKEN, MAP_STYLE, DEFAULT_CENTER, profitColor } from '@/lib/mapb
 import ListingBottomSheet from '@/components/listing/ListingBottomSheet'
 
 // ─── Marqueur ─────────────────────────────────────────────────────────────────
-const ListingMarker = ({ listing, selected, onClick, resalePrice, goldThreshold, userTier }) => {
+const ListingMarker = ({ listing, selected, onClick, resalePrice, goldThreshold, userTier, userId }) => {
   const TIER_LIMIT = { free: 2, gold: Infinity }
   const isHidden   = listing.qty > (TIER_LIMIT[userTier] || 2)
-  const color      = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
-  const isReserved = listing.reserved_by !== null
+  const isReserved     = listing.reserved_by !== null
+  const isReservedByMe = listing.reserved_by === userId
+  const isAuction      = listing.auction_mode === true && listing.reserved_by === null
+  const color          = isHidden
+    ? '#94A3B8'
+    : isReservedByMe
+      ? '#2563EB'   // bleu — ma réservation
+      : isReserved
+        ? '#94A3B8' // gris — réservé par quelqu'un d'autre
+        : isAuction
+          ? '#EC4899' // rose — enchère en cours
+          : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
   const size       = selected ? 48 : 38
 
   // Décale le marqueur de ~500m aléatoirement (déterministe par listing.id)
@@ -150,6 +160,7 @@ const DriverMapView = forwardRef(function DriverMapView({ profile, savedViewport
             resalePrice={resalePrice}
             goldThreshold={goldThreshold}
             userTier={userTier}
+            userId={profile?.id}
           />
         ))}
 
