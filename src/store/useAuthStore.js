@@ -12,9 +12,11 @@ export const useAuthStore = create((set, get) => ({
     const { data: { session } } = await supabase.auth.getSession()
 
     if (session?.user) {
-      // On débloque l'UI immédiatement avec l'user, profil arrive en arrière-plan
-      set({ user: session.user, loading: false })
-      get().fetchProfile(session.user.id)
+      // On attend que le profil soit chargé avant de débloquer l'UI
+      // pour éviter le flash vers /onboarding pendant le chargement
+      set({ user: session.user })
+      await get().fetchProfile(session.user.id)
+      set({ loading: false })
     } else {
       set({ loading: false })
     }

@@ -3,7 +3,7 @@ import { useAuthStore }   from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import { useListingStore } from '@/store/useListingStore'
 import CompanyDashboard from '@/components/company/CompanyDashboard'
-import DriverMapView    from '@/components/map/DriverMapView'
+import CompanyMapView   from '@/components/map/CompanyMapView'
 
 const TABS = [
   { id: 'annonce',   icon: '📦', label: 'Annonce'   },
@@ -46,12 +46,10 @@ export default function CompanyApp() {
       <div className="flex-1 overflow-hidden relative">
         {/* Carte — toujours montée, cachée via CSS */}
         <div style={{ display: tab === 'carte' ? 'block' : 'none', height: '100%' }}>
-          <DriverMapView
+          <CompanyMapView
             ref={mapRef}
-            profile={{ tier: 'free' }}
             savedViewport={mapViewport}
             onViewportChange={setMapViewport}
-            readOnly
           />
         </div>
         {tab !== 'carte' && <CompanyDashboard tab={tab} />}
