@@ -242,32 +242,43 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
               <>
                 {!booked ? (
                   <>
-                    <div className="bg-amber/10 border border-amber/30 rounded-xl px-4 py-3 mb-1">
-                      <p className="text-amber text-xs leading-relaxed">
-                        ⚠️ En réservant, vous vous engagez à venir récupérer ces palettes <strong>aujourd'hui</strong>. Les no-shows répétés entraînent une suspension de votre compte.
-                      </p>
-                    </div>
-                    {listingError && (
-                      <div className="w-full rounded-xl bg-red/10 border border-red/30 px-3 py-2 text-red text-xs text-center mb-2">
-                        ⚠️ {listingError}
-                      </div>
-                    )}
-                    <button onClick={handleReserve}
-                      className="w-full py-4 rounded-2xl font-bold text-bg"
-                      style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)', boxShadow: '0 6px 20px rgba(255,209,102,0.4)' }}>
-                      🥇 Réserver ces palettes
-                    </button>
-                    {/* Enchère si déjà réservée par quelqu'un d'autre */}
-                    {listing.reserved_by && (
-                      <div className="flex gap-2">
-                        {[0.10, 0.20, 0.50].map(step => (
-                          <button key={step} onClick={() => handleBid(step)} disabled={bidding}
-                            className="flex-1 py-3 rounded-xl border font-bold text-sm disabled:opacity-40"
-                            style={{ borderColor: step===0.50?'#EF444466':step===0.20?'#F9731666':'#2ECC7166', background: step===0.50?'#EF444418':step===0.20?'#F9731618':'#2ECC7118', color: step===0.50?'#EF4444':step===0.20?'#F97316':'#2ECC71' }}>
-                            +{Math.round(step*100)}¢
-                          </button>
-                        ))}
-                      </div>
+                    {listing.auction_mode ? (
+                      /* Mode enchère — pas de réservation directe */
+                      <>
+                        <div className="bg-pink/10 border border-pink/30 rounded-xl px-4 py-3 mb-1">
+                          <p className="text-pink text-xs leading-relaxed font-semibold">
+                            ⚡ Enchères ouvertes — surenchérissez pour obtenir ces palettes
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          {[0.10, 0.20, 0.50].map(step => (
+                            <button key={step} onClick={() => handleBid(step)} disabled={bidding}
+                              className="flex-1 py-3 rounded-xl border font-bold text-sm disabled:opacity-40 cursor-pointer"
+                              style={{ borderColor: step===0.50?'#EF444466':step===0.20?'#F9731666':'#EC489966', background: step===0.50?'#EF444418':step===0.20?'#F9731618':'#EC489918', color: step===0.50?'#EF4444':step===0.20?'#F97316':'#EC4899' }}>
+                              +{Math.round(step*100)}¢
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    ) : (
+                      /* Mode réservation directe */
+                      <>
+                        <div className="bg-amber/10 border border-amber/30 rounded-xl px-4 py-3 mb-1">
+                          <p className="text-amber text-xs leading-relaxed">
+                            ⚠️ En réservant, vous vous engagez à venir récupérer ces palettes <strong>aujourd'hui</strong>. Les no-shows répétés entraînent une suspension de votre compte.
+                          </p>
+                        </div>
+                        {listingError && (
+                          <div className="w-full rounded-xl bg-red/10 border border-red/30 px-3 py-2 text-red text-xs text-center mb-2">
+                            ⚠️ {listingError}
+                          </div>
+                        )}
+                        <button onClick={handleReserve}
+                          className="w-full py-4 rounded-2xl font-bold text-bg cursor-pointer"
+                          style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)', boxShadow: '0 6px 20px rgba(255,209,102,0.4)' }}>
+                          🥇 Réserver ces palettes
+                        </button>
+                      </>
                     )}
                   </>
                 ) : (
