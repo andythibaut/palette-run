@@ -124,7 +124,7 @@ export default function PickupList({ profile }) {
       .from('transactions')
       .select(`*, listings ( * ), companies ( name, city, address )`)
       .eq('driver_id', profile.id)
-      .in('status', ['pending', 'authorized', 'confirmed'])
+      .in('status', ['pending', 'authorized'])
       .order('created_at', { ascending: false })
 
     setLoading(false)
