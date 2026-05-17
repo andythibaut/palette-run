@@ -19,7 +19,7 @@ const openGPS = (address, lat, lng) => {
 }
 
 export default function ListingBottomSheet({ listing, profile, onClose }) {
-  const { reserveListing, placeBid } = useListingStore()
+  const { reserveListing, placeBid, error: listingError } = useListingStore()
   const { user } = useAuthStore()
   const [booked,       setBooked]       = useState(false)
   const [bidding,      setBidding]      = useState(false)
@@ -68,8 +68,14 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
 
   const handleReserve = async () => {
     setBooked(true)
-    await reserveListing(listing.id)
-    setTimeout(onClose, 1000)
+    const ok = await reserveListing(listing.id)
+    if (!ok) {
+      setBooked(false)
+      // L'erreur est dans le store, on ferme après 2s pour que l'utilisateur la voie
+      setTimeout(onClose, 2500)
+    } else {
+      setTimeout(onClose, 1000)
+    }
   }
 
   const handleBid = async (step) => {
@@ -241,6 +247,11 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                         ⚠️ En réservant, vous vous engagez à venir récupérer ces palettes <strong>aujourd'hui</strong>. Les no-shows répétés entraînent une suspension de votre compte.
                       </p>
                     </div>
+                    {listingError && (
+                      <div className="w-full rounded-xl bg-red/10 border border-red/30 px-3 py-2 text-red text-xs text-center mb-2">
+                        ⚠️ {listingError}
+                      </div>
+                    )}
                     <button onClick={handleReserve}
                       className="w-full py-4 rounded-2xl font-bold text-bg"
                       style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)', boxShadow: '0 6px 20px rgba(255,209,102,0.4)' }}>

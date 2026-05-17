@@ -148,7 +148,17 @@ export const useListingStore = create((set, get) => ({
         had_active_bid:       listing.current_bid !== null,
       })
 
-    if (txError) { set({ error: txError.message }); return false }
+    if (txError) {
+      // L'index unique en base a bloqué une double réservation
+      // On annule la mise à jour de reserved_by pour remettre l'annonce disponible
+      if (txError.code === '23505') {
+        await supabase.from('listings').update({ reserved_by: null, reserved_at: null, reservation_expires_at: null }).eq('id', listingId)
+        set({ error: 'Cette annonce vient d\'être réservée par un autre chauffeur.' })
+      } else {
+        set({ error: txError.message })
+      }
+      return false
+    }
     return true
   },
 
