@@ -11,8 +11,8 @@ function wkbToLatLng(wkb) {
   try {
     const buf = new Uint8Array(wkb.match(/.{2}/g).map(b => parseInt(b, 16)))
     const view = new DataView(buf.buffer)
-    const lng = view.getFloat64(5,  true)
-    const lat = view.getFloat64(13, true)
+    const lng = view.getFloat64(9,  true)
+    const lat = view.getFloat64(17, true)
     if (!isFinite(lat) || !isFinite(lng)) return null
     return { lat, lng }
   } catch { return null }
