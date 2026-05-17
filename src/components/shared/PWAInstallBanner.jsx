@@ -4,31 +4,48 @@ import { usePWAInstall } from '@/lib/usePWAInstall'
 export default function PWAInstallBanner() {
   const { canInstall, isInstalled, isIOS, isAndroid, hasNativePrompt, promptInstall } = usePWAInstall()
   const [justInstalled, setJustInstalled] = useState(false)
+  const [installing,    setInstalling]    = useState(false)
 
   const handleInstall = async () => {
     const ok = await promptInstall()
     if (ok) {
-      setJustInstalled(true)
-      window.addEventListener('appinstalled', () => {
-        setTimeout(() => window.close(), 1500)
-      }, { once: true })
+      setInstalling(true)
+      setTimeout(() => { setInstalling(false); setJustInstalled(true) }, 15000)
     }
   }
+
+  if (installing) return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}>
+      <div className="w-full max-w-sm mx-4 bg-surface border border-border rounded-3xl px-8 py-10 text-center">
+        <div className="text-5xl mb-4">📲</div>
+        <h3 className="font-bebas text-3xl text-gray-800 mb-2">Installation en cours…</h3>
+        <p className="text-gray-500 text-sm mb-8">L'icône Palette Run arrive sur votre écran d'accueil.</p>
+        <div className="w-full h-3 bg-hi rounded-full overflow-hidden">
+          <div className="h-full rounded-full"
+            style={{
+              background: "linear-gradient(135deg,#E8920A,#d4830a)",
+              animation: "progress 15s linear forwards",
+              width: "0%",
+            }} />
+        </div>
+        <style>{`
+          @keyframes progress { from { width: 0% } to { width: 100% } }
+        `}</style>
+      </div>
+    </div>
+  )
 
   if (justInstalled) return (
     <div className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}>
       <div className="w-full max-w-sm mx-4 bg-surface border border-border rounded-3xl overflow-hidden shadow-2xl text-center px-8 py-10">
         <div className="text-6xl mb-4">🎉</div>
-        <h3 className="font-bebas text-3xl text-gray-800 mb-2">Installation en cours…</h3>
-        <p className="text-gray-500 text-sm leading-relaxed mb-8">
-          L'icône <strong className="text-amber">Palette Run</strong> va apparaître sur votre écran d'accueil dans quelques secondes.
+        <div className="text-5xl mb-4">🎉</div>
+        <h3 className="font-bebas text-3xl text-gray-800 mb-2">App installée !</h3>
+        <p className="text-gray-500 text-sm leading-relaxed">
+          Ouvrez <strong className="text-amber">Palette Run</strong> depuis votre écran d'accueil.
         </p>
-        <button onClick={() => window.close()}
-          className="w-full py-4 rounded-2xl font-bold text-white text-base cursor-pointer"
-          style={{ background: "linear-gradient(135deg,#E8920A,#d4830a)", boxShadow: "0 6px 20px rgba(232,146,10,0.3)" }}>
-          Fermer cet onglet
-        </button>
       </div>
     </div>
   )
