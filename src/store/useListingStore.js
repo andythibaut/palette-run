@@ -65,7 +65,7 @@ export const useListingStore = create((set, get) => ({
         event:  '*',
         schema: 'public',
         table:  'listings',
-        filter: 'is_active=eq.true',
+        // Pas de filtre — on gère is_active dans le handler
       }, (payload) => {
         const { eventType, new: newRow, old: oldRow } = payload
 
@@ -74,11 +74,17 @@ export const useListingStore = create((set, get) => ({
             return { listings: [...state.listings, newRow] }
           }
           if (eventType === 'UPDATE') {
+            // Si l'annonce est désactivée, on la retire comme un DELETE
+            if (!newRow.is_active) {
+              return {
+                listings: state.listings.filter(l => l.id !== newRow.id),
+                selected: state.selected?.id === newRow.id ? null : state.selected,
+              }
+            }
             return {
               listings: state.listings.map(l =>
                 l.id === newRow.id ? { ...l, ...newRow } : l
               ),
-              // Met à jour selected si ouvert
               selected: state.selected?.id === newRow.id
                 ? { ...state.selected, ...newRow }
                 : state.selected,

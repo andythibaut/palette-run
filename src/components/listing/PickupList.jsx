@@ -141,6 +141,10 @@ export default function PickupList({ profile }) {
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'listings' }, () => {
         fetchPickups()
       })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transactions',
+        filter: `driver_id=eq.${profile.id}` }, () => {
+        fetchPickups()
+      })
       .subscribe()
 
     return () => supabase.removeChannel(sub)

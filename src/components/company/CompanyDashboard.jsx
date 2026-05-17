@@ -469,16 +469,14 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
       })
       .eq('listing_id', listing.id)
       .eq('driver_id',  driverId)
-      .eq('status',     'pending')
+      .in('status',     ['pending', 'authorized'])
 
-    if (error) { alert('Erreur lors de la confirmation'); return }
+    if (error) { alert('Erreur lors de la confirmation : ' + error.message); return }
 
-    // Désactive l'annonce
-    await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
-
-    alert(`✅ Transaction confirmée avec ${driverName}.`)
+    // Désactive l'annonce via le store (évite le problème de RLS SELECT)
     useCompanyStore.getState().deleteListing()
     useCompanyStore.setState({ drivers: [] })
+    alert(`✅ Transaction confirmée avec ${driverName}.`)
   }
 
   if (loading) return (
