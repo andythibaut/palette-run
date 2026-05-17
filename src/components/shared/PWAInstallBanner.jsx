@@ -15,9 +15,9 @@ export default function PWAInstallBanner() {
       style={{ background: "rgba(0,0,0,0.85)", backdropFilter: "blur(8px)" }}>
       <div className="w-full max-w-sm mx-4 bg-surface border border-border rounded-3xl overflow-hidden shadow-2xl text-center px-8 py-10">
         <div className="text-6xl mb-4">🎉</div>
-        <h3 className="font-bebas text-3xl text-gray-800 mb-2">App installée !</h3>
+        <h3 className="font-bebas text-3xl text-gray-800 mb-2">Installation en cours…</h3>
         <p className="text-gray-500 text-sm leading-relaxed mb-8">
-          Fermez cet onglet et ouvrez <strong className="text-amber">Palette Run</strong> depuis votre écran d'accueil.
+          L'icône <strong className="text-amber">Palette Run</strong> va apparaître sur votre écran d'accueil dans quelques secondes. Fermez ensuite cet onglet.
         </p>
         <button onClick={() => window.close()}
           className="w-full py-4 rounded-2xl font-bold text-white text-base cursor-pointer mb-3"
