@@ -39,6 +39,11 @@ export async function subscribeToPush(userId) {
   }
 }
 
+export function getNotificationStatus() {
+  if (!('Notification' in window)) return 'unsupported'
+  return Notification.permission // 'default', 'granted', 'denied'
+}
+
 export async function requestNotificationPermission(userId) {
   if (!('Notification' in window)) return false
   if (Notification.permission === 'granted') {
