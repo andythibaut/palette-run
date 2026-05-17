@@ -120,15 +120,43 @@ export default function PickupList({ profile }) {
 
   const fetchPickups = async () => {
     setLoading(true)
-    const { data, error } = await supabase
+
+    // 1. Transactions pending/authorized
+    const { data: txData } = await supabase
       .from('transactions')
-      .select(`*, listings ( * ), companies ( name, city, address )`)
+      .select('*, listings ( * ), companies ( name, city, address )')
       .eq('driver_id', profile.id)
       .in('status', ['pending', 'authorized'])
       .order('created_at', { ascending: false })
 
+    // 2. Enchères en cours (bids sans transaction confirmée)
+    const { data: bidData } = await supabase
+      .from('bids')
+      .select('*, listings ( *, companies ( name, city, address ) )')
+      .eq('bidder_id', profile.id)
+      .order('created_at', { ascending: false })
+
+    // Filtre : ne garder que les bids dont l'annonce est encore active
+    const activeBids = (bidData || []).filter(b => b.listings?.is_active)
+
+    // Convertit les bids en format compatible avec les transactions
+    const bidPickups = activeBids.map(b => ({
+      id:         `bid-${b.id}`,
+      type:       'bid',
+      status:     'bidding',
+      bid_price:  b.price,
+      listing_id: b.listing_id,
+      listings:   b.listings,
+      companies:  b.listings?.companies,
+      created_at: b.created_at,
+    }))
+
+    // Déduplique : si une transaction existe pour ce listing, on ne montre pas le bid
+    const txListingIds = new Set((txData || []).map(t => t.listing_id))
+    const uniqueBids   = bidPickups.filter(b => !txListingIds.has(b.listing_id))
+
     setLoading(false)
-    if (!error) setPickups(data || [])
+    setPickups([...(txData || []), ...uniqueBids])
   }
 
   // Souscription realtime sur les listings réservés
@@ -143,6 +171,10 @@ export default function PickupList({ profile }) {
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transactions',
         filter: `driver_id=eq.${profile.id}` }, () => {
+        fetchPickups()
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bids',
+        filter: `bidder_id=eq.${profile.id}` }, () => {
         fetchPickups()
       })
       .subscribe()
@@ -227,14 +259,12 @@ export default function PickupList({ profile }) {
 
       <div style={{ padding: '1rem 1.25rem', paddingBottom: '6rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {pickups.map(p => {
-          const listing   = p.listings
-          const hasBid    = listing?.current_bid !== null
-          const style     = hasBid
-            ? statusStyles.bidding
-            : statusStyles[p.status] || statusStyles.pending
-          const total     = p.buy_price * listing?.qty
-          const profit    = profile?.resale_price
-            ? (profile.resale_price - (listing?.current_bid || p.buy_price)) * listing?.qty
+          const listing      = p.listings
+          const isBid        = p.type === 'bid'
+          const style        = statusStyles[p.status] || statusStyles.pending
+          const total        = (p.buy_price || p.bid_price || listing?.price) * listing?.qty
+          const profit       = profile?.resale_price
+            ? (profile.resale_price - (p.buy_price || p.bid_price || listing?.price)) * listing?.qty
             : null
           const isPending    = p.status === 'pending'
           const isAuthorized = p.status === 'authorized'
