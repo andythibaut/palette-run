@@ -7,8 +7,8 @@ const GOLD = '#FFD166'
 
 // ─── Marqueur de l'annonce du commerçant ──────────────────────────────────────
 const CompanyListingMarker = ({ company, listing }) => {
-  const lat = company?.lat || company?.location?.coordinates?.[1]
-  const lng = company?.lng || company?.location?.coordinates?.[0]
+  const lng = company?.location?.coordinates?.[0]
+  const lat = company?.location?.coordinates?.[1]
   if (!lat || !lng) return null
 
   return (
@@ -64,14 +64,14 @@ const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onVie
   // Centre la carte sur la position de la company dès qu'on a les coords
   useEffect(() => {
     if (savedViewport) { setViewport(savedViewport); return }
-    const lat = company?.lat || company?.location?.coordinates?.[1]
-    const lng = company?.lng || company?.location?.coordinates?.[0]
+    const lng = company?.location?.coordinates?.[0]
+    const lat = company?.location?.coordinates?.[1]
     if (lat && lng) {
       setViewport({ longitude: lng, latitude: lat, zoom: 15 })
     } else {
       setViewport(DEFAULT_CENTER)
     }
-  }, [company?.lat, company?.lng])
+  }, [company?.location])
 
   const handleGeolocate = useCallback(() => {
     navigator.geolocation.getCurrentPosition(pos => {
