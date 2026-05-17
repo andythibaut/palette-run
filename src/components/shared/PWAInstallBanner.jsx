@@ -26,10 +26,10 @@ export default function PWAInstallBanner() {
         {/* Instructions iOS */}
         {isIOS ? (
           <div className="px-6 py-4 flex flex-col gap-3">
-            <p className="text-sm text-sub text-center">Ajoutez l'app à votre écran d'accueil :</p>
+            <p className="text-sm text-sub text-center">Ajoutez l&apos;app à votre écran d&apos;accueil :</p>
             {[
               { icon: '⎋', text: 'Appuyez sur le bouton Partager en bas de Safari' },
-              { icon: '+', text: 'Appuyez sur "Sur l'écran d'accueil"' },
+              { icon: '+', text: "Appuyez sur \"Sur l'écran d'accueil\"" },
               { icon: '✓', text: 'Appuyez sur "Ajouter"' },
             ].map(s => (
               <div key={s.icon} className="flex items-center gap-3 bg-hi border border-border rounded-xl px-3 py-2.5">
@@ -47,7 +47,7 @@ export default function PWAInstallBanner() {
           <div className="px-6 py-4 flex flex-col gap-2.5">
             {[
               { icon: '🔔', text: 'Notifications push instantanées' },
-              { icon: '⚡', text: 'Accès rapide depuis votre écran d'accueil' },
+              { icon: '⚡', text: "Accès rapide depuis votre écran d'accueil" },
               { icon: '📶', text: 'Fonctionne même avec une connexion faible' },
             ].map((a, i) => (
               <div key={i} className="flex items-center gap-3">
