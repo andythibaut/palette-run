@@ -7,7 +7,12 @@ export default function PWAInstallBanner() {
 
   const handleInstall = async () => {
     const ok = await promptInstall()
-    if (ok) setJustInstalled(true)
+    if (ok) {
+      setJustInstalled(true)
+      window.addEventListener('appinstalled', () => {
+        setTimeout(() => window.close(), 1500)
+      }, { once: true })
+    }
   }
 
   if (justInstalled) return (
@@ -16,15 +21,10 @@ export default function PWAInstallBanner() {
       <div className="w-full max-w-sm mx-4 bg-surface border border-border rounded-3xl overflow-hidden shadow-2xl text-center px-8 py-10">
         <div className="text-6xl mb-4">🎉</div>
         <h3 className="font-bebas text-3xl text-gray-800 mb-2">Installation en cours…</h3>
-        <p className="text-gray-500 text-sm leading-relaxed mb-8">
-          L'icône <strong className="text-amber">Palette Run</strong> va apparaître sur votre écran d'accueil dans quelques secondes. Fermez ensuite cet onglet.
+        <p className="text-gray-500 text-sm leading-relaxed">
+          L'icône <strong className="text-amber">Palette Run</strong> va apparaître sur votre écran d'accueil dans quelques secondes.
         </p>
-        <button onClick={() => window.close()}
-          className="w-full py-4 rounded-2xl font-bold text-white text-base cursor-pointer mb-3"
-          style={{ background: "linear-gradient(135deg,#E8920A,#d4830a)", boxShadow: "0 6px 20px rgba(232,146,10,0.3)" }}>
-          Fermer cet onglet
-        </button>
-        <p className="text-xs text-muted">Si l'onglet ne se ferme pas, fermez-le manuellement.</p>
+        <p className="text-xs text-muted mt-6">Cet onglet se fermera automatiquement.</p>
       </div>
     </div>
   )
