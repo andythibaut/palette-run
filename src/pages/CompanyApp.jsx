@@ -58,6 +58,13 @@ export default function CompanyApp() {
           if (l?.id) useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
         }
       )
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions',
+        filter: `listing_id=eq.${listing.id}` },
+        () => {
+          const { listing: l } = useCompanyStore.getState()
+          if (l?.id) useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+        }
+      )
       .subscribe()
 
     return () => supabase.removeChannel(sub)
