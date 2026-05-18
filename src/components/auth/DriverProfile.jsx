@@ -81,7 +81,7 @@ export default function DriverProfile() {
       <div className="flex items-center gap-4 px-5 pt-6 pb-5 border-b border-border">
         <div className="w-16 h-16 rounded-2xl bg-amber/10 border-2 border-amber/30 flex items-center justify-center text-4xl">🚛</div>
         <div className="flex-1">
-          <h1 className="font-bebas text-2xl text-white">{profile?.full_name || 'Mon profil'}</h1>
+          <h1 className="font-bebas text-2xl text-gray-800">{profile?.full_name || 'Mon profil'}</h1>
           <p className="text-sub text-xs mt-1">Acheteur de palettes</p>
           <span className="inline-block mt-2 text-xs px-3 py-1 rounded-full font-mono"
             style={{ background: `${tierColor[profile?.tier || 'free']}18`, color: tierColor[profile?.tier || 'free'], border: `1px solid ${tierColor[profile?.tier || 'free']}44` }}>
@@ -146,7 +146,7 @@ export default function DriverProfile() {
                     <input type="number" inputMode="decimal" value={resalePrice}
                       onChange={e => setResalePrice(e.target.value)}
                       placeholder="0.00" autoFocus
-                      className="flex-1 py-3 bg-transparent text-white font-bebas text-3xl outline-none"
+                      className="flex-1 py-3 bg-transparent text-gray-800 font-bebas text-3xl outline-none"
                     />
                     <span className="px-4 text-muted text-xs">/ pal.</span>
                   </div>
@@ -206,7 +206,7 @@ export default function DriverProfile() {
                   <input type="number" inputMode="decimal" value={goldThreshold}
                     onChange={e => setGoldThreshold(e.target.value)}
                     autoFocus
-                    className="flex-1 py-3 bg-transparent text-white font-bebas text-3xl outline-none"
+                    className="flex-1 py-3 bg-transparent text-gray-800 font-bebas text-3xl outline-none"
                   />
                   <span className="px-4 text-muted text-xs">total</span>
                 </div>
@@ -228,7 +228,7 @@ export default function DriverProfile() {
       <div className="px-5 pb-10 mt-6">
         {/* Déconnexion */}
         <button onClick={() => useAuthStore.getState().signOut()}
-          className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer mb-4">
+          className="w-full py-3 rounded-2xl border border-border bg-white text-gray-800 text-sm font-semibold cursor-pointer mb-4">
           🚪 Se déconnecter
         </button>
 

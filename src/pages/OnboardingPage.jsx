@@ -39,7 +39,7 @@ const ManualMapPicker = ({ onConfirm, onCancel }) => {
     <div className="fixed inset-0 z-50 flex flex-col bg-bg">
       <div className="px-4 py-3 bg-surface border-b border-border flex items-center gap-3">
         <button onClick={onCancel} className="text-muted text-sm cursor-pointer bg-transparent border-none">✕ Annuler</button>
-        <p className="flex-1 text-center text-sm font-semibold text-white">Appuyez pour placer votre adresse</p>
+        <p className="flex-1 text-center text-sm font-semibold text-gray-800">Appuyez pour placer votre adresse</p>
         <button onClick={handleConfirm} disabled={!pin}
           className="text-amber text-sm font-bold cursor-pointer bg-transparent border-none disabled:opacity-40">
           Confirmer
@@ -131,7 +131,7 @@ const AddressField = ({ onSelect, onManualPick }) => {
       <label className="text-xs text-muted uppercase tracking-widest block mb-2">
         Adresse du site <span className="text-amber">*</span>
       </label>
-      <div className={`flex items-center bg-hi rounded-2xl border-2 overflow-hidden transition-colors ${
+      <div className={`flex items-center bg-white rounded-2xl border-2 overflow-hidden shadow-sm transition-colors ${
         selected ? 'border-green' : open ? 'border-amber' : 'border-border'
       }`}>
         <span className="pl-4 text-lg shrink-0">{selected ? '✅' : '📍'}</span>
@@ -141,7 +141,7 @@ const AddressField = ({ onSelect, onManualPick }) => {
           onChange={e => { search(e.target.value); setOpen(true) }}
           onFocus={() => setOpen(true)}
           placeholder="22 avenue d'Italie, Paris…"
-          className="flex-1 px-3 py-3 bg-transparent text-white text-sm outline-none"
+          className="flex-1 px-3 py-3 bg-transparent text-gray-800 text-sm outline-none"
           autoComplete="off"
           autoCorrect="off"
           spellCheck="false"
@@ -160,9 +160,9 @@ const AddressField = ({ onSelect, onManualPick }) => {
             <button
               key={i}
               onPointerDown={() => handlePick(s)}
-              className="w-full px-4 py-3 text-left hover:bg-hi transition-colors border-none bg-transparent cursor-pointer border-b border-border/50 last:border-0"
+              className="w-full px-4 py-3 text-left hover:bg-hi transition-colors border-none bg-white cursor-pointer border-b border-border/50 last:border-0"
             >
-              <p className="text-white text-sm font-semibold leading-tight">{s.label}</p>
+              <p className="text-gray-800 text-sm font-semibold leading-tight">{s.label}</p>
               <p className="text-muted text-xs mt-0.5">{s.postcode} {s.city}</p>
             </button>
           ))}
@@ -245,7 +245,7 @@ export default function OnboardingPage() {
       </div>
 
       <div className="mb-4">
-        <h1 className="font-bebas text-3xl text-white leading-tight">Vous êtes…</h1>
+        <h1 className="font-bebas text-3xl text-gray-800 leading-tight">Vous êtes…</h1>
         <p className="text-sub text-xs mt-0.5">Choisissez votre profil pour commencer.</p>
       </div>
 
@@ -330,7 +330,7 @@ export default function OnboardingPage() {
 
         <div className="mb-8 shrink-0">
           <span className="text-4xl">🚛</span>
-          <h1 className="font-bebas text-4xl text-white leading-tight mt-2">Votre nom</h1>
+          <h1 className="font-bebas text-4xl text-gray-800 leading-tight mt-2">Votre nom</h1>
           <p className="text-sub text-sm mt-1">Ce nom sera visible par les vendeurs.</p>
         </div>
 
@@ -343,7 +343,7 @@ export default function OnboardingPage() {
             onChange={e => { setFullName(e.target.value); setError('') }}
             placeholder=""
             autoFocus
-            className="w-full px-4 py-4 bg-hi border-2 border-border rounded-2xl text-white text-lg outline-none focus:border-blue transition-colors"
+            className="w-full px-4 py-4 bg-white border-2 border-border rounded-2xl text-gray-800 text-lg outline-none focus:border-blue transition-colors shadow-sm"
           />
         </div>
 
@@ -405,7 +405,7 @@ export default function OnboardingPage() {
 
       <div className="mb-6">
         <span className="text-4xl">🏭</span>
-        <h1 className="font-bebas text-4xl text-white leading-tight mt-2">Votre enseigne</h1>
+        <h1 className="font-bebas text-4xl text-gray-800 leading-tight mt-2">Votre enseigne</h1>
         <p className="text-sub text-sm mt-1">Ces informations seront visibles sur la carte.</p>
       </div>
 
@@ -419,7 +419,7 @@ export default function OnboardingPage() {
             onChange={e => { setCompanyName(e.target.value); setError('') }}
             placeholder=""
             autoFocus
-            className="w-full px-4 py-4 bg-hi border-2 border-border rounded-2xl text-white text-lg outline-none focus:border-green transition-colors"
+            className="w-full px-4 py-4 bg-white border-2 border-border rounded-2xl text-gray-800 text-lg outline-none focus:border-green transition-colors shadow-sm"
           />
         </div>
 

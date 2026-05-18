@@ -99,7 +99,7 @@ const ListingForm = ({ listing, onSave }) => {
       {/* Toggle actif */}
       <div className="flex items-center justify-between bg-surface border border-border rounded-2xl px-4 py-3">
         <div>
-          <p className="font-semibold text-sm text-white">Annonce</p>
+          <p className="font-semibold text-sm text-gray-800">Annonce</p>
           <p className="text-xs text-sub mt-0.5">{isActive ? 'Visible sur la carte' : 'Masquée'}</p>
         </div>
         <button onClick={() => setIsActive(a => !a)}
@@ -118,7 +118,7 @@ const ListingForm = ({ listing, onSave }) => {
         style={{ borderColor: auctionMode ? '#A855F744' : '#D1D9E6' }}>
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <p className="font-semibold text-sm text-white">⚡ Mettre aux enchères</p>
+            <p className="font-semibold text-sm text-gray-800">⚡ Mettre aux enchères</p>
             <p className="text-xs text-sub mt-0.5">
               {auctionMode ? 'Les acheteurs surenchérissent pendant la durée choisie' : 'Réservation directe — premier arrivé premier servi'}
             </p>
@@ -183,7 +183,7 @@ const ListingForm = ({ listing, onSave }) => {
           <input type="number" inputMode="decimal" value={price}
             onChange={e => setPrice(e.target.value)}
             placeholder="0.00" step="0.10" min="0.10"
-            className="flex-1 py-4 bg-transparent text-white font-bebas text-3xl outline-none"
+            className="flex-1 py-4 bg-transparent text-gray-800 font-bebas text-3xl outline-none"
           />
           <span className="px-4 text-muted text-xs">/ pal.</span>
         </div>
@@ -195,7 +195,7 @@ const ListingForm = ({ listing, onSave }) => {
           Heure limite de récupération
         </label>
         <input type="time" value={pickupBefore} onChange={e => setPickupBefore(e.target.value)}
-          className="w-full px-4 py-3 bg-hi border border-border rounded-2xl text-white text-sm outline-none font-mono"
+          className="w-full px-4 py-3 bg-white border border-border rounded-2xl text-gray-800 text-sm outline-none font-mono"
         />
         <p className="text-xs text-muted mt-1">Fixez l'heure avant laquelle les palettes doivent être récupérées</p>
       </div>
@@ -272,7 +272,7 @@ const SiteSettings = ({ company }) => {
 
       <div className="flex items-center justify-between bg-surface border border-border rounded-2xl px-4 py-4">
         <div>
-          <p className="font-semibold text-sm text-white">Engin de chargement disponible</p>
+          <p className="font-semibold text-sm text-gray-800">Engin de chargement disponible</p>
           <p className="text-xs text-sub mt-1">Fenwick, Gerbeur ou autre</p>
         </div>
         <button onClick={() => setHasLoader(h => !h)}
@@ -414,7 +414,7 @@ const BlacklistPanel = ({ blacklist, onUnblacklist }) => (
           <p className="text-xs text-red/70 mt-0.5">Annonce masquée</p>
         </div>
         <button onClick={() => onUnblacklist(b.driver_id)}
-          className="px-3 py-1.5 rounded-xl bg-hi border border-border text-sub text-xs cursor-pointer hover:text-white transition-colors">
+          className="px-3 py-1.5 rounded-xl bg-white border border-border text-sub text-xs cursor-pointer hover:text-gray-800 transition-colors">
           Retirer
         </button>
       </div>
@@ -526,7 +526,7 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
         <div className="flex items-center justify-between mb-3">
           <div>
             <p className="font-mono text-[10px] text-muted uppercase tracking-widest">Mon espace vendeur</p>
-            <h1 className="font-bebas text-xl text-white leading-tight">{company?.name || 'Mon vendeur'}</h1>
+            <h1 className="font-bebas text-xl text-gray-800 leading-tight">{company?.name || 'Mon vendeur'}</h1>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 bg-surface border border-border rounded-xl px-3 py-1.5">
@@ -549,7 +549,7 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
             ? <ListingForm listing={listing} onSave={() => window.location.reload()} />
             : <div className="flex flex-col items-center justify-center h-64 gap-4 px-8 text-center">
                 <span className="text-5xl">⚙️</span>
-                <p className="font-bebas text-2xl text-white">Profil incomplet</p>
+                <p className="font-bebas text-2xl text-gray-800">Profil incomplet</p>
                 <p className="text-sm text-sub leading-relaxed">Configurez d'abord votre profil (onglet Profil) pour pouvoir publier une annonce.</p>
               </div>
         )}
@@ -574,7 +574,7 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
               <div className="border-t border-border pt-6">
                 {/* Déconnexion */}
                 <button onClick={() => useAuthStore.getState().signOut()}
-                  className="w-full py-3 rounded-2xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer mb-4">
+                  className="w-full py-3 rounded-2xl border border-border bg-white text-gray-800 text-sm font-semibold cursor-pointer mb-4">
                   🚪 Se déconnecter
                 </button>
 
