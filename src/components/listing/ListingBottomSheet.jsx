@@ -19,8 +19,10 @@ const openGPS = (address, lat, lng) => {
 }
 
 // ─── Champ d'enchère libre ────────────────────────────────────────────────────
-function AuctionBidInput({ currentPrice, bidding, bidResult, onBid }) {
-  const minPrice = Math.round((currentPrice + 0.50) * 10) / 10
+function AuctionBidInput({ currentPrice, hasExistingBid, bidding, bidResult, onBid }) {
+  const minPrice = hasExistingBid
+    ? Math.round((currentPrice + 0.50) * 10) / 10
+    : currentPrice
   const [value, setValue] = useState(minPrice.toFixed(2))
   const [error, setError] = useState('')
 
@@ -315,6 +317,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                       /* Mode enchère — champ libre avec minimum +0.50€ et pas de 0.10€ */
                       <AuctionBidInput
                         currentPrice={currentPrice}
+                        hasExistingBid={listing?.current_bid !== null && listing?.current_bid !== undefined}
                         bidding={bidding}
                         bidResult={bidResult}
                         onBid={handleBid}
