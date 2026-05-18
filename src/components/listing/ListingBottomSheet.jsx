@@ -18,6 +18,66 @@ const openGPS = (address, lat, lng) => {
   }
 }
 
+// ─── Champ d'enchère libre ────────────────────────────────────────────────────
+function AuctionBidInput({ currentPrice, bidding, bidResult, onBid }) {
+  const minPrice = Math.round((currentPrice + 0.50) * 10) / 10
+  const [value, setValue] = useState(minPrice.toFixed(2))
+  const [error, setError] = useState('')
+
+  const handleChange = (e) => {
+    setValue(e.target.value)
+    setError('')
+  }
+
+  const handleSubmit = () => {
+    const parsed = parseFloat(value)
+    if (isNaN(parsed)) { setError("Montant invalide"); return }
+    // Arrondi au dixième
+    const rounded = Math.round(parsed * 10) / 10
+    if (rounded < minPrice) { setError(`Minimum ${minPrice.toFixed(2)} €`); return }
+    if (Math.round(parsed * 100) % 10 !== 0) { setError("Montant au dixième près (ex: 2.50, 2.60)"); return }
+    onBid(rounded - currentPrice)
+  }
+
+  return (
+    <>
+      <div className="bg-pink/10 border border-pink/30 rounded-xl px-4 py-3">
+        <p className="text-pink text-xs font-semibold">
+          ⚡ Enchères ouvertes — enchère actuelle : <strong>{currentPrice.toFixed(2)} €</strong>
+        </p>
+        <p className="text-pink/70 text-xs mt-0.5">Minimum {minPrice.toFixed(2)} € · pas de 0.10€</p>
+      </div>
+      <div className="flex gap-2 items-center">
+        <div className="flex-1 flex items-center bg-white border-2 border-border rounded-xl overflow-hidden focus-within:border-pink">
+          <span className="pl-3 text-gray-400 text-sm">€</span>
+          <input
+            type="number"
+            value={value}
+            onChange={handleChange}
+            step="0.10"
+            min={minPrice}
+            className="flex-1 px-2 py-3 bg-transparent text-gray-800 text-sm outline-none font-mono"
+            placeholder={minPrice.toFixed(2)}
+          />
+        </div>
+        <button onClick={handleSubmit} disabled={bidding}
+          className="px-5 py-3 rounded-xl font-bold text-white text-sm cursor-pointer disabled:opacity-40"
+          style={{ background: "linear-gradient(135deg,#EC4899,#db2777)" }}>
+          {bidding ? "…" : "Enchérir"}
+        </button>
+      </div>
+      {error && (
+        <p className="text-red text-xs text-center">{error}</p>
+      )}
+      {bidResult && (
+        <div className={`w-full rounded-xl px-3 py-2 text-xs text-center font-semibold ${bidResult.success ? "bg-green/10 border border-green/30 text-green" : "bg-red/10 border border-red/30 text-red"}`}>
+          {bidResult.success ? `✅ Enchère placée à ${bidResult.price.toFixed(2)} €` : "❌ Erreur — réessayez"}
+        </div>
+      )}
+    </>
+  )
+}
+
 export default function ListingBottomSheet({ listing, profile, onClose }) {
   const { reserveListing, placeBid, error: listingError } = useListingStore()
   const { user } = useAuthStore()
@@ -252,28 +312,13 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                 {!booked ? (
                   <>
                     {listing.auction_mode ? (
-                      /* Mode enchère — pas de réservation directe */
-                      <>
-                        <div className="bg-pink/10 border border-pink/30 rounded-xl px-4 py-3 mb-1">
-                          <p className="text-pink text-xs leading-relaxed font-semibold">
-                            ⚡ Enchères ouvertes — surenchérissez pour obtenir ces palettes
-                          </p>
-                        </div>
-                        <div className="flex gap-2">
-                          {[{ step: 0.50, label: '+50¢', color: '#F97316' }, { step: 1.00, label: '+1€', color: '#EF4444' }].map(({ step, label, color }) => (
-                            <button key={step} onClick={() => handleBid(step)} disabled={bidding}
-                              className="flex-1 py-3 rounded-xl border-2 font-bold text-sm disabled:opacity-40 cursor-pointer"
-                              style={{ borderColor: `${color}66`, background: `${color}18`, color }}>
-                              {label}
-                            </button>
-                          ))}
-                        </div>
-                        {bidResult && (
-                          <div className={`w-full rounded-xl px-3 py-2 text-xs text-center font-semibold ${bidResult.success ? 'bg-green/10 border border-green/30 text-green' : 'bg-red/10 border border-red/30 text-red'}`}>
-                            {bidResult.success ? `✅ Enchère placée à ${bidResult.price.toFixed(2)} €` : '❌ Erreur — réessayez'}
-                          </div>
-                        )}
-                      </>
+                      /* Mode enchère — champ libre avec minimum +0.50€ et pas de 0.10€ */
+                      <AuctionBidInput
+                        currentPrice={currentPrice}
+                        bidding={bidding}
+                        bidResult={bidResult}
+                        onBid={handleBid}
+                      />
                     ) : (
                       /* Mode réservation directe */
                       <>

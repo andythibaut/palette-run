@@ -297,89 +297,85 @@ const SiteSettings = ({ company }) => {
 
 // ─── Liste acheteurs ─────────────────────────────────────────────────────────
 const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate, onConfirm }) => {
-  const blacklistedIds  = new Set(blacklist.map(b => b.driver_id))
-  const reservedDriver  = listing?.reserved_by
+  const blacklistedIds = new Set(blacklist.map(b => b.driver_id))
 
-  if (drivers.length === 0) return (
+  // Une seule annonce → un seul chauffeur actif (réservant ou meilleur enchérisseur)
+  const driver = drivers[0]
+
+  if (!driver) return (
     <div className="flex flex-col items-center justify-center h-48 gap-3 text-muted">
       <span className="text-4xl opacity-30">🚛</span>
       <p className="font-bebas text-xl">Aucun acheteur</p>
     </div>
   )
 
+  const driverName    = driver.profiles?.full_name || 'Un chauffeur'
+  const isReserver    = driver.isReservation === true
+  const isBlacklisted = blacklistedIds.has(driver.bidder_id)
+  const isAuction     = listing?.auction_mode === true
+  const currentPrice  = listing?.current_bid || listing?.price || 0
+  const totalRevenue  = currentPrice * (listing?.qty || 0)
+
   return (
-    <div className="flex flex-col gap-3 p-5">
-      {reservedDriver && (
-        <div className="bg-amber/10 border border-amber/30 rounded-xl px-4 py-3 text-xs text-amber">
-          ⚡ Un acheteur a réservé — cliquez sur son nom quand il arrive pour valider la transaction.
-        </div>
-      )}
-      <p className="text-xs text-muted">{drivers.length} acheteur{drivers.length > 1 ? 's' : ''} ont consulté votre annonce</p>
-      {drivers.map(d => {
-        const isReserver    = d.isReservation === true
-        const isBlacklisted = blacklistedIds.has(d.bidder_id)
-        const driverName    = d.profiles?.full_name || 'Un chauffeur'
-        return (
-          <div key={d.bidder_id}
-            className="bg-surface border rounded-2xl overflow-hidden"
-            style={{ borderColor: isReserver ? '#FFD16666' : '#1C2330' }}>
-            <div className="p-4 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl shrink-0"
-                style={{ background: isReserver ? '#FFD16622' : '#1A2030', border: `1px solid ${isReserver ? '#FFD16644' : '#1C2330'}` }}>
-                🚛
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="font-semibold text-sm text-white">{driverName}</p>
-                  {isReserver && <span className="text-[10px] bg-amber/20 text-amber border border-amber/30 rounded-full px-2 py-0.5 font-mono">RÉSERVÉ</span>}
-                </div>
-                <p className="text-xs text-muted mt-0.5">
-                  {d.price ? `Enchère : ${d.price.toFixed(2)}€` : 'Consulté'}
-                  {d.dist_km ? ` · 📍 ${d.dist_km.toFixed(1)} km` : ''}
-                </p>
-              </div>
-              {!isBlacklisted && (
-                <button onClick={() => onBlacklist(d.bidder_id)}
-                  className="w-9 h-9 rounded-xl bg-hi border border-border flex items-center justify-center text-base cursor-pointer hover:bg-red/10 hover:border-red/40 transition-colors">
-                  🚫
-                </button>
-              )}
-            </div>
+    <div className="flex flex-col gap-4 p-5">
 
-            {/* Message contextuel pour les réservations */}
-            {isReserver && (
-              <div className="px-4 pb-3">
-                <div className="bg-amber/5 border border-amber/20 rounded-xl px-3 py-2.5">
-                  <p className="text-xs text-amber/80 leading-relaxed">
-                    <strong className="text-amber">{driverName}</strong> est intéressé par votre annonce. Validez la demande pour qu'il puisse venir chercher les palettes dans le délai prévu.
-                  </p>
-                </div>
-              </div>
-            )}
+      {/* Carte chauffeur */}
+      <div className="bg-surface border border-border rounded-2xl overflow-hidden">
 
-            {/* Boutons validation / confirmation */}
-            {isReserver && !d.isAuthorized && (
-              <button onClick={() => onValidate(d.bidder_id, driverName)}
-                className="w-full py-3 font-bold text-bg text-sm cursor-pointer border-t border-amber/30"
-                style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)' }}>
-                ✅ Autoriser {driverName} à venir chercher les palettes
-              </button>
-            )}
-            {isReserver && d.isAuthorized && (
-              <div className="border-t border-green/30">
-                <div className="px-4 py-2 bg-green/5 text-xs text-green text-center">
-                  🟢 {driverName} est en route — confirmez quand les palettes sont récupérées
-                </div>
-                <button onClick={() => onConfirm(d.bidder_id, driverName)}
-                  className="w-full py-3 font-bold text-white text-sm cursor-pointer"
-                  style={{ background: 'linear-gradient(135deg,#16A34A,#15803D)' }}>
-                  ✅ Confirmer la transaction — palettes récupérées
-                </button>
-              </div>
-            )}
+        {/* Header chauffeur */}
+        <div className="p-4 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl shrink-0"
+            style={{ background: isAuction ? '#EC489918' : '#FFD16622', border: `1px solid ${isAuction ? '#EC489944' : '#FFD16644'}` }}>
+            🚛
           </div>
-        )
-      })}
+          <div className="flex-1">
+            <p className="font-bebas text-xl text-gray-800 leading-tight">{driverName}</p>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full"
+              style={{ background: isAuction ? '#EC489920' : '#FFD16620', color: isAuction ? '#EC4899' : '#E8920A', border: `1px solid ${isAuction ? '#EC489940' : '#E8920A40'}` }}>
+              {isAuction ? '⚡ ENCHÈRE' : '🔒 RÉSERVÉ'}
+            </span>
+          </div>
+          {!isBlacklisted && (
+            <button onClick={() => onBlacklist(driver.bidder_id)}
+              className="w-9 h-9 rounded-xl bg-hi border border-border flex items-center justify-center text-base cursor-pointer">
+              🚫
+            </button>
+          )}
+        </div>
+
+        {/* Détails financiers */}
+        <div className="px-4 pb-4 grid grid-cols-2 gap-3">
+          <div className="bg-hi rounded-xl p-3 text-center">
+            <p className="text-xs text-muted mb-1">{isAuction ? 'Enchère actuelle' : 'Prix / palette'}</p>
+            <p className="font-bebas text-2xl text-gray-800">{currentPrice.toFixed(2)} €</p>
+          </div>
+          <div className="bg-hi rounded-xl p-3 text-center">
+            <p className="text-xs text-muted mb-1">Recette totale</p>
+            <p className="font-bebas text-2xl text-green">{totalRevenue.toFixed(2)} €</p>
+          </div>
+        </div>
+
+        {/* Boutons */}
+        {isReserver && !driver.isAuthorized && (
+          <button onClick={() => onValidate(driver.bidder_id, driverName)}
+            className="w-full py-4 font-bold text-white text-sm cursor-pointer border-t border-border"
+            style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)', color: '#1E293B' }}>
+            ✅ Autoriser {driverName} à venir chercher les palettes
+          </button>
+        )}
+        {isReserver && driver.isAuthorized && (
+          <div className="border-t border-green/30">
+            <div className="px-4 py-2 bg-green/5 text-xs text-green text-center">
+              🟢 {driverName} est en route
+            </div>
+            <button onClick={() => onConfirm(driver.bidder_id, driverName)}
+              className="w-full py-4 font-bold text-white text-sm cursor-pointer"
+              style={{ background: 'linear-gradient(135deg,#16A34A,#15803D)' }}>
+              ✅ Confirmer — palettes récupérées
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

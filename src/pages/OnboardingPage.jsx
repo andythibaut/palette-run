@@ -1,8 +1,75 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Map, { Marker } from 'react-map-gl'
+import { MAPBOX_TOKEN, MAP_STYLE } from '@/lib/mapbox'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import PalletLogo from '@/components/shared/PalletLogo'
+
+// ─── Sélecteur manuel sur la carte ───────────────────────────────────────────
+const ManualMapPicker = ({ onConfirm, onCancel }) => {
+  const [viewport, setViewport] = useState({ longitude: 2.3522, latitude: 46.8566, zoom: 5 })
+  const [pin, setPin]           = useState(null)
+
+  const handleClick = (e) => {
+    const { lng, lat } = e.lngLat
+    setPin({ lng, lat })
+  }
+
+  const handleConfirm = async () => {
+    if (!pin) return
+    // Géocodage inverse pour obtenir l'adresse
+    try {
+      const res  = await fetch(`https://api-adresse.data.gouv.fr/reverse/?lon=${pin.lng}&lat=${pin.lat}`)
+      const data = await res.json()
+      const feat = data.features?.[0]
+      onConfirm({
+        label:    feat?.properties?.label || `${pin.lat.toFixed(5)}, ${pin.lng.toFixed(5)}`,
+        city:     feat?.properties?.city  || feat?.properties?.municipality || '',
+        postcode: feat?.properties?.postcode || '',
+        lat:      pin.lat,
+        lng:      pin.lng,
+      })
+    } catch {
+      onConfirm({ label: `${pin.lat.toFixed(5)}, ${pin.lng.toFixed(5)}`, city: '', postcode: '', lat: pin.lat, lng: pin.lng })
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-bg">
+      <div className="px-4 py-3 bg-surface border-b border-border flex items-center gap-3">
+        <button onClick={onCancel} className="text-muted text-sm cursor-pointer bg-transparent border-none">✕ Annuler</button>
+        <p className="flex-1 text-center text-sm font-semibold text-white">Appuyez pour placer votre adresse</p>
+        <button onClick={handleConfirm} disabled={!pin}
+          className="text-amber text-sm font-bold cursor-pointer bg-transparent border-none disabled:opacity-40">
+          Confirmer
+        </button>
+      </div>
+      <div className="flex-1">
+        <Map
+          {...viewport}
+          onMove={e => setViewport(e.viewState)}
+          onClick={handleClick}
+          mapStyle={MAP_STYLE}
+          mapboxAccessToken={MAPBOX_TOKEN}
+          style={{ width: "100%", height: "100%" }}
+          cursor="crosshair"
+        >
+          {pin && (
+            <Marker longitude={pin.lng} latitude={pin.lat} anchor="bottom">
+              <div className="text-3xl">📍</div>
+            </Marker>
+          )}
+        </Map>
+      </div>
+      {pin && (
+        <div className="px-4 py-3 bg-surface border-t border-border text-center">
+          <p className="text-xs text-muted">📌 {pin.lat.toFixed(5)}, {pin.lng.toFixed(5)}</p>
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ─── Autocomplétion API Adresse (data.gouv.fr) ───────────────────────────────
 const useAddressSearch = () => {
@@ -49,7 +116,7 @@ const useAddressSearch = () => {
 }
 
 // ─── Composant champ adresse ─────────────────────────────────────────────────
-const AddressField = ({ onSelect }) => {
+const AddressField = ({ onSelect, onManualPick }) => {
   const { query, search, suggestions, selected, pick, loading } = useAddressSearch()
   const [open, setOpen] = useState(false)
 
@@ -105,7 +172,12 @@ const AddressField = ({ onSelect }) => {
       {/* Aucun résultat */}
       {open && query.length >= 3 && !loading && suggestions.length === 0 && !selected && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-surface border border-border rounded-2xl px-4 py-3 shadow-2xl">
-          <p className="text-muted text-sm">Aucune adresse trouvée — vérifiez l'orthographe</p>
+          <p className="text-muted text-sm mb-2">Aucune adresse trouvée — vérifiez l'orthographe</p>
+          <button
+            onPointerDown={(e) => { e.preventDefault(); setOpen(false); onManualPick() }}
+            className="w-full py-2 rounded-xl bg-amber/10 border border-amber/30 text-amber text-xs font-semibold cursor-pointer">
+            📍 Placer manuellement sur la carte
+          </button>
         </div>
       )}
 
@@ -145,6 +217,7 @@ export default function OnboardingPage() {
   const [fullName,       setFullName]       = useState('')
   const [companyName,    setCompanyName]    = useState('')
   const [geoAddress,     setGeoAddress]     = useState(null)
+  const [showManualMap,  setShowManualMap]  = useState(false)
   const [loading,        setLoading]        = useState(false)
   const [error,          setError]          = useState('')
   // Guard : on bloque la redirection auto pendant la création company
