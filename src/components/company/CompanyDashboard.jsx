@@ -115,7 +115,7 @@ const ListingForm = ({ listing, onSave }) => {
 
       {/* Mode enchère */}
       <div className="bg-surface border rounded-2xl overflow-hidden"
-        style={{ borderColor: auctionMode ? '#A855F744' : '#1C2330' }}>
+        style={{ borderColor: auctionMode ? '#A855F744' : '#D1D9E6' }}>
         <div className="flex items-center justify-between px-4 py-3">
           <div>
             <p className="font-semibold text-sm text-white">⚡ Mettre aux enchères</p>
@@ -127,7 +127,7 @@ const ListingForm = ({ listing, onSave }) => {
             className="relative cursor-pointer border-none bg-transparent p-0"
             style={{ width: 52, height: 28 }}>
             <div className="w-full h-full rounded-full transition-colors duration-200"
-              style={{ background: auctionMode ? '#A855F7' : '#1C2330', border: `2px solid ${auctionMode ? '#A855F7' : '#2D3748'}` }}>
+              style={{ background: auctionMode ? '#A855F7' : '#D1D9E6', border: `2px solid ${auctionMode ? '#A855F7' : '#D1D9E6'}` }}>
               <div className="absolute top-0.5 h-6 w-6 rounded-full bg-white shadow-md transition-transform duration-200"
                 style={{ transform: auctionMode ? 'translateX(26px)' : 'translateX(2px)' }} />
             </div>
@@ -143,16 +143,16 @@ const ListingForm = ({ listing, onSave }) => {
                 <button key={d} onClick={() => setAuctionDays(d)}
                   className="flex-1 py-2.5 rounded-xl border-2 text-sm font-bold cursor-pointer transition-all"
                   style={{
-                    borderColor: auctionDays === d ? '#A855F7' : '#1C2330',
-                    background:  auctionDays === d ? '#A855F722' : '#13181F',
-                    color:       auctionDays === d ? '#A855F7' : '#4A5568',
+                    borderColor: auctionDays === d ? '#A855F7' : '#D1D9E6',
+                    background:  auctionDays === d ? '#A855F718' : '#F0F2F5',
+                    color:       auctionDays === d ? '#A855F7' : '#64748B',
                   }}>
                   {d} jour{d > 1 ? 's' : ''}
                 </button>
               ))}
             </div>
             <p className="text-xs text-muted mt-2 leading-relaxed">
-              Le gagnant aura <strong className="text-white">{auctionDays} jour{auctionDays > 1 ? 's' : ''}</strong> après la fin des enchères pour venir récupérer.
+              Le gagnant aura <strong className="text-gray-800">{auctionDays} jour{auctionDays > 1 ? 's' : ''}</strong> après la fin des enchères pour venir récupérer.
             </p>
           </div>
         )}
