@@ -128,11 +128,11 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   const isTopBidder   = isAuctionMode && listing?.reserved_by === user?.id
   const canSeeDetails = isConfirmed || isTopBidder
 
+  const currentPrice = listing.current_bid || listing.price
+
   const profit = resalePrice && resalePrice > listing.price && !isHidden
     ? (resalePrice - currentPrice) * listing.qty
     : null
-
-  const currentPrice = listing.current_bid || listing.price
 
   const handleReserve = async () => {
     setBooked(true)
