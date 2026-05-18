@@ -122,7 +122,11 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   const color          = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
 
   // Nom et adresse visibles uniquement si le commerçant a validé la transaction
-  const canSeeDetails = isConfirmed
+  // En mode enchère : le chauffeur voit les détails s'il est le meilleur enchérisseur
+  // En mode normal : seulement si la transaction est confirmée
+  const isAuctionMode = listing?.auction_mode === true
+  const isTopBidder   = isAuctionMode && listing?.reserved_by === user?.id
+  const canSeeDetails = isConfirmed || isTopBidder
 
   const profit = resalePrice && resalePrice > listing.price && !isHidden
     ? (resalePrice - listing.price) * listing.qty
@@ -208,9 +212,9 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-2 mb-4">
             {[
-              { label: 'Palettes',   value: isReserved ? '—' : listing.qty,                                  color },
-              { label: 'Prix',       value: isReserved ? '—' : `${listing.price.toFixed(2)}€`,              color: '#2ECC71' },
-              { label: 'Total',      value: isReserved ? '—' : `${(listing.qty * listing.price).toFixed(2)}€`, color: '#F5A623' },
+              { label: 'Palettes',   value: (isReserved && !isAuctionMode) ? '—' : listing.qty,                                                   color },
+              { label: 'Prix',       value: (isReserved && !isAuctionMode) ? '—' : `${currentPrice.toFixed(2)}€`,                      color: '#2ECC71' },
+              { label: 'Total',      value: (isReserved && !isAuctionMode) ? '—' : `${(listing.qty * currentPrice).toFixed(2)}€`,      color: '#F5A623' },
             ].map(s => (
               <div key={s.label} className="bg-hi rounded-2xl p-3 text-center border border-border">
                 <p className="font-bebas text-2xl leading-none" style={{ color: isReserved ? '#4A5568' : s.color }}>
