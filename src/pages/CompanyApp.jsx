@@ -54,8 +54,9 @@ export default function CompanyApp() {
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'listings',
         filter: `id=eq.${listing.id}` },
         () => {
-          const { listing: l } = useCompanyStore.getState()
+          const { listing: l, company } = useCompanyStore.getState()
           if (l?.id) useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+          if (company?.id) useCompanyStore.getState().fetchActiveListing(company.id)
         }
       )
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions',
