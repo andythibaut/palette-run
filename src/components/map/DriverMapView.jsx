@@ -21,7 +21,7 @@ const ListingMarker = ({ listing, selected, onClick, resalePrice, goldThreshold,
         : isAuction
           ? '#EC4899' // rose — enchère en cours
           : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
-  const size       = selected ? 48 : 38
+  const size       = selected ? 56 : 44
 
   // Décale le marqueur de ~500m aléatoirement (déterministe par listing.id)
   const seed  = listing.id ? listing.id.charCodeAt(0) + listing.id.charCodeAt(4) : 0
@@ -55,13 +55,17 @@ const ListingMarker = ({ listing, selected, onClick, resalePrice, goldThreshold,
             <span className="text-sm">🔒</span>
           ) : (
             <>
-              <span className="font-bebas text-sm leading-none"
+              <span className="font-bebas text-base leading-none"
                 style={{ color: selected ? '#0B0E13' : color }}>
                 {listing.qty}
               </span>
-              <span className="text-[7px] leading-none"
+              <span className="text-[8px] leading-none"
                 style={{ color: selected ? '#0B0E13AA' : `${color}99` }}>
                 pal.
+              </span>
+              <span className="font-bebas text-[11px] leading-none"
+                style={{ color: selected ? '#0B0E13' : color }}>
+                {(listing.current_bid || listing.price).toFixed(0)}€
               </span>
             </>
           )}

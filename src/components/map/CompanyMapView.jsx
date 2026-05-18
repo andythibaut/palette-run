@@ -39,13 +39,13 @@ const CompanyListingMarker = ({ listing }) => {
             boxShadow:   `0 0 20px ${GOLD}66`,
           }}
         >
-          <span className="font-bebas text-sm leading-none text-black">
+          <span className="font-bebas text-base leading-none text-black">
             {listing?.qty ?? '—'}
           </span>
-          <span className="text-[7px] leading-none text-black/70">pal.</span>
-          {listing?.price && (
-            <span className="font-bebas text-[10px] leading-none text-black/80">{listing.price}€</span>
-          )}
+          <span className="text-[8px] leading-none text-black/70">pal.</span>
+          <span className="font-bebas text-[11px] leading-none text-black/90">
+            {(listing?.current_bid || listing?.price || 0).toFixed(0)}€
+          </span>
         </div>
         {/* Tag "Mon annonce" */}
         <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-mono font-semibold"
