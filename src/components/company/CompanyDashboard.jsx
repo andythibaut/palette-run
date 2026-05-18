@@ -481,7 +481,7 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
     await supabase.from('notifications').insert({
       user_id: driverId,
       type:    'transaction_authorized',
-      title:   isAuction ? '🏆 Vous avez remporté l'enchère !' : '🎉 Votre demande a été acceptée !',
+      title:   isAuction ? "🏆 Vous avez remporté l'enchère !" : "🎉 Votre demande a été acceptée !",
       body:    `${company.name} vous autorise à venir chercher les palettes. ${pickupDeadline}`,
       data:    { listing_id: listing.id, company_name: company.name, company_address: company.address },
     })
