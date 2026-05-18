@@ -87,7 +87,8 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   const [booked,       setBooked]       = useState(false)
   const [bidding,      setBidding]      = useState(false)
   const [bidResult,    setBidResult]    = useState(null) // { success, price }
-  const [isConfirmed,  setIsConfirmed]  = useState(false)
+  const [isConfirmed,   setIsConfirmed]   = useState(false)
+  const [isAuthorized,  setIsAuthorized]  = useState(false)
   const [companyDetails, setCompanyDetails] = useState(null) // { name, address, lat, lng }
 
   // Vérifie si transaction confirmée et charge les détails défloutés via fonction SQL sécurisée
@@ -112,6 +113,36 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
       })
   }, [listing?.id, user?.id])
 
+  // Realtime sur transactions — met à jour isConfirmed si le commerçant valide
+  useEffect(() => {
+    if (!user?.id || !listing?.id) return
+    const sub = supabase
+      .channel(`listing-tx-${listing.id}`)
+      .on('postgres_changes', {
+        event: '*', schema: 'public', table: 'transactions',
+        filter: `listing_id=eq.${listing.id}`
+      }, async () => {
+        const { data } = await supabase
+          .from('transactions')
+          .select('id, status')
+          .eq('listing_id', listing.id)
+          .eq('driver_id', user.id)
+          .in('status', ['authorized', 'confirmed'])
+          .maybeSingle()
+        if (data) {
+          setIsConfirmed(data.status === 'confirmed')
+          setIsAuthorized(data.status === 'authorized')
+          if (data.status === 'authorized' || data.status === 'confirmed') {
+            const { data: details } = await supabase
+              .rpc('get_confirmed_company_details', { p_listing_id: listing.id })
+            if (details?.[0]) setCompanyDetails(details[0])
+          }
+        }
+      })
+      .subscribe()
+    return () => supabase.removeChannel(sub)
+  }, [listing?.id, user?.id])
+
   const userTier       = profile?.tier          || 'free'
   const resalePrice    = profile?.resale_price  || null
   const goldThreshold  = profile?.gold_threshold || 20
@@ -126,7 +157,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   // En mode normal : seulement si la transaction est confirmée
   const isAuctionMode = listing?.auction_mode === true
   const isTopBidder   = isAuctionMode && listing?.reserved_by === user?.id
-  const canSeeDetails = isConfirmed || isTopBidder
+  const canSeeDetails = isConfirmed || isAuthorized || isTopBidder
 
   const currentPrice = listing.current_bid || listing.price
 

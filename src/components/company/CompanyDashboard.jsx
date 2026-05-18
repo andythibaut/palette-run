@@ -445,26 +445,49 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
     if (!window.confirm(`Autoriser ${driverName} à venir chercher les palettes ?`)) return
     if (!listing) return
 
-    const { error } = await supabase
-      .from('transactions')
-      .update({ status: 'authorized' })
-      .eq('listing_id', listing.id)
-      .eq('driver_id',  driverId)
-      .eq('status',     'pending')
+    const isAuction = listing.auction_mode === true
 
-    if (error) { alert('Erreur : ' + JSON.stringify(error)); return }
+    if (isAuction) {
+      // En mode enchère : créer la transaction directement en 'authorized'
+      const { error } = await supabase.from('transactions').insert({
+        listing_id:  listing.id,
+        company_id:  listing.company_id,
+        driver_id:   driverId,
+        qty:         listing.qty,
+        buy_price:   listing.current_bid || listing.price,
+        status:      'authorized',
+        company_validated_at: new Date().toISOString(),
+      })
+      if (error) { alert('Erreur : ' + JSON.stringify(error)); return }
+    } else {
+      // En mode réservation : mettre à jour la transaction pending
+      const { error } = await supabase
+        .from('transactions')
+        .update({ status: 'authorized' })
+        .eq('listing_id', listing.id)
+        .eq('driver_id',  driverId)
+        .eq('status',     'pending')
+      if (error) { alert('Erreur : ' + JSON.stringify(error)); return }
+    }
 
     // Notification au chauffeur avec les détails défloutés
+    const auctionDays = listing.auction_ends_at
+      ? Math.round((new Date(listing.auction_ends_at) - new Date()) / (1000 * 60 * 60 * 24))
+      : null
+    const pickupDeadline = auctionDays
+      ? `Vous avez ${auctionDays} jour(s) pour venir récupérer les palettes.`
+      : `Rendez-vous au ${company.address}, ${company.city}.`
+
     await supabase.from('notifications').insert({
       user_id: driverId,
       type:    'transaction_authorized',
-      title:   '🎉 Votre demande a été acceptée !',
-      body:    `${company.name} vous autorise à venir chercher les palettes. Rendez-vous au ${company.address}, ${company.city}.`,
+      title:   isAuction ? '🏆 Vous avez remporté l'enchère !' : '🎉 Votre demande a été acceptée !',
+      body:    `${company.name} vous autorise à venir chercher les palettes. ${pickupDeadline}`,
       data:    { listing_id: listing.id, company_name: company.name, company_address: company.address },
     })
 
     // Rafraîchit la liste pour refléter le nouveau statut
-    fetchDrivers(listing.id, listing.reserved_by)
+    fetchDrivers(listing.id, driverId)
   }
 
   // Étape 2 : confirme que les palettes ont été récupérées
