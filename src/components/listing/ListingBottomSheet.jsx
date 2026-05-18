@@ -99,7 +99,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
       .eq('listing_id', listing.id)
       .eq('driver_id', user.id)
       .eq('status', 'confirmed')
-      .single()
+      .maybeSingle()
       .then(async ({ data }) => {
         const confirmed = !!data
         setIsConfirmed(confirmed)

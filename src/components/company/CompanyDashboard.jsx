@@ -343,6 +343,14 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate, onC
           )}
         </div>
 
+        {/* Fin d'enchère */}
+        {isAuction && listing?.auction_ends_at && (
+          <div className="mx-4 mb-3 bg-pink/5 border border-pink/20 rounded-xl px-3 py-2 text-xs text-center"
+            style={{ color: '#EC4899' }}>
+            ⏱ Enchère se termine le <strong>{new Date(listing.auction_ends_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</strong>
+          </div>
+        )}
+
         {/* Détails financiers */}
         <div className="px-4 pb-4 grid grid-cols-2 gap-3">
           <div className="bg-hi rounded-xl p-3 text-center">
@@ -356,7 +364,14 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate, onC
         </div>
 
         {/* Boutons */}
-        {isReserver && !driver.isAuthorized && (
+        {isAuction && driver && (
+          <button onClick={() => onValidate(driver.bidder_id, driverName)}
+            className="w-full py-4 font-bold text-sm cursor-pointer border-t border-pink/20"
+            style={{ background: 'linear-gradient(135deg,#EC4899,#db2777)', color: '#fff' }}>
+            ⚡ Clôturer l'enchère — {driverName} remporte les palettes
+          </button>
+        )}
+        {isReserver && !driver.isAuthorized && !isAuction && (
           <button onClick={() => onValidate(driver.bidder_id, driverName)}
             className="w-full py-4 font-bold text-white text-sm cursor-pointer border-t border-border"
             style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)', color: '#1E293B' }}>
