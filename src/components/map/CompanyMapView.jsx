@@ -43,6 +43,9 @@ const CompanyListingMarker = ({ listing }) => {
             {listing?.qty ?? '—'}
           </span>
           <span className="text-[7px] leading-none text-black/70">pal.</span>
+          {listing?.price && (
+            <span className="font-bebas text-[10px] leading-none text-black/80">{listing.price}€</span>
+          )}
         </div>
         {/* Tag "Mon annonce" */}
         <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-mono font-semibold"
