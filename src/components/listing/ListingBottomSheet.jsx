@@ -129,7 +129,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
   const canSeeDetails = isConfirmed || isTopBidder
 
   const profit = resalePrice && resalePrice > listing.price && !isHidden
-    ? (resalePrice - listing.price) * listing.qty
+    ? (resalePrice - currentPrice) * listing.qty
     : null
 
   const currentPrice = listing.current_bid || listing.price
