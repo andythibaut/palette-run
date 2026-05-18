@@ -81,7 +81,6 @@ function AuctionBidInput({ currentPrice, hasExistingBid, bidding, bidResult, onB
 }
 
 export default function ListingBottomSheet({ listing, profile, onClose }) {
-  console.log('listing:', JSON.stringify(listing, null, 2))
   const { reserveListing, placeBid, error: listingError } = useListingStore()
   const { user } = useAuthStore()
   const [booked,       setBooked]       = useState(false)
