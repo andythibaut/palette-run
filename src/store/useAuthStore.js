@@ -38,10 +38,10 @@ export const useAuthStore = create((set, get) => ({
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
 
-    if (error && error.code !== 'PGRST116') {
-      set({ error: error.message })
+    if (error) {
+      set({ error: error.message, loading: false })
       return
     }
     set({ user: { id: userId }, profile: data })
