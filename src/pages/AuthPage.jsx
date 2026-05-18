@@ -46,7 +46,7 @@ const Divider = () => (
 )
 
 // ─── Écran email ──────────────────────────────────────────────────────────────
-const EmailForm = ({ mode, onBack }) => {
+const EmailForm = ({ mode, onBack, onToggleMode }) => {
   const { signInWithEmail, signUpWithEmail, error, clearError } = useAuthStore()
   const navigate = useNavigate()
   const [email,    setEmail]    = useState('')
@@ -181,6 +181,10 @@ const EmailForm = ({ mode, onBack }) => {
       >
         {loading ? 'Chargement…' : mode === 'login' ? 'Se connecter →' : 'Créer mon compte →'}
       </button>
+      <button onClick={() => onToggleMode()}
+        className="text-muted text-sm text-center bg-transparent border-none cursor-pointer mt-1">
+        {mode === 'login' ? 'Pas encore de compte ? Créer un compte' : 'Déjà un compte ? Se connecter'}
+      </button>
     </div>
   )
 }
@@ -279,7 +283,7 @@ export default function AuthPage() {
   const [mode,   setMode]   = useState('login')
   const [screen, setScreen] = useState('main')
 
-  if (screen === 'email') return <EmailForm mode={mode} onBack={() => setScreen('main')} />
+  if (screen === 'email') return <EmailForm mode={mode} onBack={() => setScreen('main')} onToggleMode={() => setMode(m => m === 'login' ? 'signup' : 'login')} />
 
   return (
     <div className="flex flex-col min-h-screen bg-bg px-6 pb-10">
@@ -288,17 +292,6 @@ export default function AuthPage() {
         <PalletLogo size={56} color="#F5A623" />
         <h1 className="font-bebas text-4xl tracking-widest text-amber">PALETTE RUN</h1>
         <p className="font-mono text-xs tracking-widest text-muted">BOURSE AUX PALETTES</p>
-      </div>
-
-      {/* Mode toggle */}
-      <div className="flex bg-hi rounded-2xl p-1 mb-7 border border-border">
-        {['login', 'signup'].map(m => (
-          <button key={m} onClick={() => setMode(m)}
-            className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer border-none ${mode === m ? 'bg-white text-gray-800 shadow-sm' : 'bg-transparent text-sub'}`}
-          >
-            {m === 'login' ? 'Se connecter' : 'Créer un compte'}
-          </button>
-        ))}
       </div>
 
       {/* Google */}
