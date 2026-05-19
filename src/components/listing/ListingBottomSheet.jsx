@@ -121,9 +121,9 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
     const sub = supabase
       .channel(`listing-tx-${listing.id}`)
       .on('postgres_changes', {
-        event: '*', schema: 'public', table: 'transactions',
-        filter: `listing_id=eq.${listing.id}`
-      }, async () => {
+        event: '*', schema: 'public', table: 'transactions'
+      }, async (payload) => {
+        if (payload.new?.listing_id !== listing.id && payload.old?.listing_id !== listing.id) return
         const { data } = await supabase
           .from('transactions')
           .select('id, status')

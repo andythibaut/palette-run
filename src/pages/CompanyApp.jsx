@@ -44,26 +44,28 @@ export default function CompanyApp() {
 
     const sub = supabase
       .channel('company-bids-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'bids',
-        filter: `listing_id=eq.${listing.id}` },
-        () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bids' },
+        (payload) => {
           const { listing: l } = useCompanyStore.getState()
-          if (l?.id) useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+          if (l?.id && payload.new?.listing_id === l.id) {
+            useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+          }
         }
       )
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'listings',
-        filter: `id=eq.${listing.id}` },
-        () => {
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'listings' },
+        (payload) => {
           const { listing: l, company } = useCompanyStore.getState()
-          if (l?.id) useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+          if (!l?.id || payload.new?.id !== l.id) return
+          useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
           if (company?.id) useCompanyStore.getState().fetchActiveListing(company.id)
         }
       )
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions',
-        filter: `listing_id=eq.${listing.id}` },
-        () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transactions' },
+        (payload) => {
           const { listing: l } = useCompanyStore.getState()
-          if (l?.id) useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+          if (l?.id && payload.new?.listing_id === l.id) {
+            useCompanyStore.getState().fetchDrivers(l.id, l.reserved_by)
+          }
         }
       )
       .subscribe()

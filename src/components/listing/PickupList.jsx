@@ -169,14 +169,16 @@ export default function PickupList({ profile }) {
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'listings' }, () => {
         fetchPickups()
       })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transactions',
-        filter: `driver_id=eq.${profile.id}` }, () => {
-        fetchPickups()
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'bids',
-        filter: `bidder_id=eq.${profile.id}` }, () => {
-        fetchPickups()
-      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'transactions' },
+        (payload) => {
+          if (payload.new?.driver_id === profile.id || payload.old?.driver_id === profile.id) fetchPickups()
+        }
+      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'bids' },
+        (payload) => {
+          if (payload.new?.bidder_id === profile.id || payload.old?.bidder_id === profile.id) fetchPickups()
+        }
+      )
       .subscribe()
 
     return () => supabase.removeChannel(sub)
