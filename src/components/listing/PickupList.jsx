@@ -271,6 +271,7 @@ export default function PickupList({ profile }) {
           const isPending    = p.status === 'pending'
           const isAuthorized = p.status === 'authorized'
           const isConfirmed  = p.status === 'confirmed'
+          const hasBid       = listing?.current_bid !== null && listing?.current_bid !== undefined
 
           return (
             <div key={p.id} className="bg-surface rounded-2xl border overflow-hidden"
