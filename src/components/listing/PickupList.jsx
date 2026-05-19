@@ -184,6 +184,58 @@ export default function PickupList({ profile }) {
     return () => supabase.removeChannel(sub)
   }, [profile?.id])
 
+  const handleCancelBid = async (p) => {
+    if (!window.confirm("Se retirer de cette enchère ?")) return
+    setCancelling(p.id)
+
+    // Supprime le bid du chauffeur
+    await supabase.from("bids")
+      .delete()
+      .eq("listing_id", p.listing_id)
+      .eq("bidder_id", profile.id)
+
+    // Vérifie si ce chauffeur était le meilleur enchérisseur
+    const listing = p.listings
+    if (listing?.reserved_by === profile.id) {
+      // Cherche le second meilleur enchérisseur
+      const { data: nextBid } = await supabase
+        .from("bids")
+        .select("bidder_id, price")
+        .eq("listing_id", p.listing_id)
+        .order("price", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (nextBid) {
+        // Passe la main au second
+        await supabase.from("listings").update({
+          reserved_by: nextBid.bidder_id,
+          current_bid: nextBid.price,
+        }).eq("id", p.listing_id)
+
+        // Notifie le second enchérisseur qu'il est maintenant en tête
+        await supabase.from("notifications").insert({
+          user_id: nextBid.bidder_id,
+          type:    "auction_leader",
+          title:   "⚡ Vous êtes en tête de l'enchère !",
+          body:    `Le meilleur enchérisseur s'est retiré. Votre offre de ${nextBid.price.toFixed(2)} € est maintenant la meilleure.`,
+          data:    { listing_id: p.listing_id },
+        })
+      } else {
+        // Personne d'autre — remet l'annonce à zéro
+        await supabase.from("listings").update({
+          reserved_by: null,
+          current_bid: null,
+          bid_lock_step: null,
+          bid_locked_until: null,
+        }).eq("id", p.listing_id)
+      }
+    }
+
+    setCancelling(null)
+    fetchPickups()
+  }
+
   const handleCancel = async (p) => {
     const isAuthorized = p.status === 'authorized'
     const isConfirmed  = p.status === 'confirmed'
@@ -382,11 +434,18 @@ export default function PickupList({ profile }) {
                   <BidButtons listing={listing} profile={profile} onBidPlaced={fetchPickups} />
                 )}
 
-                {/* Annuler */}
-                {(isPending || isAuthorized || isConfirmed) && (
+                {/* Annuler réservation */}
+                {!isBid && (isPending || isAuthorized || isConfirmed) && (
                   <button onClick={() => handleCancel(p)} disabled={cancelling === p.id}
                     className="w-full py-2.5 rounded-xl border border-red/30 bg-red/10 text-red text-sm font-semibold cursor-pointer disabled:opacity-40 mt-3">
                     {cancelling === p.id ? 'Annulation…' : isConfirmed ? '✕ Signaler un problème — annuler' : isAuthorized ? '✕ Annuler — je ne peux plus venir' : '✕ Annuler la réservation'}
+                  </button>
+                )}
+                {/* Se retirer d'une enchère */}
+                {isBid && (
+                  <button onClick={() => handleCancelBid(p)} disabled={cancelling === p.id}
+                    className="w-full py-2.5 rounded-xl border border-red/30 bg-red/10 text-red text-sm font-semibold cursor-pointer disabled:opacity-40 mt-3">
+                    {cancelling === p.id ? 'Annulation…' : '✕ Se retirer de l'enchère'}
                   </button>
                 )}
               </div>

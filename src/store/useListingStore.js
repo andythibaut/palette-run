@@ -68,6 +68,7 @@ export const useListingStore = create((set, get) => ({
         // Pas de filtre — on gère is_active dans le handler
       }, (payload) => {
         const { eventType, new: newRow, old: oldRow } = payload
+        console.log('REALTIME listings:', eventType, newRow?.id, 'is_active:', newRow?.is_active)
 
         set((state) => {
           if (eventType === 'INSERT') {
@@ -207,6 +208,42 @@ export const useListingStore = create((set, get) => ({
       .eq('id', listingId)
 
     if (listingError) { set({ error: listingError.message }); return false }
+
+    // Récupère l'ancien meilleur enchérisseur pour le notifier
+    const { data: listing } = await supabase
+      .from('listings')
+      .select('reserved_by, qty, price')
+      .eq('id', listingId)
+      .single()
+
+    const previousLeader = listing?.reserved_by
+    if (previousLeader && previousLeader !== user.id) {
+      // Notifie l'ancien leader qu'il a été surenchéri
+      await supabase.from('notifications').insert({
+        user_id: previousLeader,
+        type:    'auction_outbid',
+        title:   '⚡ Vous avez été surenchéri !',
+        body:    `Quelqu'un a proposé ${newPrice.toFixed(2)} €. Surenchérissez pour rester en tête.`,
+        data:    { listing_id: listingId },
+      })
+    }
+
+    // Notifie le commerçant d'une nouvelle enchère
+    const { data: company } = await supabase
+      .from('companies')
+      .select('owner_id')
+      .eq('id', listing?.company_id)
+      .maybeSingle()
+
+    if (company?.owner_id) {
+      await supabase.from('notifications').insert({
+        user_id: company.owner_id,
+        type:    'auction_new_bid',
+        title:   '💰 Nouvelle enchère !',
+        body:    `Un chauffeur a enchéri à ${newPrice.toFixed(2)} € / palette.`,
+        data:    { listing_id: listingId },
+      })
+    }
 
     // Met à jour le listing dans le store local pour que le prix s'affiche immédiatement
     set(state => ({

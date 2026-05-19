@@ -74,15 +74,36 @@ const ListingForm = ({ listing, onSave }) => {
   const handleDelete = async () => {
     if (!window.confirm('Supprimer cette annonce ?')) return
     setLoading(true)
-    // Annule les transactions pending liées à cette annonce
+
+    // Récupère les chauffeurs à notifier avant annulation
+    const { data: pendingTx } = await supabase
+      .from('transactions')
+      .select('driver_id')
+      .eq('listing_id', listing.id)
+      .in('status', ['pending', 'authorized'])
+
+    // Annule les transactions
     await supabase.from('transactions')
       .update({ status: 'cancelled' })
       .eq('listing_id', listing.id)
-      .eq('status', 'pending')
+      .in('status', ['pending', 'authorized'])
+
+    // Notifie les chauffeurs concernés
+    if (pendingTx?.length) {
+      await supabase.from('notifications').insert(
+        pendingTx.map(tx => ({
+          user_id: tx.driver_id,
+          type:    'listing_cancelled',
+          title:   "❌ Annonce annulée",
+          body:    `${company.name} a retiré son annonce. Votre réservation a été annulée.`,
+          data:    { listing_id: listing.id },
+        }))
+      )
+    }
+
     // Met à jour en base
     const { error } = await supabase.from('listings').update({ is_active: false }).eq('id', listing.id)
     if (error) { setError(error.message); setLoading(false); return }
-    // Met à jour le store immédiatement (listing → null), sans rechargement
     await deleteListing()
     setLoading(false)
   }
