@@ -3,11 +3,11 @@ import { supabase } from '@/lib/supabase'
 import { formatPickupDeadline } from '@/lib/transaction'
 
 const statusStyles = {
-  pending:    { color: '#F97316', bg: '#F9731618', label: 'En attente vendeur' },
-  authorized: { color: '#3B82F6', bg: '#3B82F618', label: 'Autorisé — en route' },
-  confirmed:  { color: '#2ECC71', bg: '#2ECC7118', label: 'Confirmée'          },
-  cancelled:  { color: '#4A5568', bg: '#4A556818', label: 'Annulée'            },
-  bidding:    { color: '#FFD166', bg: '#FFD16618', label: 'Enchère en cours'   },
+  pending:    { color: '#F97316', bg: '#F9731618', label: "En attente vendeur" },
+  authorized: { color: '#3B82F6', bg: '#3B82F618', label: "Autorisé — en route" },
+  confirmed:  { color: '#2ECC71', bg: '#2ECC7118', label: "Confirmée"          },
+  cancelled:  { color: '#4A5568', bg: '#4A556818', label: "Annulée"            },
+  bidding:    { color: '#FFD166', bg: '#FFD16618', label: "Enchère en cours"   },
 }
 
 // ─── Mini bid panel — +50¢ uniquement ────────────────────────────────────────
@@ -275,7 +275,7 @@ export default function PickupList({ profile }) {
           await supabase.from('notifications').insert({
             user_id: company.owner_id,
             type:    'driver_cancelled',
-            title:   '⚠️ Un chauffeur a annulé',
+            title:   "⚠️ Un chauffeur a annulé",
             body:    isConfirmed
               ? 'Un chauffeur a signalé un problème et annulé après confirmation. Votre annonce a été remise en ligne.'
               : 'Un chauffeur autorisé a annulé sa venue. Votre annonce a été remise en ligne.',
@@ -445,7 +445,7 @@ export default function PickupList({ profile }) {
                 {isBid && (
                   <button onClick={() => handleCancelBid(p)} disabled={cancelling === p.id}
                     className="w-full py-2.5 rounded-xl border border-red/30 bg-red/10 text-red text-sm font-semibold cursor-pointer disabled:opacity-40 mt-3">
-                    {cancelling === p.id ? 'Annulation…' : '✕ Se retirer de l'enchère'}
+                    {cancelling === p.id ? 'Annulation…' : "✕ Se retirer de l'enchère"}
                   </button>
                 )}
               </div>
