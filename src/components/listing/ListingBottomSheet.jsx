@@ -18,59 +18,62 @@ const openGPS = (address, lat, lng) => {
   }
 }
 
-// ─── Champ d'enchère libre ────────────────────────────────────────────────────
-function AuctionBidInput({ currentPrice, hasExistingBid, bidding, bidResult, onBid }) {
+// ─── Nouveau système d'enchère avec + / - ─────────────────────────────────────
+function AuctionBidInput({ currentPrice, hasExistingBid, resalePrice, qty, bidding, bidResult, onBid }) {
   const minPrice = hasExistingBid
     ? Math.round((currentPrice + 0.50) * 10) / 10
     : currentPrice
-  const [value, setValue] = useState(minPrice.toFixed(2))
-  const [error, setError] = useState('')
+  const [myBid, setMyBid] = useState(minPrice)
 
-  const handleChange = (e) => {
-    setValue(e.target.value)
-    setError('')
-  }
+  const increment = () => setMyBid(p => Math.round((p + 0.50) * 10) / 10)
+  const decrement = () => setMyBid(p => Math.max(minPrice, Math.round((p - 0.50) * 10) / 10))
 
-  const handleSubmit = () => {
-    const parsed = parseFloat(value)
-    if (isNaN(parsed)) { setError("Montant invalide"); return }
-    // Arrondi au dixième
-    const rounded = Math.round(parsed * 10) / 10
-    if (rounded < minPrice) { setError(`Minimum ${minPrice.toFixed(2)} €`); return }
-    if (Math.round(parsed * 100) % 10 !== 0) { setError("Montant au dixième près (ex: 2.50, 2.60)"); return }
-    onBid(rounded - currentPrice)
-  }
+  const profit = resalePrice ? (resalePrice - myBid) * qty : null
+  const canBid = myBid > currentPrice
 
   return (
     <>
-      <div className="bg-pink/10 border border-pink/30 rounded-xl px-4 py-3">
-        <p className="text-pink text-xs font-semibold">
-          ⚡ Enchères ouvertes — enchère actuelle : <strong>{currentPrice.toFixed(2)} €</strong>
-        </p>
-        <p className="text-pink/70 text-xs mt-0.5">Minimum {minPrice.toFixed(2)} € · pas de 0.10€</p>
+      {/* Prix actuel */}
+      <div className="bg-pink/5 border border-pink/20 rounded-xl px-4 py-3 text-center">
+        <p className="text-xs text-muted mb-1">Enchère actuelle</p>
+        <p className="font-bebas text-3xl" style={{ color: "#EC4899" }}>{currentPrice.toFixed(2)} €</p>
       </div>
-      <div className="flex gap-2 items-center">
-        <div className="flex-1 flex items-center bg-white border-2 border-border rounded-xl overflow-hidden focus-within:border-pink">
-          <span className="pl-3 text-gray-400 text-sm">€</span>
-          <input
-            type="number"
-            value={value}
-            onChange={handleChange}
-            step="0.10"
-            min={minPrice}
-            className="flex-1 px-2 py-3 bg-transparent text-gray-800 text-sm outline-none font-mono"
-            placeholder={minPrice.toFixed(2)}
-          />
+
+      {/* Sélecteur + / - */}
+      <div className="bg-white border-2 border-border rounded-xl p-4">
+        <p className="text-xs text-muted text-center mb-3">Votre enchère</p>
+        <div className="flex items-center justify-between gap-4">
+          <button onClick={decrement} disabled={myBid <= minPrice}
+            className="w-12 h-12 rounded-xl border-2 font-bold text-xl cursor-pointer disabled:opacity-30 transition-colors"
+            style={{ borderColor: "#EC4899", color: "#EC4899", background: "#EC489910" }}>
+            −
+          </button>
+          <p className="font-bebas text-4xl text-gray-800 flex-1 text-center">{myBid.toFixed(2)} €</p>
+          <button onClick={increment}
+            className="w-12 h-12 rounded-xl border-2 font-bold text-xl cursor-pointer transition-colors"
+            style={{ borderColor: "#EC4899", color: "#EC4899", background: "#EC489910" }}>
+            +
+          </button>
         </div>
-        <button onClick={handleSubmit} disabled={bidding}
-          className="px-5 py-3 rounded-xl font-bold text-white text-sm cursor-pointer disabled:opacity-40"
-          style={{ background: "linear-gradient(135deg,#EC4899,#db2777)" }}>
-          {bidding ? "…" : "Enchérir"}
-        </button>
+
+        {/* Bénéfice potentiel */}
+        {profit !== null && (
+          <div className={`mt-3 rounded-lg px-3 py-2 text-center text-xs font-semibold ${profit > 0 ? "bg-green/10 text-green" : "bg-red/10 text-red"}`}>
+            {profit > 0
+              ? `📈 +${profit.toFixed(2)} € de bénéfice potentiel`
+              : `📉 ${profit.toFixed(2)} € — vous perdriez de l'argent`}
+          </div>
+        )}
       </div>
-      {error && (
-        <p className="text-red text-xs text-center">{error}</p>
-      )}
+
+      {/* Bouton enchérir */}
+      <button onClick={() => onBid(Math.round((myBid - currentPrice) * 10) / 10)}
+        disabled={bidding || !canBid}
+        className="w-full py-4 rounded-2xl font-bold text-white text-base cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+        style={{ background: canBid ? "linear-gradient(135deg,#EC4899,#db2777)" : "#D1D9E6", color: canBid ? "#fff" : "#94A3B8" }}>
+        {bidding ? "Enchère en cours…" : canBid ? `⚡ Enchérir à ${myBid.toFixed(2)} €` : "Augmentez votre offre pour enchérir"}
+      </button>
+
       {bidResult && (
         <div className={`w-full rounded-xl px-3 py-2 text-xs text-center font-semibold ${bidResult.success ? "bg-green/10 border border-green/30 text-green" : "bg-red/10 border border-red/30 text-red"}`}>
           {bidResult.success ? `✅ Enchère placée à ${bidResult.price.toFixed(2)} €` : "❌ Erreur — réessayez"}
@@ -288,7 +291,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                 <p className="font-semibold text-sm" style={{ color: '#A855F7' }}>Enchère en cours</p>
               </div>
               <p className="text-xs text-muted leading-relaxed">
-                Se termine le <strong className="text-white">
+                Se termine le <strong className="text-gray-800">
                   {new Date(listing.auction_ends_at).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
                 </strong>
               </p>
@@ -303,7 +306,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
             <div className="flex items-center gap-2 mb-4 bg-surface border border-border rounded-xl px-3 py-2">
               <span>📅</span>
               <div>
-                <p className="text-white text-sm font-semibold">
+                <p className="text-gray-800 text-sm font-semibold">
                   Enlèvement au plus tard : <strong className="text-amber">{formatPickupDeadline(listing.qty)}</strong>
                 </p>
                 <p className="text-muted text-xs mt-0.5">
@@ -353,6 +356,8 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                       <AuctionBidInput
                         currentPrice={currentPrice}
                         hasExistingBid={listing?.current_bid !== null && listing?.current_bid !== undefined}
+                        resalePrice={resalePrice}
+                        qty={listing?.qty}
                         bidding={bidding}
                         bidResult={bidResult}
                         onBid={handleBid}
