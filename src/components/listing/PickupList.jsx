@@ -137,8 +137,11 @@ export default function PickupList({ profile }) {
       .eq('bidder_id', profile.id)
       .order('created_at', { ascending: false })
 
-    // Filtre : ne garder que les bids dont l'annonce est encore active
+    // Sépare les bids actifs et les bids perdus (annonce inactive et quelqu'un d'autre a gagné)
     const activeBids = (bidData || []).filter(b => b.listings?.is_active)
+    const lostBids   = (bidData || []).filter(b => 
+      b.listings && !b.listings.is_active && b.listings.reserved_by && b.listings.reserved_by !== profile.id
+    )
 
     // Convertit les bids en format compatible avec les transactions
     const bidPickups = activeBids.map(b => ({
@@ -156,8 +159,20 @@ export default function PickupList({ profile }) {
     const txListingIds = new Set((txData || []).map(t => t.listing_id))
     const uniqueBids   = bidPickups.filter(b => !txListingIds.has(b.listing_id))
 
+    // Bids perdus
+    const lostPickups = lostBids.map(b => ({
+      id:         `lost-${b.id}`,
+      type:       'lost',
+      status:     'lost',
+      listing_id: b.listing_id,
+      listings:   b.listings,
+      companies:  b.listings?.companies,
+      created_at: b.created_at,
+      bid_price:  b.price,
+    })).filter(b => !txListingIds.has(b.listing_id))
+
     setLoading(false)
-    setPickups([...(txData || []), ...uniqueBids])
+    setPickups([...(txData || []), ...uniqueBids, ...lostPickups])
   }
 
   // Souscription realtime sur les listings réservés
@@ -184,6 +199,15 @@ export default function PickupList({ profile }) {
 
     return () => supabase.removeChannel(sub)
   }, [profile?.id])
+
+  const handleDismissLost = async (p) => {
+    // Supprime le bid en base et retire la carte
+    await supabase.from("bids")
+      .delete()
+      .eq("listing_id", p.listing_id)
+      .eq("bidder_id", profile.id)
+    setPickups(prev => prev.filter(x => x.id !== p.id))
+  }
 
   const handleCancelBid = async (p) => {
     if (!window.confirm("Se retirer de cette enchère ?")) return
@@ -315,7 +339,7 @@ export default function PickupList({ profile }) {
       <div style={{ padding: '1rem 1.25rem', paddingBottom: '6rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {pickups.map(p => {
           const listing      = p.listings
-          const isBid        = p.type === 'bid'
+          const isBid        = p.type === 'bid' || p.type === 'lost'
           const style        = statusStyles[p.status] || statusStyles.pending
           // Utilise buy_price/qty de la transaction si le listing n'est plus dispo (is_active false)
           const price        = parseFloat(p.buy_price || p.bid_price || listing?.price || 0)

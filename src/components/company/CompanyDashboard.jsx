@@ -353,9 +353,8 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate, onC
 
         {/* Fin d'enchère */}
         {isAuction && listing?.auction_ends_at && (
-          <div className="mx-4 mb-3 bg-pink/5 border border-pink/20 rounded-xl px-3 py-2 text-xs text-center"
-            style={{ color: '#EC4899' }}>
-            ⏱ Enchère se termine le <strong>{new Date(listing.auction_ends_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</strong>
+          <div className="mx-4 mb-3">
+            <AuctionCountdown endsAt={listing.auction_ends_at} />
           </div>
         )}
 

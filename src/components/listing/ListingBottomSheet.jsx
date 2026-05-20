@@ -284,18 +284,9 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
 
           {/* Enchère programmée */}
           {listing.auction_mode && listing.auction_ends_at && (
-            <div className="mb-4 rounded-xl px-4 py-3 border"
-              style={{ background: '#A855F711', borderColor: '#A855F744' }}>
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-base">⚡</span>
-                <p className="font-semibold text-sm" style={{ color: '#A855F7' }}>Enchère en cours</p>
-              </div>
-              <p className="text-xs text-muted leading-relaxed">
-                Se termine le <strong className="text-gray-800">
-                  {new Date(listing.auction_ends_at).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
-                </strong>
-              </p>
-              <p className="text-xs text-muted mt-1">
+            <div className="mb-4">
+              <AuctionCountdown endsAt={listing.auction_ends_at} daysOnly={true} />
+              <p className="text-xs text-muted text-center mt-2">
                 Le gagnant aura 5 jours ouvrés pour venir récupérer les palettes.
               </p>
             </div>

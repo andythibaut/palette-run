@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 
 // Pages
@@ -12,8 +12,6 @@ import DriverApp        from '@/pages/DriverApp'
 import CompanyApp       from '@/pages/CompanyApp'
 import PublicMapPage    from '@/pages/PublicMapPage'
 import PrivacyPage      from '@/pages/PrivacyPage'
-import { useEffect }    from 'react'
-import { useNavigate }  from 'react-router-dom'
 import LoadingScreen    from '@/components/shared/LoadingScreen'
 import PWAInstallBanner from '@/components/shared/PWAInstallBanner'
 
