@@ -97,8 +97,9 @@ const UserMarker = ({ lng, lat }) => (
 const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onViewportChange }, ref) {
   const { company, listing } = useCompanyStore()
   const { listings } = useListingStore()
-  const [viewport, setViewport] = useState(null)
-  const [userPos,  setUserPos]  = useState(null)
+  const [viewport,    setViewport]    = useState(null)
+  const [userPos,     setUserPos]     = useState(null)
+  const [dismissed,   setDismissed]   = useState(false)
   const mapRef = useRef(null)
 
   useImperativeHandle(ref, () => ({
@@ -162,15 +163,46 @@ const CompanyMapView = forwardRef(function CompanyMapView({ savedViewport, onVie
       </div>
 
       {/* Info si pas d'annonce active */}
-      {!hasListing && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="bg-bg/80 backdrop-blur-md border border-border rounded-2xl px-5 py-4 text-center mx-6">
-            <p className="text-2xl mb-2">📦</p>
-            <p className="font-bebas text-lg text-white">Aucune annonce active</p>
-            <p className="text-sub text-xs mt-1">Publiez une annonce pour la voir ici</p>
+      {!hasListing && !dismissed && (
+        <div className="absolute inset-0 flex items-center justify-center"
+          style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(2px)" }}>
+          <div className="bg-white border border-border rounded-2xl px-6 py-5 text-center mx-6 shadow-xl max-w-sm w-full">
+            <p className="text-3xl mb-3">📦</p>
+            <p className="font-bebas text-xl text-gray-800 leading-tight mb-2">
+              Créez votre annonce pour être visible sur la carte
+            </p>
+            <p className="text-sub text-xs mb-4">
+              Publiez votre stock de palettes depuis l'onglet Annonce.
+            </p>
+            <button onClick={() => setDismissed(true)}
+              className="w-full py-3 rounded-xl font-bold text-white text-sm cursor-pointer"
+              style={{ background: "linear-gradient(135deg,#E8920A,#d4830a)" }}>
+              OK, j'y vais →
+            </button>
           </div>
+          {/* Flèche SVG pointant vers l'onglet Annonce en bas à gauche */}
+          <svg
+            viewBox="0 0 80 120"
+            className="absolute"
+            style={{
+              bottom: 72,
+              left: "10%",
+              width: 60,
+              height: 100,
+              animation: "bounceDown 1s ease-in-out infinite",
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.4))"
+            }}>
+            <path d="M40 0 C40 0 40 80 40 90 L25 70 M40 90 L55 70"
+              stroke="white" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          </svg>
         </div>
       )}
+      <style>{`
+        @keyframes bounceDown {
+          0%, 100% { transform: translateY(0) }
+          50%       { transform: translateY(10px) }
+        }
+      `}</style>
     </div>
   )
 })

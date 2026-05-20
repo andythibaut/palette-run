@@ -56,6 +56,22 @@ function NavigationListener() {
   return null
 }
 
+function AutoUpdate() {
+  useEffect(() => {
+    if (!('serviceWorker' in navigator)) return
+    navigator.serviceWorker.ready.then(reg => {
+      // Vérifie les mises à jour toutes les 60 secondes
+      const interval = setInterval(() => reg.update(), 60 * 1000)
+      // Recharge quand un nouveau SW prend le contrôle
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        window.location.reload()
+      })
+      return () => clearInterval(interval)
+    })
+  }, [])
+  return null
+}
+
 export default function App() {
   const { init, loading } = useAuthStore()
 
@@ -67,6 +83,7 @@ export default function App() {
     <>
     <PWAInstallBanner />
     <NavigationListener />
+    <AutoUpdate />
     <Routes>
       {/* Public — carte démo sans auth */}
       <Route path="/"              element={<PublicMapPage />} />
