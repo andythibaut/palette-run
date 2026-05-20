@@ -37,7 +37,7 @@ const ListingForm = ({ listing, onSave }) => {
     setLoading(true)
     try {
       const auctionEndsAt = auctionMode
-        ? addWorkingDays(new Date(), AUCTION_DURATION_DAYS).toISOString()
+        ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
         : null
       const data = {
         qty,
@@ -161,7 +161,7 @@ const ListingForm = ({ listing, onSave }) => {
         {/* Info durée fixe */}
         {auctionMode && (
           <div className="px-4 pb-4 border-t border-border/50 pt-3 text-xs text-muted leading-relaxed">
-            ⏱ L'enchère dure <strong className="text-gray-800">5 jours ouvrés</strong>. Le gagnant aura ensuite <strong className="text-gray-800">5 jours ouvrés</strong> pour venir récupérer les palettes.
+            ⏱ L'enchère dure <strong className="text-gray-800">7 jours</strong>. Le gagnant aura ensuite <strong className="text-gray-800">7 jours</strong> pour venir récupérer les palettes.
           </div>
         )}
       </div>
@@ -479,7 +479,7 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
 
     // Notification au chauffeur avec les détails défloutés
     const pickupDeadline = listing.auction_mode
-      ? "Vous avez 5 jours ouvrés pour venir récupérer les palettes."
+      ? "Vous avez 7 jours pour venir récupérer les palettes."
       : `Rendez-vous au ${company.address}, ${company.city}.`
 
     await supabase.from('notifications').insert({

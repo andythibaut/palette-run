@@ -287,7 +287,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
             <div className="mb-4">
               <AuctionCountdown endsAt={listing.auction_ends_at} daysOnly={true} />
               <p className="text-xs text-muted text-center mt-2">
-                Le gagnant aura 5 jours ouvrés pour venir récupérer les palettes.
+                Le gagnant aura 7 jours pour venir récupérer les palettes.
               </p>
             </div>
           )}
