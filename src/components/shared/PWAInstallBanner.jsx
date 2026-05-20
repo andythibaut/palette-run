@@ -110,6 +110,9 @@ export default function PWAInstallBanner() {
               style={{ background: "linear-gradient(135deg,#E8920A,#d4830a)", boxShadow: "0 6px 20px rgba(232,146,10,0.3)" }}>
               📲 Installer l'application
             </button>
+            <p className="text-xs text-muted text-center mt-2">
+              ⚠️ Sur certains appareils, Chrome affiche un avertissement — c'est normal, appuyez quand même sur Installer.
+            </p>
           </div>
         )}
       </div>

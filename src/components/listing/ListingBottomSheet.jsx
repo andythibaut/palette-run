@@ -296,7 +296,7 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
                 </strong>
               </p>
               <p className="text-xs text-muted mt-1">
-                Le gagnant aura autant de temps que la durée de l'enchère pour venir récupérer.
+                Le gagnant aura 5 jours ouvrés pour venir récupérer les palettes.
               </p>
             </div>
           )}

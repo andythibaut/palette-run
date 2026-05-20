@@ -12,6 +12,8 @@ import DriverApp        from '@/pages/DriverApp'
 import CompanyApp       from '@/pages/CompanyApp'
 import PublicMapPage    from '@/pages/PublicMapPage'
 import PrivacyPage      from '@/pages/PrivacyPage'
+import { useEffect }    from 'react'
+import { useNavigate }  from 'react-router-dom'
 import LoadingScreen    from '@/components/shared/LoadingScreen'
 import PWAInstallBanner from '@/components/shared/PWAInstallBanner'
 
@@ -44,6 +46,18 @@ const RoleRoute = ({ role, children }) => {
   return children
 }
 
+function NavigationListener() {
+  const navigate = useNavigate()
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === 'NAVIGATE') navigate(e.data.url)
+    }
+    navigator.serviceWorker?.addEventListener('message', handler)
+    return () => navigator.serviceWorker?.removeEventListener('message', handler)
+  }, [navigate])
+  return null
+}
+
 export default function App() {
   const { init, loading } = useAuthStore()
 
@@ -54,6 +68,7 @@ export default function App() {
   return (
     <>
     <PWAInstallBanner />
+    <NavigationListener />
     <Routes>
       {/* Public — carte démo sans auth */}
       <Route path="/"              element={<PublicMapPage />} />

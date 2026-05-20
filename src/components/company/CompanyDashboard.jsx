@@ -21,7 +21,8 @@ const ListingForm = ({ listing, onSave }) => {
   const [pickupBefore,    setPickupBefore]    = useState(listing?.pickup_before || '')
   const [isActive,        setIsActive]        = useState(listing?.is_active ?? true)
   const [auctionMode,     setAuctionMode]     = useState(listing?.auction_mode  || false)
-  const [auctionDays,     setAuctionDays]     = useState(1)
+  const [requiresCall,    setRequiresCall]    = useState(listing?.requires_call || false)
+  const [contactPhone,    setContactPhone]    = useState(listing?.contact_phone || '')
   const [saved,           setSaved]           = useState(false)
   const [loading,         setLoading]         = useState(false)
   const [error,           setError]           = useState('')
@@ -36,7 +37,7 @@ const ListingForm = ({ listing, onSave }) => {
     setLoading(true)
     try {
       const auctionEndsAt = auctionMode
-        ? new Date(Date.now() + auctionDays * 24 * 60 * 60 * 1000).toISOString()
+        ? addWorkingDays(new Date(), AUCTION_DURATION_DAYS).toISOString()
         : null
       const data = {
         qty,
@@ -45,6 +46,8 @@ const ListingForm = ({ listing, onSave }) => {
         is_active:       isActive,
         auction_mode:    auctionMode,
         auction_ends_at: auctionEndsAt,
+        requires_call:   requiresCall,
+        contact_phone:   requiresCall ? contactPhone : null,
       }
       if (listing) {
         const { error } = await supabase.from('listings').update(data).eq('id', listing.id)
@@ -155,26 +158,10 @@ const ListingForm = ({ listing, onSave }) => {
           </button>
         </div>
 
-        {/* Durée enchère */}
+        {/* Info durée fixe */}
         {auctionMode && (
-          <div className="px-4 pb-4 border-t border-border/50 pt-3">
-            <p className="text-xs text-muted mb-2">Durée de l'enchère</p>
-            <div className="flex gap-2">
-              {[1, 2, 3].map(d => (
-                <button key={d} onClick={() => setAuctionDays(d)}
-                  className="flex-1 py-2.5 rounded-xl border-2 text-sm font-bold cursor-pointer transition-all"
-                  style={{
-                    borderColor: auctionDays === d ? '#A855F7' : '#D1D9E6',
-                    background:  auctionDays === d ? '#A855F718' : '#F0F2F5',
-                    color:       auctionDays === d ? '#A855F7' : '#64748B',
-                  }}>
-                  {d} jour{d > 1 ? 's' : ''}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-muted mt-2 leading-relaxed">
-              Le gagnant aura <strong className="text-gray-800">{auctionDays} jour{auctionDays > 1 ? 's' : ''}</strong> après la fin des enchères pour venir récupérer.
-            </p>
+          <div className="px-4 pb-4 border-t border-border/50 pt-3 text-xs text-muted leading-relaxed">
+            ⏱ L'enchère dure <strong className="text-gray-800">5 jours ouvrés</strong>. Le gagnant aura ensuite <strong className="text-gray-800">5 jours ouvrés</strong> pour venir récupérer les palettes.
           </div>
         )}
       </div>
@@ -492,11 +479,8 @@ export default function CompanyDashboard({ tab = 'annonce' }) {
     }
 
     // Notification au chauffeur avec les détails défloutés
-    const auctionDays = listing.auction_ends_at
-      ? Math.round((new Date(listing.auction_ends_at) - new Date()) / (1000 * 60 * 60 * 24))
-      : null
-    const pickupDeadline = auctionDays
-      ? `Vous avez ${auctionDays} jour(s) pour venir récupérer les palettes.`
+    const pickupDeadline = listing.auction_mode
+      ? "Vous avez 5 jours ouvrés pour venir récupérer les palettes."
       : `Rendez-vous au ${company.address}, ${company.city}.`
 
     await supabase.from('notifications').insert({

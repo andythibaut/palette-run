@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useSearchParams }               from 'react-router-dom'
 import { useAuthStore }   from '@/store/useAuthStore'
 import { useCompanyStore } from '@/store/useCompanyStore'
 import { useListingStore } from '@/store/useListingStore'

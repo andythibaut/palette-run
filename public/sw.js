@@ -22,12 +22,50 @@ self.addEventListener('push', (e) => {
   )
 })
 
+// ─── Clic sur notification → ouvre la bonne page ──────────────────────────
 self.addEventListener('notificationclick', (e) => {
   e.notification.close()
+
+  const notifData = e.notification.data || {}
+  const type      = notifData.type || ''
+
+  // Types destinés au chauffeur → onglet Achats (/app?tab=pickups)
+  const driverTypes = [
+    'transaction_authorized',
+    'transaction_confirmed',
+    'auction_won',
+    'auction_outbid',
+    'auction_leader',
+    'listing_cancelled',
+  ]
+
+  // Types destinés au commerçant → onglet Acheteurs (/company?tab=acheteurs)
+  const companyTypes = [
+    'auction_new_bid',
+    'auction_closed',
+    'auction_no_winner',
+  ]
+
+  let targetUrl = '/'
+  if (driverTypes.includes(type)) {
+    targetUrl = '/app?tab=pickups'
+  } else if (companyTypes.includes(type)) {
+    targetUrl = '/company?tab=acheteurs'
+  }
+
+  const fullUrl = self.location.origin + targetUrl
+
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      if (list.length > 0) return list[0].focus()
-      return clients.openWindow('/')
+      // Si l'app est déjà ouverte, on la focus et on navigue
+      for (const client of list) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.postMessage({ type: 'NAVIGATE', url: targetUrl })
+          return client.focus()
+        }
+      }
+      // Sinon on ouvre la bonne URL
+      return clients.openWindow(fullUrl)
     })
   )
 })

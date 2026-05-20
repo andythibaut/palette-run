@@ -117,6 +117,7 @@ export default function PickupList({ profile }) {
   const [listings,   setListings]   = useState({})
   const [loading,    setLoading]    = useState(true)
   const [cancelling, setCancelling] = useState(null)
+  const [calledListings, setCalledListings] = useState({})
 
   const fetchPickups = async () => {
     setLoading(true)
@@ -124,7 +125,7 @@ export default function PickupList({ profile }) {
     // 1. Transactions pending/authorized
     const { data: txData } = await supabase
       .from('transactions')
-      .select('*, listings ( * ), companies ( name, city, address )')
+      .select('*, listings ( requires_call, contact_phone, qty, price, current_bid, auction_mode ), companies ( name, city, address )')
       .eq('driver_id', profile.id)
       .in('status', ['pending', 'authorized'])
       .order('created_at', { ascending: false })
@@ -316,9 +317,12 @@ export default function PickupList({ profile }) {
           const listing      = p.listings
           const isBid        = p.type === 'bid'
           const style        = statusStyles[p.status] || statusStyles.pending
-          const total        = (p.buy_price || p.bid_price || listing?.price) * listing?.qty
+          // Utilise buy_price/qty de la transaction si le listing n'est plus dispo (is_active false)
+          const price        = parseFloat(p.buy_price || p.bid_price || listing?.price || 0)
+          const qty          = p.qty || listing?.qty || 0
+          const total        = price * qty
           const profit       = profile?.resale_price
-            ? (profile.resale_price - (p.buy_price || p.bid_price || listing?.price)) * listing?.qty
+            ? (parseFloat(profile.resale_price) - price) * qty
             : null
           const isPending    = p.status === 'pending'
           const isAuthorized = p.status === 'authorized'
@@ -364,11 +368,11 @@ export default function PickupList({ profile }) {
                 {/* Stats */}
                 <div className="grid grid-cols-3 gap-2 mb-3">
                   <div className="bg-hi rounded-xl p-2.5 text-center border border-border">
-                    <p className="font-bebas text-2xl text-amber leading-none">{listing?.qty}</p>
+                    <p className="font-bebas text-2xl text-amber leading-none">{qty}</p>
                     <p className="text-[10px] text-muted mt-0.5">palettes</p>
                   </div>
                   <div className="bg-hi rounded-xl p-2.5 text-center border border-border">
-                    <p className="font-bebas text-2xl text-green leading-none">{(listing?.current_bid || p.buy_price)?.toFixed(2)}€</p>
+                    <p className="font-bebas text-2xl text-green leading-none">{price.toFixed(2)}€</p>
                     <p className="text-[10px] text-muted mt-0.5">/ palette</p>
                   </div>
                   <div className="bg-hi rounded-xl p-2.5 text-center border border-border">
@@ -398,7 +402,7 @@ export default function PickupList({ profile }) {
                 )}
 
                 {/* Délai d'enlèvement */}
-                {listing?.qty && (
+                {qty > 0 && (
                   <div className="flex items-center gap-2 mb-3 rounded-xl px-3 py-2 bg-surface border border-border">
                     <span>📅</span>
                     <div>
@@ -412,22 +416,58 @@ export default function PickupList({ profile }) {
                   </div>
                 )}
 
-                {/* Bouton GPS — uniquement après confirmation */}
-                {(p.status === 'confirmed' || p.status === 'authorized') && (
-                  <button onClick={() => {
-                    const addr = p.companies?.address
+                {/* Appel requis + bouton GPS */}
+                {(p.status === 'confirmed' || p.status === 'authorized') && (() => {
+                  const requiresCall = p.listings?.requires_call
+                  const contactPhone = p.listings?.contact_phone
+                  const hasCalled    = calledListings[p.listing_id]
+                  const canGo        = !requiresCall || hasCalled
+
+                  const openGPSHandler = () => {
+                    const addr  = p.companies?.address
                     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-                    const query = addr ? encodeURIComponent(addr) : ''
+                    const query = addr ? encodeURIComponent(addr) : ""
                     if (isIOS) {
-                      window.open(`maps://maps.apple.com/?q=${query}`, '_blank')
+                      window.open("maps://maps.apple.com/?q=" + query, "_blank")
                     } else {
-                      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank')
+                      window.open("https://www.google.com/maps/search/?api=1&query=" + query, "_blank")
                     }
-                  }}
-                    className="w-full py-3 rounded-xl border border-border bg-hi text-white text-sm font-semibold cursor-pointer flex items-center justify-center gap-2 mb-3">
-                    🗺 Y aller
-                  </button>
-                )}
+                  }
+
+                  return (
+                    <>
+                      {requiresCall && contactPhone && (
+                        <div className="bg-blue/5 border border-blue/20 rounded-xl px-4 py-3 mb-2">
+                          <p className="text-xs text-blue font-semibold mb-2">📞 Appel requis avant passage</p>
+                          <a href={"tel:" + contactPhone}
+                            onClick={() => setCalledListings(c => ({ ...c, [p.listing_id]: true }))}
+                            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg font-bold text-white text-sm"
+                            style={{ background: "linear-gradient(135deg,#2563EB,#1d4ed8)" }}>
+                            📞 Appeler le {contactPhone}
+                          </a>
+                          {!hasCalled && (
+                            <p className="text-xs text-muted text-center mt-2">
+                              Appelez pour convenir d'un RDV avant de vous déplacer
+                            </p>
+                          )}
+                          {hasCalled && (
+                            <p className="text-xs text-blue font-semibold text-center mt-2">✓ RDV convenu — vous pouvez y aller</p>
+                          )}
+                        </div>
+                      )}
+                      <button onClick={openGPSHandler} disabled={!canGo}
+                        className="w-full py-3 rounded-xl border text-sm font-semibold flex items-center justify-center gap-2 mb-3"
+                        style={{
+                          borderColor: canGo ? "#D1D9E6" : "#E2E8F0",
+                          background:  canGo ? "#1E293B" : "#F1F5F9",
+                          color:       canGo ? "#ffffff" : "#94A3B8",
+                          cursor:      canGo ? "pointer" : "not-allowed",
+                        }}>
+                        🗺 {canGo ? "Y aller" : "Appelez d'abord pour débloquer"}
+                      </button>
+                    </>
+                  )
+                })()}
 
                 {/* Enchères si actives */}
                 {hasBid && listing && isPending && (
