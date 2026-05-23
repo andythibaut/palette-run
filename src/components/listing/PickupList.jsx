@@ -125,7 +125,7 @@ export default function PickupList({ profile }) {
     // 1. Transactions pending/authorized
     const { data: txData } = await supabase
       .from('transactions')
-      .select('*, listings ( requires_call, contact_phone, qty, price, current_bid, auction_mode, companies ( name, city, address ) )')
+      .select('*, listings ( requires_call, contact_phone, qty, price, current_bid, auction_mode ), companies ( name, city, address )')
       .eq('driver_id', profile.id)
       .in('status', ['pending', 'authorized'])
       .order('created_at', { ascending: false })
@@ -375,9 +375,9 @@ export default function PickupList({ profile }) {
                   <div className="flex-1">
                     {(p.status === 'confirmed' || p.status === 'authorized') ? (
                       <>
-                        <p className="font-bebas text-xl text-white leading-tight">{p.listings?.companies?.name}</p>
-                        <p className="text-sub text-xs">{p.listings?.companies?.city}</p>
-                        {p.listings?.companies?.address && <p className="text-muted text-xs mt-0.5">📍 {p.listings?.companies?.address}</p>}
+                        <p className="font-bebas text-xl text-white leading-tight">{p.companies?.name}</p>
+                        <p className="text-sub text-xs">{p.companies?.city}</p>
+                        {p.companies?.address && <p className="text-muted text-xs mt-0.5">📍 {p.companies?.address}</p>}
                       </>
                     ) : (
                       <>
@@ -448,7 +448,7 @@ export default function PickupList({ profile }) {
                   const canGo        = !requiresCall || hasCalled
 
                   const openGPSHandler = () => {
-                    const addr  = p.listings?.companies?.address
+                    const addr  = p.companies?.address
                     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
                     const query = addr ? encodeURIComponent(addr) : ""
                     if (isIOS) {
