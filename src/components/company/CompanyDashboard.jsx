@@ -265,8 +265,8 @@ const SiteSettings = ({ company }) => {
               style={{ borderColor: vehicleRequired === v.id ? '#F5A623' : '#1C2330', background: vehicleRequired === v.id ? '#F5A62314' : '#13181F' }}>
               <span className="text-3xl">{v.icon}</span>
               <div className="flex-1">
-                <p className="font-semibold text-sm" style={{ color: vehicleRequired === v.id ? '#E8EDF5' : '#718096' }}>{v.label}</p>
-                <p className="text-xs text-muted mt-0.5">{v.sub}</p>
+                <p className="font-semibold text-sm" style={{ color: vehicleRequired === v.id ? '#1C2330' : '#E8EDF5' }}>{v.label}</p>
+                <p className="text-xs mt-0.5" style={{ color: vehicleRequired === v.id ? '#4A5568' : '#718096' }}>{v.sub}</p>
               </div>
               <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
                 style={{ borderColor: vehicleRequired === v.id ? '#F5A623' : '#1C2330', background: vehicleRequired === v.id ? '#F5A623' : 'transparent' }}>
