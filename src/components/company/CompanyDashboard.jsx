@@ -382,7 +382,7 @@ const DriversList = ({ drivers, blacklist, listing, onBlacklist, onValidate, onC
           <button onClick={() => onValidate(driver.bidder_id, driverName)}
             className="w-full py-4 font-bold text-white text-sm cursor-pointer border-t border-border"
             style={{ background: 'linear-gradient(135deg,#FFD166,#E8B800)', color: '#1E293B' }}>
-            ✅ Autoriser {driverName} à venir chercher les palettes
+            Valider le transporteur
           </button>
         )}
         {isReserver && driver.isAuthorized && (
