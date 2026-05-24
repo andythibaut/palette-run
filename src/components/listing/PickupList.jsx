@@ -375,7 +375,7 @@ export default function PickupList({ profile }) {
                   <div className="flex-1">
                     {(p.status === 'confirmed' || p.status === 'authorized') ? (
                       <>
-                        <p className="font-bebas text-xl text-white leading-tight">{p.companies?.name}</p>
+                        <p className="font-bebas text-xl text-gray-900 leading-tight">{p.companies?.name}</p>
                         <p className="text-sub text-xs">{p.companies?.city}</p>
                         {p.companies?.address && <p className="text-muted text-xs mt-0.5">📍 {p.companies?.address}</p>}
                       </>
