@@ -56,7 +56,7 @@ export const useAuthStore = create((set, get) => ({
   signInWithGoogle: async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: 'https://palette-run-psi.vercel.app/auth/callback' },
     })
     if (error) set({ error: error.message })
   },
@@ -65,7 +65,7 @@ export const useAuthStore = create((set, get) => ({
   signInWithApple: async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'apple',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: 'https://palette-run-psi.vercel.app/auth/callback' },
     })
     if (error) set({ error: error.message })
   },
@@ -74,7 +74,7 @@ export const useAuthStore = create((set, get) => ({
   signInWithFacebook: async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'facebook',
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: 'https://palette-run-psi.vercel.app/auth/callback' },
     })
     if (error) set({ error: error.message })
   },
