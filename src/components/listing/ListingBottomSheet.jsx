@@ -309,32 +309,9 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
             </div>
           )}
 
-          {/* Tier nudge */}
-          {isHidden && (
-            <div className="mb-4 rounded-xl px-4 py-3"
-              style={{ background: userTier === 'free' ? '#F5A62318' : '#FFD16618', border: `1px solid ${userTier === 'free' ? '#F5A62333' : '#FFD16633'}` }}>
-              <p className="text-sm font-semibold" style={{ color: userTier === 'free' ? '#F5A623' : '#FFD166' }}>
-                🔒 {userTier === 'free' ? 'Annonce > 2 palettes — passez Gold' : 'Annonce > 10 palettes — réservé Gold'}
-              </p>
-            </div>
-          )}
-
           {/* CTA */}
           <div className="flex flex-col gap-2">
-            {isHidden ? (
-              <>
-                {userTier === 'free' && (
-                  <button className="w-full py-4 rounded-2xl font-bold text-bg"
-                    style={{ background: 'linear-gradient(135deg,#F5A623,#E8940F)', boxShadow: '0 6px 20px rgba(245,166,35,0.4)' }}>
-                    ⭐ Gold — 24,90€/mois
-                  </button>
-                )}
-                <button className="w-full py-3 rounded-2xl font-bold border text-gold"
-                  style={{ borderColor: '#FFD16666', background: '#FFD16618' }}>
-                  🥇 Gold — 24,90€/mois
-                </button>
-              </>
-            ) : isReserved ? (
+            {isReserved ? (
               <div className="w-full py-4 rounded-2xl bg-hi border border-border text-center text-muted text-sm">
                 Disponible dès qu'elle est libérée
               </div>
