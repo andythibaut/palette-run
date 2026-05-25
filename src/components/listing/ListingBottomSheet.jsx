@@ -145,11 +145,11 @@ export default function ListingBottomSheet({ listing, profile, onClose }) {
     return () => supabase.removeChannel(sub)
   }, [listing?.id, user?.id])
 
-  const userTier       = profile?.tier          || 'free'
+  const userTier       = 'gold'
   const resalePrice    = profile?.resale_price  || null
   const goldThreshold  = profile?.gold_threshold || 20
-  const canBook        = userTier === 'gold'
-  const isHidden       = listing.qty > (TIER_LIMIT[userTier] || 2)
+  const canBook        = true
+  const isHidden       = false
   const isReserved     = listing.reserved_by !== null
   const isReservedByMe = listing.reserved_by === user?.id
   const color          = isHidden ? '#4A5568' : profitColor(listing.price, resalePrice, goldThreshold, listing.qty)
