@@ -41,17 +41,6 @@
     .logo {
       width: min(520px, 90vw);
       height: auto;
-      filter: none;
-    }
-
-    .tagline {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(20px, 3vw, 28px);
-      font-weight: 700;
-      color: rgba(255,255,255,0.45);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-align: center;
     }
 
     .btn {
@@ -67,39 +56,113 @@
       border-radius: 16px;
       transition: transform .2s, box-shadow .2s;
       box-shadow: 0 8px 32px rgba(245,166,35,0.4);
+      cursor: pointer;
     }
     .btn:hover {
       transform: translateY(-2px);
       box-shadow: 0 12px 40px rgba(245,166,35,0.55);
     }
-
     .btn-arrow { font-size: 20px; }
 
-    #overlay {
+    #canvas {
       position: fixed; inset: 0;
-      background: #000;
-      opacity: 0;
       pointer-events: none;
-      transition: opacity .6s ease;
       z-index: 999;
+      opacity: 0;
+      transition: opacity .15s;
     }
-    #overlay.active { opacity: 1; }
+    #canvas.active { opacity: 1; }
   </style>
 </head>
 <body>
-  <div id="overlay"></div>
-  <div class="page">
+  <canvas id="canvas"></canvas>
+  <div class="page" id="page">
     <img src="palette-run.png" alt="Palette Run" class="logo" />
-    <a href="landing.html" class="btn" onclick="fadeOut(event)">
+    <a href="landing.html" class="btn" onclick="dissolve(event)">
       Découvrir l'app <span class="btn-arrow">→</span>
     </a>
   </div>
+
   <script>
-    function fadeOut(e) {
+    function dissolve(e) {
       e.preventDefault()
-      const overlay = document.getElementById("overlay")
-      overlay.classList.add("active")
-      setTimeout(() => { window.location.href = "landing.html" }, 600)
+
+      const canvas = document.getElementById("canvas")
+      const ctx = canvas.getContext("2d")
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      canvas.classList.add("active")
+
+      const COLORS = ["#F5A623", "#D4891A", "#FEF3C7", "#ffffff", "#FBBF24"]
+      const COUNT = 280
+      const particles = []
+
+      const cx = canvas.width / 2
+      const cy = canvas.height / 2
+
+      for (let i = 0; i < COUNT; i++) {
+        const angle = Math.random() * Math.PI * 2
+        const radius = Math.random() * Math.min(canvas.width, canvas.height) * 0.38
+        particles.push({
+          x: cx + Math.cos(angle) * radius * Math.random(),
+          y: cy + Math.sin(angle) * radius * Math.random(),
+          vx: (Math.random() - 0.5) * 6,
+          vy: (Math.random() - 0.5) * 6 - 1.5,
+          size: Math.random() * 5 + 1.5,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          alpha: 1,
+          decay: Math.random() * 0.018 + 0.008,
+          rotation: Math.random() * Math.PI * 2,
+          rotSpeed: (Math.random() - 0.5) * 0.15,
+          shape: Math.random() > 0.5 ? "rect" : "circle"
+        })
+      }
+
+      // Fade out page content
+      document.getElementById("page").style.transition = "opacity .4s"
+      document.getElementById("page").style.opacity = "0"
+
+      let redirected = false
+      const start = performance.now()
+
+      function draw(now) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        let alive = false
+        for (const p of particles) {
+          if (p.alpha <= 0) continue
+          alive = true
+          ctx.save()
+          ctx.globalAlpha = p.alpha
+          ctx.fillStyle = p.color
+          ctx.translate(p.x, p.y)
+          ctx.rotate(p.rotation)
+          if (p.shape === "rect") {
+            ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6)
+          } else {
+            ctx.beginPath()
+            ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2)
+            ctx.fill()
+          }
+          ctx.restore()
+
+          p.x += p.vx
+          p.y += p.vy
+          p.vy += 0.08
+          p.vx *= 0.98
+          p.rotation += p.rotSpeed
+          p.alpha -= p.decay
+        }
+
+        if (!redirected && now - start > 900) {
+          redirected = true
+          window.location.href = "landing.html"
+        }
+
+        if (alive) requestAnimationFrame(draw)
+      }
+
+      requestAnimationFrame(draw)
     }
   </script>
 </body>
