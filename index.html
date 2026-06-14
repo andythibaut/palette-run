@@ -28,6 +28,7 @@
     }
 
     html { scroll-behavior: smooth; }
+    body.splash-active { overflow: hidden; }
 
     body {
       font-family: 'Inter', sans-serif;
@@ -284,8 +285,9 @@
     }
     #splash-logo {
       width: min(520px, 90vw); height: auto;
-      animation: splashIn .8s ease both;
+      opacity: 0; transition: opacity .5s ease;
     }
+    #splash-logo.loaded { opacity: 1; }
     #splash-btn {
       display: inline-flex; align-items: center; gap: 10px;
       background: #F5A623; color: #111827;
@@ -293,14 +295,10 @@
       font-size: 18px; font-weight: 700; font-family: 'Inter', sans-serif;
       padding: 18px 40px; cursor: pointer;
       box-shadow: 0 8px 32px rgba(245,166,35,0.4);
-      transition: transform .2s, box-shadow .2s;
-      animation: splashIn .8s ease .2s both;
+      opacity: 0; transition: transform .2s, box-shadow .2s, opacity .5s ease .2s;
     }
+    #splash-btn.loaded { opacity: 1; }
     #splash-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(245,166,35,0.55); }
-    @keyframes splashIn {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
 
     /* Canvas par-dessus tout pendant la désintégration */
     #shatter-canvas {
@@ -553,6 +551,7 @@ function shatter() {
 
     // Lancer la désintégration
     splash.style.display = "none"
+    document.body.classList.remove("splash-active")
     window.scrollTo(0, 0)
     startShatter(canvas, ctx, offscreen, W, H)
   }
@@ -565,11 +564,12 @@ function shatter() {
 }
 
 function startShatter(canvas, ctx, snapshot, W, H) {
-  const TILE = Math.round(W / 22)   // taille d'une tuile carrée ~50px sur desktop
+  const isMobile = W < 768
+  const TILE = Math.round(W / (isMobile ? 12 : 22))
   const COLS = Math.ceil(W / TILE)
   const ROWS = Math.ceil(H / TILE)
   const TW = W / COLS
-  const TH = TW                      // carré
+  const TH = TW
 
   const tiles = []
   for (let r = 0; r < ROWS; r++) {
@@ -655,6 +655,22 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach(el => { if (el.isIntersecting) el.target.classList.add("visible") })
 }, { threshold: 0.08 })
 document.querySelectorAll(".reveal").forEach(el => observer.observe(el))
+
+// Apparition logo + bouton après chargement
+const splashLogo = document.getElementById("splash-logo")
+const splashBtn  = document.getElementById("splash-btn")
+function revealSplash() {
+  splashLogo.classList.add("loaded")
+  splashBtn.classList.add("loaded")
+}
+if (splashLogo.complete && splashLogo.naturalWidth > 0) {
+  requestAnimationFrame(revealSplash)
+} else {
+  splashLogo.addEventListener("load", revealSplash)
+}
+
+// Bloquer le scroll tant que le splash est visible
+document.body.classList.add("splash-active")
 </script>
 </body>
 </html>
