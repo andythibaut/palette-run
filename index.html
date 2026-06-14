@@ -32,6 +32,7 @@
       color: var(--dark);
       background: var(--white);
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
     /* ── Nav ── */
@@ -40,25 +41,21 @@
       background: rgba(255,255,255,0.95);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 64px;
+      padding: 0 24px; height: 64px;
       display: flex; align-items: center; justify-content: space-between;
     }
-
     .nav-logo {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 22px; font-weight: 900; letter-spacing: 1px;
       color: var(--dark); text-decoration: none;
     }
     .nav-logo span { color: var(--amber); }
-
     .nav-links { display: flex; gap: 28px; align-items: center; }
     .nav-links a {
       text-decoration: none; font-size: 14px; font-weight: 500;
       color: var(--muted); transition: color .2s;
     }
     .nav-links a:hover { color: var(--dark); }
-
     .btn-nav {
       background: var(--amber); color: var(--white);
       border: none; border-radius: 10px;
@@ -73,37 +70,29 @@
       background: linear-gradient(160deg, #FFFBF0 0%, #FFFFFF 60%);
       border-bottom: 1px solid var(--border);
     }
-
     .hero-inner {
       max-width: 1100px; margin: 0 auto;
       display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
     }
-
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
       background: var(--amber-light); color: #92400E;
       font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-      padding: 6px 14px; border-radius: 20px;
-      margin-bottom: 24px;
+      padding: 6px 14px; border-radius: 20px; margin-bottom: 24px;
     }
-
     .hero h1 {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: clamp(44px, 5.5vw, 72px);
       font-weight: 900; line-height: 1.0;
       letter-spacing: -1px; margin-bottom: 8px;
     }
-
     .hero h1 .accent { color: var(--amber); }
-
     .hero-tagline {
       font-size: clamp(16px, 2vw, 20px);
       color: var(--muted); line-height: 1.6;
       margin-bottom: 36px; max-width: 460px;
     }
-
     .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
-
     .btn-primary {
       background: var(--amber); color: var(--white);
       border: none; border-radius: 14px;
@@ -114,7 +103,6 @@
       box-shadow: 0 4px 20px rgba(245,166,35,0.35);
     }
     .btn-primary:hover { background: var(--amber-dark); transform: translateY(-1px); }
-
     .btn-secondary {
       background: var(--white); color: var(--dark);
       border: 2px solid var(--border); border-radius: 14px;
@@ -124,27 +112,21 @@
       transition: border-color .2s;
     }
     .btn-secondary:hover { border-color: var(--amber); }
-
     .hero-proof {
       display: flex; gap: 28px; flex-wrap: wrap;
       padding-top: 32px; border-top: 1px solid var(--border);
     }
-
     .proof-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
     .proof-icon { font-size: 18px; }
     .proof-text { color: var(--muted); }
     .proof-text strong { color: var(--dark); }
-
     .hero-visual { position: relative; }
-
     .dashboard-card {
-      background: white;
-      border-radius: 24px;
+      background: white; border-radius: 24px;
       border: 1px solid var(--border);
       box-shadow: 0 20px 60px rgba(0,0,0,0.10);
       overflow: hidden;
     }
-
     .dash-header {
       background: var(--dark); color: white;
       padding: 14px 20px;
@@ -156,23 +138,16 @@
       font-size: 10px; font-weight: 700;
       padding: 3px 8px; border-radius: 20px;
     }
-
     .dash-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
     .dash-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-    .dash-stat {
-      background: var(--light); border-radius: 12px; padding: 12px;
-      text-align: center;
-    }
+    .dash-stat { background: var(--light); border-radius: 12px; padding: 12px; text-align: center; }
     .dash-stat-val {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 22px; font-weight: 900; color: var(--amber);
     }
     .dash-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
     .dash-annonce { background: var(--light); border-radius: 12px; padding: 14px; }
     .dash-annonce-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
-
     .driver-row {
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 0; border-bottom: 1px solid var(--border);
@@ -181,8 +156,7 @@
     .driver-info { display: flex; align-items: center; gap: 10px; }
     .driver-avatar {
       width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
     }
     .driver-avatar.a { background: #FEF3C7; }
     .driver-avatar.b { background: #EFF6FF; }
@@ -190,96 +164,40 @@
     .driver-name { font-size: 12px; font-weight: 700; }
     .driver-type { font-size: 10px; color: var(--muted); }
     .driver-actions { display: flex; gap: 6px; }
-    .driver-btn {
-      font-size: 10px; font-weight: 700; padding: 5px 10px;
-      border-radius: 8px; border: none; cursor: pointer;
-    }
+    .driver-btn { font-size: 10px; font-weight: 700; padding: 5px 10px; border-radius: 8px; border: none; cursor: pointer; }
     .driver-btn.accept { background: #22C55E; color: white; }
     .driver-btn.refuse { background: var(--light); color: var(--muted); }
 
     /* ── Sections ── */
     section { padding: 88px 24px; }
     .section-inner { max-width: 1100px; margin: 0 auto; }
-    .section-eyebrow {
-      font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--amber); margin-bottom: 12px;
-    }
-    .section-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(32px, 4vw, 52px); font-weight: 900;
-      line-height: 1.05; margin-bottom: 16px;
-    }
+    .section-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--amber); margin-bottom: 12px; }
+    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(32px, 4vw, 52px); font-weight: 900; line-height: 1.05; margin-bottom: 16px; }
     .section-sub { font-size: 17px; color: var(--muted); max-width: 520px; line-height: 1.7; }
-
     .why-bg { background: var(--light); }
-    .why-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr);
-      gap: 24px; margin-top: 52px;
-    }
-    .why-card {
-      background: white; border-radius: 20px; padding: 28px;
-      border: 1px solid var(--border);
-      transition: box-shadow .2s, transform .2s;
-    }
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 52px; }
+    .why-card { background: white; border-radius: 20px; padding: 28px; border: 1px solid var(--border); transition: box-shadow .2s, transform .2s; }
     .why-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-2px); }
     .why-icon { font-size: 36px; margin-bottom: 16px; display: block; }
     .why-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
     .why-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
-
-    .steps-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 0; margin-top: 52px; position: relative;
-    }
-    .steps-grid::before {
-      content: '';
-      position: absolute; top: 26px; left: 10%; right: 10%; height: 2px;
-      background: var(--border); z-index: 0;
-    }
+    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 52px; position: relative; }
+    .steps-grid::before { content: ''; position: absolute; top: 26px; left: 10%; right: 10%; height: 2px; background: var(--border); z-index: 0; }
     .step { text-align: center; padding: 0 16px; position: relative; z-index: 1; }
-    .step-num {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: var(--amber); color: white;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px; border: 4px solid white;
-      box-shadow: 0 0 0 2px var(--border);
-    }
+    .step-num { width: 52px; height: 52px; border-radius: 50%; background: var(--amber); color: white; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 4px solid white; box-shadow: 0 0 0 2px var(--border); }
     .step-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
     .step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
-
     .roles-container { margin-top: 52px; display: flex; flex-direction: column; gap: 24px; }
-    .role-main {
-      background: var(--dark); border-radius: 24px; padding: 40px;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
-      color: white;
-    }
-    .role-main .role-badge {
-      display: inline-block; background: var(--amber); color: var(--dark);
-      font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px;
-      margin-bottom: 20px;
-    }
-    .role-main h3 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 36px; font-weight: 900; line-height: 1.1; margin-bottom: 12px;
-    }
+    .role-main { background: var(--dark); border-radius: 24px; padding: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; color: white; }
+    .role-main .role-badge { display: inline-block; background: var(--amber); color: var(--dark); font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; margin-bottom: 20px; }
+    .role-main h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; line-height: 1.1; margin-bottom: 12px; }
     .role-main p { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.7; margin-bottom: 24px; }
     .role-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
     .role-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: rgba(255,255,255,.8); }
-    .role-list li::before {
-      content: '✓'; min-width: 20px; height: 20px;
-      background: var(--amber); color: var(--dark); font-weight: 900; font-size: 11px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 1px;
-    }
-    .role-visual {
-      background: rgba(255,255,255,.05); border-radius: 16px; padding: 20px;
-      display: flex; flex-direction: column; gap: 12px;
-    }
+    .role-list li::before { content: '✓'; min-width: 20px; height: 20px; background: var(--amber); color: var(--dark); font-weight: 900; font-size: 11px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+    .role-visual { background: rgba(255,255,255,.05); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
     .mini-stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .mini-stat {
-      background: rgba(255,255,255,.08); border-radius: 10px; padding: 12px;
-      text-align: center;
-    }
+    .mini-stat { background: rgba(255,255,255,.08); border-radius: 10px; padding: 12px; text-align: center; }
     .mini-stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; color: var(--amber); }
     .mini-stat-label { font-size: 10px; color: rgba(255,255,255,.5); margin-top: 2px; }
     .mini-annonce { background: rgba(255,255,255,.08); border-radius: 10px; padding: 12px; }
@@ -288,105 +206,50 @@
     .mini-annonce-label { color: rgba(255,255,255,.5); }
     .mini-annonce-val { font-weight: 700; color: white; }
     .mini-annonce-val.amber { color: var(--amber); }
-
-    .role-secondary {
-      background: var(--blue-light); border-radius: 20px; padding: 28px 32px;
-      display: flex; align-items: center; gap: 32px; border: 1px solid #BFDBFE;
-    }
+    .role-secondary { background: var(--blue-light); border-radius: 20px; padding: 28px 32px; display: flex; align-items: center; gap: 32px; border: 1px solid #BFDBFE; }
     .role-secondary-icon { font-size: 40px; }
     .role-secondary-content { flex: 1; }
-    .role-secondary-badge {
-      display: inline-block; background: var(--blue); color: white;
-      font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px;
-    }
+    .role-secondary-badge { display: inline-block; background: var(--blue); color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; }
     .role-secondary h3 { font-size: 18px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
     .role-secondary p { font-size: 14px; color: #1E40AF; opacity: .7; line-height: 1.6; }
-
-    .credits-layout {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
-      margin-top: 52px; align-items: start;
-    }
-    .pack-card {
-      background: white; border-radius: 16px; padding: 20px 24px;
-      border: 2px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px; transition: border-color .2s;
-    }
+    .credits-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 52px; align-items: start; }
+    .pack-card { background: white; border-radius: 16px; padding: 20px 24px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; transition: border-color .2s; }
     .pack-card:hover { border-color: var(--amber); }
     .pack-card.popular { border-color: var(--amber); background: #FFFBEB; }
     .pack-label { font-size: 11px; font-weight: 700; color: var(--amber); margin-bottom: 3px; }
     .pack-name { font-size: 17px; font-weight: 900; }
     .pack-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
     .pack-price { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; }
-
     .credits-table { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
     .credits-table-header { background: var(--dark); color: white; padding: 14px 20px; font-size: 13px; font-weight: 700; }
-    .credits-table-row {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 14px;
-    }
+    .credits-table-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
     .credits-table-row:last-child { border-bottom: none; }
     .credits-table-row span:first-child { color: var(--muted); }
     .credits-table-row span:last-child { font-weight: 700; color: var(--dark); }
     .credits-table-row span.green { color: #15803D; }
-    .credits-table-row span.amber { color: #B45309; }
-
-    .cta-section {
-      background: var(--amber); color: var(--dark); text-align: center; padding: 88px 24px;
-    }
-    .cta-section h2 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(36px, 5vw, 60px); font-weight: 900;
-      margin-bottom: 16px; line-height: 1.05;
-    }
+    .cta-section { background: var(--amber); color: var(--dark); text-align: center; padding: 88px 24px; }
+    .cta-section h2 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(36px, 5vw, 60px); font-weight: 900; margin-bottom: 16px; line-height: 1.05; }
     .cta-section p { font-size: 18px; color: rgba(17,24,39,.7); margin-bottom: 40px; }
-
     .store-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .store-btn {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--dark); color: white;
-      border: none; border-radius: 14px;
-      padding: 14px 24px; cursor: pointer;
-      text-decoration: none; transition: transform .15s, background .2s;
-      min-width: 180px;
-    }
+    .store-btn { display: flex; align-items: center; gap: 12px; background: var(--dark); color: white; border: none; border-radius: 14px; padding: 14px 24px; cursor: pointer; text-decoration: none; transition: transform .15s, background .2s; min-width: 180px; }
     .store-btn:hover { transform: translateY(-2px); background: #1F2937; }
     .store-btn-icon { font-size: 26px; }
     .store-btn-sub { font-size: 10px; color: rgba(255,255,255,.5); }
     .store-btn-name { font-size: 15px; font-weight: 700; }
     .cta-note { margin-top: 20px; font-size: 13px; color: rgba(17,24,39,.5); }
-
-    .contact-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
-      align-items: start; margin-top: 52px;
-    }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; margin-top: 52px; }
     .contact-info h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
     .contact-info p { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
     .contact-item { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; font-size: 15px; }
-    .contact-icon {
-      width: 40px; height: 40px; border-radius: 10px;
-      background: var(--amber-light); display: flex; align-items: center; justify-content: center; font-size: 18px;
-    }
+    .contact-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--amber-light); display: flex; align-items: center; justify-content: center; font-size: 18px; }
     .contact-form { display: flex; flex-direction: column; gap: 14px; }
     .form-label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 5px; }
-    .form-input, .form-textarea {
-      width: 100%; border: 1.5px solid var(--border); border-radius: 12px;
-      padding: 12px 16px; font-size: 15px; font-family: 'Inter', sans-serif;
-      outline: none; transition: border-color .2s; color: var(--dark);
-    }
+    .form-input, .form-textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 15px; font-family: 'Inter', sans-serif; outline: none; transition: border-color .2s; color: var(--dark); }
     .form-input:focus, .form-textarea:focus { border-color: var(--amber); }
     .form-textarea { resize: vertical; min-height: 110px; }
-    .form-submit {
-      background: var(--amber); color: var(--dark); border: none;
-      border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700;
-      cursor: pointer; transition: background .2s;
-    }
+    .form-submit { background: var(--amber); color: var(--dark); border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .2s; }
     .form-submit:hover { background: var(--amber-dark); color: white; }
-
-    footer {
-      background: var(--dark); color: rgba(255,255,255,.35);
-      padding: 28px 24px; text-align: center; font-size: 13px;
-    }
+    footer { background: var(--dark); color: rgba(255,255,255,.35); padding: 28px 24px; text-align: center; font-size: 13px; }
     footer a { color: var(--amber); text-decoration: none; }
 
     @media (max-width: 900px) {
@@ -409,54 +272,50 @@
     .reveal { opacity: 0; transform: translateY(24px); transition: opacity .5s ease, transform .5s ease; }
     .reveal.visible { opacity: 1; transform: translateY(0); }
 
-    /* ── Splash overlay ── */
+    /* ── Splash ── */
     #splash {
       position: fixed; inset: 0; z-index: 9999;
       background: #000;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 48px; padding: 40px 24px;
-      transition: opacity .7s ease;
     }
-    #splash.hiding { opacity: 0; pointer-events: none; }
-
     #splash-logo {
-      width: min(520px, 90vw);
-      height: auto;
-      animation: splashFadeIn .8s ease both;
+      width: min(520px, 90vw); height: auto;
+      animation: splashIn .8s ease both;
     }
-
     #splash-btn {
       display: inline-flex; align-items: center; gap: 10px;
       background: #F5A623; color: #111827;
-      text-decoration: none; border: none;
+      border: none; border-radius: 16px;
       font-size: 18px; font-weight: 700; font-family: 'Inter', sans-serif;
-      padding: 18px 40px; border-radius: 16px;
-      cursor: pointer;
-      transition: transform .2s, box-shadow .2s;
+      padding: 18px 40px; cursor: pointer;
       box-shadow: 0 8px 32px rgba(245,166,35,0.4);
-      animation: splashFadeIn .8s ease .2s both;
+      transition: transform .2s, box-shadow .2s;
+      animation: splashIn .8s ease .2s both;
     }
     #splash-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(245,166,35,0.55); }
-
-    @keyframes splashFadeIn {
+    @keyframes splashIn {
       from { opacity: 0; transform: translateY(16px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    #splash-canvas {
-      position: absolute; inset: 0;
-      pointer-events: none;
+    /* Canvas par-dessus tout pendant la désintégration */
+    #shatter-canvas {
+      position: fixed; inset: 0; z-index: 99999;
+      pointer-events: none; display: none;
     }
   </style>
 </head>
 <body>
 
+<!-- Canvas désintégration -->
+<canvas id="shatter-canvas"></canvas>
+
 <!-- ═══ SPLASH ═══ -->
 <div id="splash">
-  <canvas id="splash-canvas"></canvas>
   <img id="splash-logo" src="palette-run.png" alt="Palette Run" />
-  <button id="splash-btn" onclick="launchDissolve()">
+  <button id="splash-btn" onclick="shatter()">
     Découvrir l'app <span style="font-size:20px">→</span>
   </button>
 </div>
@@ -484,18 +343,9 @@
         <a href="#comment" class="btn-secondary">Comment ça marche →</a>
       </div>
       <div class="hero-proof">
-        <div class="proof-item">
-          <span class="proof-icon">🎁</span>
-          <span class="proof-text"><strong>1 000 crédits</strong> offerts</span>
-        </div>
-        <div class="proof-item">
-          <span class="proof-icon">📞</span>
-          <span class="proof-text"><strong>Zéro appel</strong> téléphonique</span>
-        </div>
-        <div class="proof-item">
-          <span class="proof-icon">⏱</span>
-          <span class="proof-text"><strong>30 secondes</strong> pour publier</span>
-        </div>
+        <div class="proof-item"><span class="proof-icon">🎁</span><span class="proof-text"><strong>1 000 crédits</strong> offerts</span></div>
+        <div class="proof-item"><span class="proof-icon">📞</span><span class="proof-text"><strong>Zéro appel</strong> téléphonique</span></div>
+        <div class="proof-item"><span class="proof-icon">⏱</span><span class="proof-text"><strong>30 secondes</strong> pour publier</span></div>
       </div>
     </div>
     <div class="hero-visual">
@@ -506,57 +356,15 @@
         </div>
         <div class="dash-body">
           <div class="dash-stats">
-            <div class="dash-stat">
-              <div class="dash-stat-val">24</div>
-              <div class="dash-stat-label">palettes</div>
-            </div>
-            <div class="dash-stat">
-              <div class="dash-stat-val">72 €</div>
-              <div class="dash-stat-label">prix du lot</div>
-            </div>
+            <div class="dash-stat"><div class="dash-stat-val">24</div><div class="dash-stat-label">palettes</div></div>
+            <div class="dash-stat"><div class="dash-stat-val">72 €</div><div class="dash-stat-label">prix du lot</div></div>
           </div>
           <div class="dash-annonce">
             <div class="dash-annonce-title">3 demandes reçues</div>
             <div style="display:flex;flex-direction:column;gap:8px;">
-              <div class="driver-row">
-                <div class="driver-info">
-                  <div class="driver-avatar a">🚗</div>
-                  <div>
-                    <div class="driver-name">Marc D.</div>
-                    <div class="driver-type">VL · ⭐ 4,9</div>
-                  </div>
-                </div>
-                <div class="driver-actions">
-                  <button class="driver-btn accept">✓ Autoriser</button>
-                  <button class="driver-btn refuse">✕</button>
-                </div>
-              </div>
-              <div class="driver-row">
-                <div class="driver-info">
-                  <div class="driver-avatar b">🚛</div>
-                  <div>
-                    <div class="driver-name">Sophie L.</div>
-                    <div class="driver-type">Porteur · ⭐ 4,7</div>
-                  </div>
-                </div>
-                <div class="driver-actions">
-                  <button class="driver-btn accept">✓ Autoriser</button>
-                  <button class="driver-btn refuse">✕</button>
-                </div>
-              </div>
-              <div class="driver-row">
-                <div class="driver-info">
-                  <div class="driver-avatar c">🚚</div>
-                  <div>
-                    <div class="driver-name">Thomas R.</div>
-                    <div class="driver-type">Semi · ⭐ 4,8</div>
-                  </div>
-                </div>
-                <div class="driver-actions">
-                  <button class="driver-btn accept">✓ Autoriser</button>
-                  <button class="driver-btn refuse">✕</button>
-                </div>
-              </div>
+              <div class="driver-row"><div class="driver-info"><div class="driver-avatar a">🚗</div><div><div class="driver-name">Marc D.</div><div class="driver-type">VL · ⭐ 4,9</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
+              <div class="driver-row"><div class="driver-info"><div class="driver-avatar b">🚛</div><div><div class="driver-name">Sophie L.</div><div class="driver-type">Porteur · ⭐ 4,7</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
+              <div class="driver-row"><div class="driver-info"><div class="driver-avatar c">🚚</div><div><div class="driver-name">Thomas R.</div><div class="driver-type">Semi · ⭐ 4,8</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
             </div>
           </div>
         </div>
@@ -696,101 +504,147 @@
 </footer>
 
 <script>
-  /* ── Splash dissolution ── */
-  function launchDissolve() {
-    const splash = document.getElementById("splash")
-    const canvas = document.getElementById("splash-canvas")
-    const ctx = canvas.getContext("2d")
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+async function shatter() {
+  const splash = document.getElementById("splash")
+  const canvas = document.getElementById("shatter-canvas")
+  const ctx = canvas.getContext("2d")
 
-    const COLORS = ["#F5A623", "#D4891A", "#FEF3C7", "#ffffff", "#FBBF24", "#F59E0B"]
-    const COUNT = 320
-    const particles = []
-    const cx = canvas.width / 2
-    const cy = canvas.height / 2
+  const W = window.innerWidth
+  const H = window.innerHeight
+  canvas.width = W
+  canvas.height = H
+  canvas.style.display = "block"
 
-    for (let i = 0; i < COUNT; i++) {
-      const angle = Math.random() * Math.PI * 2
-      const r = Math.random() * Math.min(canvas.width, canvas.height) * 0.42
-      particles.push({
-        x: cx + Math.cos(angle) * r * Math.random(),
-        y: cy + Math.sin(angle) * r * Math.random(),
-        vx: (Math.random() - 0.5) * 7,
-        vy: (Math.random() - 0.5) * 7 - 2,
-        size: Math.random() * 6 + 1.5,
-        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+  // Capture le splash via html2canvas-like : on dessine un rect noir + texte simplifié
+  // On utilise une snapshot couleur unie du splash (noir) découpée en tuiles
+  const COLS = 14
+  const ROWS = 10
+  const TW = W / COLS
+  const TH = H / ROWS
+
+  // Créer les tuiles
+  const tiles = []
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      // Délai en vague depuis le centre
+      const cx = c - COLS / 2
+      const cy = r - ROWS / 2
+      const dist = Math.sqrt(cx * cx + cy * cy)
+      const delay = dist * 55 + Math.random() * 60
+
+      tiles.push({
+        sx: c * TW, sy: r * TH,   // position source
+        x: c * TW,  y: r * TH,   // position courante
+        w: TW + 1,  h: TH + 1,
+        // vélocités
+        vx: (Math.random() - 0.5) * 4,
+        vy: Math.random() * 3 + 1,
+        vr: (Math.random() - 0.5) * 0.25,
+        rotation: 0,
         alpha: 1,
-        decay: Math.random() * 0.016 + 0.007,
-        rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.18,
-        shape: Math.random() > 0.45 ? "rect" : "circle"
+        delay,
+        started: false,
+        elapsed: 0
       })
     }
+  }
 
-    // Fade out logo + button
-    document.getElementById("splash-logo").style.transition = "opacity .35s"
-    document.getElementById("splash-logo").style.opacity = "0"
-    document.getElementById("splash-btn").style.transition = "opacity .35s"
-    document.getElementById("splash-btn").style.opacity = "0"
+  // Dessiner le splash sur le canvas (simple fond noir + on garde le DOM visible dessous)
+  // Le canvas recouvre le splash, on dessine les tuiles noires
+  // puis on cache le splash DOM immédiatement
+  splash.style.display = "none"
 
-    // Fade out the whole splash after particles
-    setTimeout(() => {
-      splash.classList.add("hiding")
-      setTimeout(() => { splash.style.display = "none" }, 700)
-    }, 950)
+  // Fond initial : tuiles noires pleines
+  ctx.fillStyle = "#000000"
+  ctx.fillRect(0, 0, W, H)
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      let alive = false
-      for (const p of particles) {
-        if (p.alpha <= 0) continue
-        alive = true
+  // Optionnel : redessiner le logo centré (texte de substitution car pas d'accès cross-origin)
+  // On skippe et on anime directement les tuiles noires
+
+  let last = null
+  const DURATION = 1400 // ms total avant suppression
+
+  function animate(ts) {
+    if (!last) last = ts
+    const dt = ts - last
+    last = ts
+
+    ctx.clearRect(0, 0, W, H)
+
+    let anyActive = false
+
+    for (const t of tiles) {
+      t.elapsed += dt
+
+      if (t.elapsed < t.delay) {
+        // Tuile encore en place, dessiner statique
         ctx.save()
-        ctx.globalAlpha = p.alpha
-        ctx.fillStyle = p.color
-        ctx.translate(p.x, p.y)
-        ctx.rotate(p.rotation)
-        if (p.shape === "rect") {
-          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.55)
-        } else {
-          ctx.beginPath()
-          ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2)
-          ctx.fill()
-        }
+        ctx.globalAlpha = 1
+        ctx.fillStyle = "#000"
+        ctx.fillRect(t.sx, t.sy, t.w, t.h)
         ctx.restore()
-        p.x += p.vx
-        p.y += p.vy
-        p.vy += 0.07
-        p.vx *= 0.985
-        p.rotation += p.rotSpeed
-        p.alpha -= p.decay
+        anyActive = true
+        continue
       }
-      if (alive) requestAnimationFrame(draw)
+
+      if (!t.started) { t.started = true }
+
+      // Mouvement
+      t.x  += t.vx
+      t.y  += t.vy
+      t.vy += 0.18          // gravité
+      t.vx *= 0.995
+      t.rotation += t.vr
+      t.alpha -= 0.022
+
+      if (t.alpha <= 0) continue
+      anyActive = true
+
+      ctx.save()
+      ctx.globalAlpha = t.alpha
+      // Rotation autour du centre de la tuile
+      ctx.translate(t.x + t.w / 2, t.y + t.h / 2)
+      ctx.rotate(t.rotation)
+      ctx.fillStyle = "#000"
+      ctx.fillRect(-t.w / 2, -t.h / 2, t.w, t.h)
+
+      // Fine ligne amber sur le bord pour l'effet "verre"
+      ctx.strokeStyle = "rgba(245,166,35,0.35)"
+      ctx.lineWidth = 0.5
+      ctx.strokeRect(-t.w / 2, -t.h / 2, t.w, t.h)
+      ctx.restore()
     }
-    requestAnimationFrame(draw)
+
+    if (anyActive) {
+      requestAnimationFrame(animate)
+    } else {
+      canvas.style.display = "none"
+    }
   }
 
-  /* ── Contact form ── */
-  function handleSubmit(e) {
-    e.preventDefault()
-    const btn = e.target.querySelector(".form-submit")
-    btn.textContent = "✅ Message envoyé !"
-    btn.style.background = "#22C55E"
-    btn.style.color = "white"
-    setTimeout(() => {
-      btn.textContent = "Envoyer"
-      btn.style.background = ""
-      btn.style.color = ""
-      e.target.reset()
-    }, 3000)
-  }
+  requestAnimationFrame(animate)
+}
 
-  /* ── Scroll reveal ── */
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(el => { if (el.isIntersecting) el.target.classList.add("visible") })
-  }, { threshold: 0.08 })
-  document.querySelectorAll(".reveal").forEach(el => observer.observe(el))
+/* ── Contact form ── */
+function handleSubmit(e) {
+  e.preventDefault()
+  const btn = e.target.querySelector(".form-submit")
+  btn.textContent = "✅ Message envoyé !"
+  btn.style.background = "#22C55E"
+  btn.style.color = "white"
+  setTimeout(() => {
+    btn.textContent = "Envoyer"
+    btn.style.background = ""
+    btn.style.color = ""
+    e.target.reset()
+  }, 3000)
+}
+
+/* ── Scroll reveal ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(el => { if (el.isIntersecting) el.target.classList.add("visible") })
+}, { threshold: 0.08 })
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el))
 </script>
 </body>
 </html>
