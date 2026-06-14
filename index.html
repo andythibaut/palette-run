@@ -567,18 +567,16 @@ function shatter() {
 }
 
 function startShatter(canvas, ctx, snapshot, W, H) {
-  const COLS = 14
-  const ROWS = 10
+  const TILE = Math.round(W / 22)   // taille d'une tuile carrée ~50px sur desktop
+  const COLS = Math.ceil(W / TILE)
+  const ROWS = Math.ceil(H / TILE)
   const TW = W / COLS
-  const TH = H / ROWS
+  const TH = TW                      // carré
 
   const tiles = []
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      const dcx = c - COLS / 2
-      const dcy = r - ROWS / 2
-      const dist = Math.sqrt(dcx * dcx + dcy * dcy)
-      const delay = dist * 55 + Math.random() * 60
+      const delay = r * 40 + Math.random() * 50
       tiles.push({
         sx: c * TW, sy: r * TH,
         x:  c * TW, y:  r * TH,
