@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -515,111 +516,90 @@ async function shatter() {
   canvas.height = H
   canvas.style.display = "block"
 
-  // Capture le splash via html2canvas-like : on dessine un rect noir + texte simplifié
-  // On utilise une snapshot couleur unie du splash (noir) découpée en tuiles
+  // Capture le splash avec html2canvas
+  const snapshot = await html2canvas(splash, {
+    backgroundColor: "#000000",
+    scale: window.devicePixelRatio || 1,
+    useCORS: true,
+    allowTaint: true,
+    width: W,
+    height: H
+  })
+
+  splash.style.display = "none"
+
   const COLS = 14
   const ROWS = 10
   const TW = W / COLS
   const TH = H / ROWS
+  const PR = window.devicePixelRatio || 1
 
-  // Créer les tuiles
   const tiles = []
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
-      // Délai en vague depuis le centre
-      const cx = c - COLS / 2
-      const cy = r - ROWS / 2
-      const dist = Math.sqrt(cx * cx + cy * cy)
+      const dcx = c - COLS / 2
+      const dcy = r - ROWS / 2
+      const dist = Math.sqrt(dcx * dcx + dcy * dcy)
       const delay = dist * 55 + Math.random() * 60
-
       tiles.push({
-        sx: c * TW, sy: r * TH,   // position source
-        x: c * TW,  y: r * TH,   // position courante
+        sx: c * TW, sy: r * TH,
+        x:  c * TW, y:  r * TH,
         w: TW + 1,  h: TH + 1,
-        // vélocités
-        vx: (Math.random() - 0.5) * 4,
-        vy: Math.random() * 3 + 1,
-        vr: (Math.random() - 0.5) * 0.25,
+        vx: (Math.random() - 0.5) * 5,
+        vy: Math.random() * 2 + 0.5,
+        vr: (Math.random() - 0.5) * 0.22,
         rotation: 0,
         alpha: 1,
         delay,
-        started: false,
         elapsed: 0
       })
     }
   }
 
-  // Dessiner le splash sur le canvas (simple fond noir + on garde le DOM visible dessous)
-  // Le canvas recouvre le splash, on dessine les tuiles noires
-  // puis on cache le splash DOM immédiatement
-  splash.style.display = "none"
-
-  // Fond initial : tuiles noires pleines
-  ctx.fillStyle = "#000000"
-  ctx.fillRect(0, 0, W, H)
-
-  // Optionnel : redessiner le logo centré (texte de substitution car pas d'accès cross-origin)
-  // On skippe et on anime directement les tuiles noires
-
   let last = null
-  const DURATION = 1400 // ms total avant suppression
 
   function animate(ts) {
     if (!last) last = ts
     const dt = ts - last
     last = ts
-
     ctx.clearRect(0, 0, W, H)
-
     let anyActive = false
 
     for (const t of tiles) {
       t.elapsed += dt
 
       if (t.elapsed < t.delay) {
-        // Tuile encore en place, dessiner statique
-        ctx.save()
-        ctx.globalAlpha = 1
-        ctx.fillStyle = "#000"
-        ctx.fillRect(t.sx, t.sy, t.w, t.h)
-        ctx.restore()
+        ctx.drawImage(snapshot,
+          t.sx * PR, t.sy * PR, t.w * PR, t.h * PR,
+          t.sx,      t.sy,      t.w,      t.h)
         anyActive = true
         continue
       }
 
-      if (!t.started) { t.started = true }
-
-      // Mouvement
       t.x  += t.vx
       t.y  += t.vy
-      t.vy += 0.18          // gravité
-      t.vx *= 0.995
+      t.vy += 0.2
+      t.vx *= 0.993
       t.rotation += t.vr
-      t.alpha -= 0.022
-
+      t.alpha -= 0.020
       if (t.alpha <= 0) continue
       anyActive = true
 
       ctx.save()
       ctx.globalAlpha = t.alpha
-      // Rotation autour du centre de la tuile
       ctx.translate(t.x + t.w / 2, t.y + t.h / 2)
       ctx.rotate(t.rotation)
-      ctx.fillStyle = "#000"
-      ctx.fillRect(-t.w / 2, -t.h / 2, t.w, t.h)
-
-      // Fine ligne amber sur le bord pour l'effet "verre"
-      ctx.strokeStyle = "rgba(245,166,35,0.35)"
-      ctx.lineWidth = 0.5
+      ctx.drawImage(snapshot,
+        t.sx * PR, t.sy * PR, t.w * PR, t.h * PR,
+        -t.w / 2,  -t.h / 2,  t.w,      t.h)
+      ctx.strokeStyle = "rgba(245,166,35,0.45)"
+      ctx.lineWidth = 0.8
       ctx.strokeRect(-t.w / 2, -t.h / 2, t.w, t.h)
       ctx.restore()
     }
 
-    if (anyActive) {
-      requestAnimationFrame(animate)
-    } else {
-      canvas.style.display = "none"
-    }
+    if (anyActive) requestAnimationFrame(animate)
+    else canvas.style.display = "none"
   }
 
   requestAnimationFrame(animate)
