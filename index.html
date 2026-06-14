@@ -283,6 +283,16 @@
       align-items: center; justify-content: center;
       gap: 48px; padding: 40px 24px;
     }
+    #splash-spinner {
+      width: 40px; height: 40px;
+      border: 3px solid rgba(245,166,35,0.2);
+      border-top-color: #F5A623;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #splash-spinner.hidden { display: none; }
+
     #splash-logo {
       width: min(520px, 90vw); height: auto;
       opacity: 0; transition: opacity .5s ease;
@@ -314,6 +324,7 @@
 
 <!-- ═══ SPLASH ═══ -->
 <div id="splash">
+  <div id="splash-spinner"></div>
   <img id="splash-logo" src="palette-run.png" alt="Palette Run" />
   <button id="splash-btn" onclick="shatter()">
     Découvrir l'app <span style="font-size:20px">→</span>
@@ -660,6 +671,7 @@ document.querySelectorAll(".reveal").forEach(el => observer.observe(el))
 const splashLogo = document.getElementById("splash-logo")
 const splashBtn  = document.getElementById("splash-btn")
 function revealSplash() {
+  document.getElementById("splash-spinner").classList.add("hidden")
   splashLogo.classList.add("loaded")
   splashBtn.classList.add("loaded")
 }
