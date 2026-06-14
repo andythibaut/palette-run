@@ -1,31 +1,796 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#F5A623" />
-    <meta name="description" content="Palette Run — Bourse aux palettes entre chauffeurs et entreprises" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Palette Run" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
-    <title>Palette Run</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.0/mapbox-gl.css" rel="stylesheet" />
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-        })
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Palette Run — La bourse aux palettes entre chauffeurs et entreprises. Trouvez des palettes à récupérer près de chez vous." />
+  <meta name="theme-color" content="#F5A623" />
+  <title>Palette Run — Bourse aux palettes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber: #F5A623;
+      --amber-dark: #D4891A;
+      --dark: #111827;
+      --muted: #6B7280;
+      --light: #F9FAFB;
+      --border: #E5E7EB;
+      --white: #FFFFFF;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--dark);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 900; letter-spacing: 1px;
+      color: var(--dark);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--amber); }
+
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+    .nav-links a {
+      text-decoration: none; font-size: 14px; font-weight: 500;
+      color: var(--muted); transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--dark); }
+
+    .btn-nav {
+      background: var(--amber); color: var(--white);
+      border: none; border-radius: 10px;
+      padding: 10px 20px; font-size: 14px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: background .2s;
+    }
+    .btn-nav:hover { background: var(--amber-dark); }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 140px 24px 80px;
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      background: #FEF3C7; color: #92400E;
+      font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(42px, 5vw, 68px);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+    }
+    .hero h1 span { color: var(--amber); }
+
+    .hero-sub {
+      font-size: 18px; color: var(--muted); line-height: 1.7;
+      margin-bottom: 36px; max-width: 420px;
+    }
+
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--amber); color: var(--white);
+      border: none; border-radius: 14px;
+      padding: 16px 28px; font-size: 16px; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background .2s, transform .15s;
+      box-shadow: 0 4px 20px rgba(245,166,35,0.35);
+    }
+    .btn-primary:hover { background: var(--amber-dark); transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: var(--white); color: var(--dark);
+      border: 2px solid var(--border); border-radius: 14px;
+      padding: 14px 28px; font-size: 16px; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: border-color .2s;
+    }
+    .btn-secondary:hover { border-color: var(--amber); }
+
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 40px;
+      padding-top: 32px; border-top: 1px solid var(--border);
+    }
+    .stat-value {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 32px; font-weight: 900; color: var(--amber);
+    }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+    /* Mockup téléphone */
+    .hero-visual {
+      display: flex; justify-content: center; align-items: center;
+    }
+
+    .phone-mockup {
+      width: 260px; height: 520px;
+      background: var(--dark);
+      border-radius: 40px;
+      border: 6px solid #1F2937;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.08);
+      overflow: hidden; position: relative;
+    }
+
+    .phone-notch {
+      width: 80px; height: 22px;
+      background: var(--dark);
+      border-radius: 0 0 14px 14px;
+      margin: 0 auto;
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      z-index: 2;
+    }
+
+    .phone-screen {
+      width: 100%; height: 100%;
+      background: #F3F4F6;
+      padding: 32px 12px 12px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    .phone-header {
+      background: white; border-radius: 16px; padding: 12px;
+      font-size: 11px; font-weight: 700; color: var(--dark);
+    }
+    .phone-header-sub { font-size: 9px; color: var(--muted); margin-top: 2px; }
+
+    .phone-map {
+      flex: 1; background: #E5E7EB; border-radius: 12px;
+      position: relative; overflow: hidden;
+    }
+    .phone-map-bg {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #E8EFF5 0%, #D4DDE7 100%);
+    }
+    .map-road-h {
+      position: absolute; left: 0; right: 0; height: 6px;
+      background: white; opacity: .6;
+    }
+    .map-road-v {
+      position: absolute; top: 0; bottom: 0; width: 6px;
+      background: white; opacity: .6;
+    }
+
+    .map-pin {
+      position: absolute;
+      background: var(--amber); color: white;
+      border-radius: 8px; padding: 4px 7px;
+      font-size: 9px; font-weight: 800;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      opacity: .85;
+    }
+    .map-pin::after {
+      content: '';
+      position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--amber);
+    }
+    .map-pin.green { background: #22C55E; }
+    .map-pin.green::after { border-top-color: #22C55E; }
+
+    .phone-sheet {
+      background: white; border-radius: 16px; padding: 12px;
+    }
+    .sheet-title { font-size: 12px; font-weight: 900; color: var(--dark); }
+    .sheet-row { display: flex; gap: 6px; margin-top: 8px; }
+    .sheet-card {
+      flex: 1; background: #F3F4F6; border-radius: 8px; padding: 6px 8px;
+      font-size: 9px; color: var(--muted); font-weight: 600;
+    }
+    .sheet-card strong { display: block; font-size: 11px; color: var(--dark); font-weight: 800; }
+    .sheet-card.amber { background: #FFFBEB; }
+    .sheet-card.amber strong { color: #B45309; }
+    .sheet-btn {
+      margin-top: 8px; background: var(--amber); border-radius: 10px;
+      padding: 8px; text-align: center;
+      font-size: 10px; font-weight: 800; color: white;
+    }
+
+    /* ── Section base ── */
+    section { padding: 96px 24px; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-eyebrow {
+      font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--amber);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(32px, 4vw, 48px); font-weight: 900;
+      line-height: 1.1; margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 17px; color: var(--muted); max-width: 520px; line-height: 1.7;
+    }
+
+    /* ── Features ── */
+    .features-bg { background: var(--light); }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px; margin-top: 56px;
+    }
+
+    .feature-card {
+      background: white; border-radius: 20px; padding: 28px;
+      border: 1px solid var(--border);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+
+    .feature-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      background: #FEF3C7; display: flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 16px;
+    }
+    .feature-icon.blue { background: #EFF6FF; }
+    .feature-icon.green { background: #F0FFF4; }
+
+    .feature-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* ── Rôles ── */
+    .roles-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 56px;
+    }
+
+    .role-card {
+      border-radius: 24px; padding: 36px; border: 2px solid var(--border);
+    }
+    .role-card.driver { border-color: var(--amber); }
+    .role-card.company { border-color: #1E40AF; }
+
+    .role-badge {
+      display: inline-block; border-radius: 20px;
+      padding: 6px 14px; font-size: 12px; font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .role-badge.driver { background: #FEF3C7; color: #92400E; }
+    .role-badge.company { background: #EFF6FF; color: #1E40AF; }
+
+    .role-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 28px; font-weight: 900; margin-bottom: 12px;
+    }
+    .role-desc { font-size: 15px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+
+    .role-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .role-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; line-height: 1.5;
+    }
+    .role-list li::before {
+      content: '✓'; font-weight: 900; font-size: 13px;
+      min-width: 20px; height: 20px;
+      background: var(--amber); color: white;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .role-card.company .role-list li::before { background: #1E40AF; }
+
+    /* ── Comment ça marche ── */
+    .how-bg { background: var(--light); }
+
+    .steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0; margin-top: 56px; position: relative;
+    }
+
+    .step {
+      padding: 28px 24px; position: relative; text-align: center;
+    }
+
+    .step-num {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--amber); color: white;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 24px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .step-icon { font-size: 28px; margin-bottom: 12px; }
+    .step-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    .step-arrow {
+      position: absolute; right: -16px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px; color: var(--amber); z-index: 1;
+    }
+
+    /* ── Crédits ── */
+    .credits-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+      align-items: center; margin-top: 56px;
+    }
+
+    .credits-packs { display: flex; flex-direction: column; gap: 16px; }
+
+    .pack-card {
+      background: white; border-radius: 16px; padding: 20px 24px;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color .2s;
+    }
+    .pack-card:hover { border-color: var(--amber); }
+    .pack-card.popular { border-color: var(--amber); background: #FFFBEB; }
+
+    .pack-label { font-size: 12px; font-weight: 700; color: var(--amber); margin-bottom: 4px; }
+    .pack-name { font-size: 18px; font-weight: 900; }
+    .pack-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .pack-price { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; color: var(--dark); }
+    .pack-price span { font-size: 14px; font-weight: 500; color: var(--muted); }
+
+    .credits-info { padding: 36px; background: var(--dark); border-radius: 24px; color: white; }
+    .credits-info h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; margin-bottom: 16px; }
+    .credits-info p { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.7; margin-bottom: 16px; }
+    .credits-detail { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .credits-detail-item { display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+    .credits-detail-item span:first-child { color: rgba(255,255,255,.6); }
+    .credits-detail-item span:last-child { font-weight: 700; color: var(--amber); }
+
+    /* ── CTA ── */
+    .cta-section {
+      background: var(--dark); color: white; text-align: center;
+      padding: 96px 24px;
+    }
+    .cta-section h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(36px, 5vw, 56px); font-weight: 900;
+      margin-bottom: 16px; line-height: 1.1;
+    }
+    .cta-section h2 span { color: var(--amber); }
+    .cta-section p { font-size: 17px; color: rgba(255,255,255,.6); margin-bottom: 40px; }
+
+    .store-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .store-btn {
+      display: flex; align-items: center; gap: 12px;
+      background: white; color: var(--dark);
+      border: none; border-radius: 14px;
+      padding: 14px 24px; cursor: pointer;
+      text-decoration: none; transition: transform .15s;
+      min-width: 180px;
+    }
+    .store-btn:hover { transform: translateY(-2px); }
+    .store-btn-icon { font-size: 28px; }
+    .store-btn-text { text-align: left; }
+    .store-btn-sub { font-size: 11px; color: var(--muted); }
+    .store-btn-name { font-size: 16px; font-weight: 700; }
+
+    .cta-note { margin-top: 24px; font-size: 13px; color: rgba(255,255,255,.4); }
+
+    /* ── Contact ── */
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px;
+      align-items: start; margin-top: 56px;
+    }
+    .contact-info h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+    .contact-info p { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+    .contact-item { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; font-size: 15px; }
+    .contact-item-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: #FEF3C7; display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 13px; font-weight: 600; color: var(--dark); }
+    .form-input, .form-textarea {
+      border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 12px 16px; font-size: 15px; font-family: 'Inter', sans-serif;
+      outline: none; transition: border-color .2s;
+      background: white; color: var(--dark);
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--amber); }
+    .form-textarea { resize: vertical; min-height: 120px; }
+    .form-submit {
+      background: var(--amber); color: white; border: none;
+      border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+    }
+    .form-submit:hover { background: var(--amber-dark); }
+
+    /* ── Footer ── */
+    footer {
+      background: #0A0F1A; color: rgba(255,255,255,.4);
+      padding: 32px 24px; text-align: center; font-size: 13px;
+    }
+    footer a { color: var(--amber); text-decoration: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hero { grid-template-columns: 1fr; gap: 40px; padding: 100px 20px 60px; }
+      .hero-visual { display: none; }
+      .roles-grid { grid-template-columns: 1fr; }
+      .credits-grid { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .steps { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="nav-logo">PALETTE <span>RUN</span></a>
+  <div class="nav-links">
+    <a href="#fonctionnalites">Fonctionnalités</a>
+    <a href="#comment">Comment ça marche</a>
+    <a href="#credits">Crédits</a>
+    <a href="#contact">Contact</a>
+    <a href="#telecharger" class="btn-nav">Télécharger</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">🚚 Bourse aux palettes</div>
+    <h1>Des palettes<br>près de <span>chez vous</span></h1>
+    <p class="hero-sub">Palette Run connecte les chauffeurs qui cherchent des palettes avec les entreprises qui veulent s'en débarrasser. Simple, rapide, rentable.</p>
+    <div class="hero-actions">
+      <a href="#telecharger" class="btn-primary">📱 Télécharger l'app</a>
+      <a href="#comment" class="btn-secondary">Comment ça marche →</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="stat-value">1 000</div>
+        <div class="stat-label">crédits offerts</div>
+      </div>
+      <div>
+        <div class="stat-value">0 €</div>
+        <div class="stat-label">pour les entreprises</div>
+      </div>
+      <div>
+        <div class="stat-value">2 rôles</div>
+        <div class="stat-label">chauffeur / entreprise</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="phone-mockup">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-header">
+          📍 41 annonces
+          <div class="phone-header-sub">● Rentable &nbsp;&nbsp; ● Top affaire &nbsp;&nbsp; ● Perte</div>
+        </div>
+        <div class="phone-map">
+          <div class="phone-map-bg"></div>
+          <div class="map-road-h" style="top:35%"></div>
+          <div class="map-road-h" style="top:65%"></div>
+          <div class="map-road-v" style="left:30%"></div>
+          <div class="map-road-v" style="left:60%"></div>
+          <div class="map-pin green" style="top:20%;left:18%">8 pal.<br>+45€</div>
+          <div class="map-pin" style="top:38%;left:52%">12 pal.<br>+32€</div>
+          <div class="map-pin green" style="top:60%;left:28%">5 pal.<br>+18€</div>
+          <div class="map-pin" style="top:45%;left:68%">20 pal.<br>+77€</div>
+        </div>
+        <div class="phone-sheet">
+          <div class="sheet-title">Léguevin</div>
+          <div class="sheet-row">
+            <div class="sheet-card"><span>Quantité</span><strong>20 pal.</strong></div>
+            <div class="sheet-card amber"><span>Prix lot</span><strong>33,00 €</strong></div>
+            <div class="sheet-card"><span>Avant</span><strong>17h00</strong></div>
+          </div>
+          <div class="sheet-btn">📦 Réserver — 200 crédits</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fonctionnalités -->
+<section class="features-bg" id="fonctionnalites">
+  <div class="section-inner">
+    <div class="section-eyebrow">Fonctionnalités</div>
+    <h2 class="section-title">Tout ce qu'il faut,<br>rien de plus</h2>
+    <p class="section-sub">Une app pensée pour aller vite — trouver, réserver, récupérer.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🗺️</div>
+        <div class="feature-title">Carte en temps réel</div>
+        <div class="feature-desc">Visualisez toutes les annonces autour de vous sur une carte interactive. Filtrage automatique selon votre type de véhicule.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon blue">💰</div>
+        <div class="feature-title">Bénéfice visible d'un coup d'œil</div>
+        <div class="feature-desc">Chaque marqueur affiche le bénéfice potentiel en fonction de votre prix de revente. Plus besoin de calculer dans sa tête.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">⚡</div>
+        <div class="feature-title">Réservation instantanée</div>
+        <div class="feature-desc">Réservez en deux clics. Le commerçant reçoit une demande et vous autorise à venir. L'adresse exacte est révélée à la confirmation.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-title">Position floue avant validation</div>
+        <div class="feature-desc">L'adresse exacte du vendeur reste masquée jusqu'à validation. Confidentialité garantie pour les deux parties.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon blue">🏗️</div>
+        <div class="feature-title">Chargeur sur place</div>
+        <div class="feature-desc">Les annonces signalent si un chargeur est disponible sur place. Gagnez du temps à la planification.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">🔔</div>
+        <div class="feature-title">Notifications push</div>
+        <div class="feature-desc">Recevez une notification dès qu'une demande est acceptée ou qu'une nouvelle annonce correspond à votre profil.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Rôles -->
+<section id="roles">
+  <div class="section-inner">
+    <div class="section-eyebrow">Deux rôles</div>
+    <h2 class="section-title">Chauffeur ou entreprise,<br>l'app s'adapte</h2>
+    <p class="section-sub">Un compte unique, deux expériences distinctes selon votre profil.</p>
+
+    <div class="roles-grid">
+      <div class="role-card driver">
+        <div class="role-badge driver">🚚 Chauffeur</div>
+        <div class="role-title">Trouvez des palettes<br>sur votre route</div>
+        <div class="role-desc">Consultez la carte, évaluez le bénéfice, réservez et récupérez. Votre solde de crédits se recharge en quelques secondes.</div>
+        <ul class="role-list">
+          <li>Carte filtrée selon votre véhicule (VL, porteur, semi)</li>
+          <li>Bénéfice potentiel affiché sur chaque annonce</li>
+          <li>1 000 crédits offerts au départ</li>
+          <li>Remboursement automatique si non sélectionné</li>
+          <li>Historique de vos transactions</li>
+        </ul>
+      </div>
+
+      <div class="role-card company">
+        <div class="role-badge company">🏢 Entreprise</div>
+        <div class="role-title">Valorisez vos palettes<br>sans effort</div>
+        <div class="role-desc">Publiez une annonce en 30 secondes, choisissez votre acheteur, confirmez la récupération. Zéro appel téléphonique.</div>
+        <ul class="role-list">
+          <li>Publication d'annonce en quelques clics</li>
+          <li>Choix de l'acheteur parmi les demandes reçues</li>
+          <li>Adresse révélée seulement à la confirmation</li>
+          <li>Blacklist pour écarter les profils indésirables</li>
+          <li>1 000 crédits offerts au départ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Comment ça marche -->
+<section class="how-bg" id="comment">
+  <div class="section-inner">
+    <div class="section-eyebrow">Comment ça marche</div>
+    <h2 class="section-title">En 4 étapes</h2>
+    <p class="section-sub">Du repérage à la récupération, tout se passe dans l'app.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-icon">📱</div>
+        <div class="step-title">Téléchargez l'app</div>
+        <div class="step-desc">Disponible sur iOS et Android. Créez votre compte en 30 secondes avec Google.</div>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-icon">🗺️</div>
+        <div class="step-title">Consultez la carte</div>
+        <div class="step-desc">Voyez toutes les annonces disponibles près de vous avec leur bénéfice potentiel.</div>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-icon">📦</div>
+        <div class="step-title">Réservez</div>
+        <div class="step-desc">Envoyez une demande au vendeur. Il choisit son acheteur et vous valide.</div>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-icon">✅</div>
+        <div class="step-title">Récupérez</div>
+        <div class="step-desc">Rendez-vous sur place, le vendeur confirme la transaction. C'est réglé.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Crédits -->
+<section id="credits">
+  <div class="section-inner">
+    <div class="section-eyebrow">Tarifs</div>
+    <h2 class="section-title">Payez à l'usage,<br>pas à l'abonnement</h2>
+    <p class="section-sub">Un système de crédits simple — 10 crédits par palette réservée ou publiée. Rechargez quand vous voulez.</p>
+
+    <div class="credits-grid">
+      <div class="credits-packs">
+        <div class="pack-card">
+          <div>
+            <div class="pack-label">STARTER</div>
+            <div class="pack-name">1 000 crédits</div>
+            <div class="pack-detail">≈ 100 palettes</div>
+          </div>
+          <div class="pack-price">9,90 € <span></span></div>
+        </div>
+        <div class="pack-card popular">
+          <div>
+            <div class="pack-label">⭐ POPULAIRE</div>
+            <div class="pack-name">3 000 crédits</div>
+            <div class="pack-detail">≈ 300 palettes · économisez 16%</div>
+          </div>
+          <div class="pack-price">24,90 €</div>
+        </div>
+        <div class="pack-card">
+          <div>
+            <div class="pack-label">PRO</div>
+            <div class="pack-name">6 000 crédits</div>
+            <div class="pack-detail">≈ 600 palettes · économisez 25%</div>
+          </div>
+          <div class="pack-price">44,90 €</div>
+        </div>
+      </div>
+
+      <div class="credits-info">
+        <h3>1 000 crédits offerts<br>dès l'inscription</h3>
+        <p>Testez l'application sans rien payer. Vos premiers crédits sont offerts, chauffeur comme entreprise.</p>
+        <div class="credits-detail">
+          <div class="credits-detail-item">
+            <span>Réserver une annonce</span>
+            <span>10 cr. / palette</span>
+          </div>
+          <div class="credits-detail-item">
+            <span>Publier une annonce</span>
+            <span>10 cr. / palette</span>
+          </div>
+          <div class="credits-detail-item">
+            <span>Remboursement si non sélectionné</span>
+            <span>✓ Automatique</span>
+          </div>
+          <div class="credits-detail-item">
+            <span>Annulation chauffeur</span>
+            <span>Non remboursé</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Télécharger -->
+<section class="cta-section" id="telecharger">
+  <h2>Prêt à trouver des<br><span>palettes près de vous ?</span></h2>
+  <p>Téléchargez Palette Run et commencez avec 1 000 crédits offerts.</p>
+  <div class="store-buttons">
+    <a href="#" class="store-btn">
+      <div class="store-btn-icon">🍎</div>
+      <div class="store-btn-text">
+        <div class="store-btn-sub">Disponible sur</div>
+        <div class="store-btn-name">App Store</div>
+      </div>
+    </a>
+    <a href="#" class="store-btn">
+      <div class="store-btn-icon">▶</div>
+      <div class="store-btn-text">
+        <div class="store-btn-sub">Disponible sur</div>
+        <div class="store-btn-name">Google Play</div>
+      </div>
+    </a>
+  </div>
+  <div class="cta-note">Bientôt disponible · Lancement prévu en septembre 2026</div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="section-eyebrow">Contact</div>
+    <h2 class="section-title">Une question ?</h2>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <h3>On est là pour vous aider</h3>
+        <p>Une question sur l'app, un problème technique, une demande de partenariat ? Écrivez-nous, on répond vite.</p>
+        <div class="contact-item">
+          <div class="contact-item-icon">📧</div>
+          <span>contact@palette-run.fr</span>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">📍</div>
+          <span>Toulouse, France</span>
+        </div>
+      </div>
+
+      <form class="contact-form" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label class="form-label">Nom</label>
+          <input type="text" class="form-input" placeholder="Votre nom" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" placeholder="votre@email.fr" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" placeholder="Votre message..." required></textarea>
+        </div>
+        <button type="submit" class="form-submit">Envoyer le message</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>© 2026 Palette Run · <a href="mailto:contact@palette-run.fr">contact@palette-run.fr</a> · Toulouse, France</p>
+</footer>
+
+<script>
+  function handleSubmit(e) {
+    e.preventDefault()
+    const btn = e.target.querySelector('.form-submit')
+    btn.textContent = '✅ Message envoyé !'
+    btn.style.background = '#22C55E'
+    setTimeout(() => {
+      btn.textContent = 'Envoyer le message'
+      btn.style.background = ''
+      e.target.reset()
+    }, 3000)
+  }
+
+  // Scroll animations légères
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => {
+      if (el.isIntersecting) {
+        el.target.style.opacity = '1'
+        el.target.style.transform = 'translateY(0)'
       }
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    })
+  }, { threshold: 0.1 })
+
+  document.querySelectorAll('.feature-card, .role-card, .step, .pack-card').forEach(el => {
+    el.style.opacity = '0'
+    el.style.transform = 'translateY(20px)'
+    el.style.transition = 'opacity .5s ease, transform .5s ease'
+    observer.observe(el)
+  })
+</script>
+</body>
 </html>
