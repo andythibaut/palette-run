@@ -74,14 +74,33 @@
     }
 
     .btn-arrow { font-size: 20px; }
+
+    #overlay {
+      position: fixed; inset: 0;
+      background: #000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .6s ease;
+      z-index: 999;
+    }
+    #overlay.active { opacity: 1; }
   </style>
 </head>
 <body>
+  <div id="overlay"></div>
   <div class="page">
     <img src="palette-run.png" alt="Palette Run" class="logo" />
-    <a href="landing.html" class="btn">
+    <a href="landing.html" class="btn" onclick="fadeOut(event)">
       Découvrir l'app <span class="btn-arrow">→</span>
     </a>
   </div>
+  <script>
+    function fadeOut(e) {
+      e.preventDefault()
+      const overlay = document.getElementById("overlay")
+      overlay.classList.add("active")
+      setTimeout(() => { window.location.href = "landing.html" }, 600)
+    }
+  </script>
 </body>
 </html>
