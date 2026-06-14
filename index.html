@@ -209,8 +209,12 @@
     .mini-annonce-label { color: rgba(255,255,255,.5); }
     .mini-annonce-val { font-weight: 700; color: white; }
     .mini-annonce-val.amber { color: var(--amber); }
-    .role-secondary { background: var(--blue-light); border-radius: 20px; padding: 28px 32px; display: flex; align-items: center; gap: 32px; border: 1px solid #BFDBFE; }
+    .role-secondary { background: var(--blue-light); border-radius: 20px; padding: 28px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; border: 1px solid #BFDBFE; align-items: center; }
     .role-secondary-icon { font-size: 40px; }
+    .driver-map-card { background: white; border-radius: 14px; border: 1px solid #BFDBFE; overflow: hidden; box-shadow: 0 4px 20px rgba(30,64,175,.1); }
+    .driver-map-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; font-size: 12px; font-weight: 700; color: var(--blue); border-bottom: 1px solid #BFDBFE; }
+    .driver-map-count { background: var(--blue); color: white; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
+    .driver-listing-price { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; color: var(--blue); }
     .role-secondary-content { flex: 1; }
     .role-secondary-badge { display: inline-block; background: var(--blue); color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; }
     .role-secondary h3 { font-size: 18px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
@@ -264,7 +268,7 @@
       .credits-layout { grid-template-columns: 1fr; }
       .contact-grid { grid-template-columns: 1fr; }
       .nav-links { display: none; }
-      .role-secondary { flex-direction: column; text-align: center; }
+      .role-secondary { grid-template-columns: 1fr; }
     }
     @media (max-width: 600px) {
       .why-grid { grid-template-columns: 1fr; }
@@ -344,41 +348,13 @@
 </nav>
 
 <div class="hero">
-  <div class="hero-inner">
+  <div class="hero-inner" style="grid-template-columns:1fr">
     <div>
-      <div class="hero-eyebrow">🏢 Pour les entreprises</div>
       <h1>Vos palettes<br>ont de la <span class="accent">valeur.</span><br>On vous trouve<br>l'acheteur.</h1>
       <p class="hero-tagline">Publiez une annonce en 30 secondes. Des chauffeurs près de vous font une demande. Vous choisissez, vous confirmez. C'est tout.</p>
       <div class="hero-actions">
         <a href="#telecharger" class="btn-primary">📱 Télécharger gratuitement</a>
         <a href="#comment" class="btn-secondary">Comment ça marche →</a>
-      </div>
-      <div class="hero-proof">
-        <div class="proof-item"><span class="proof-icon">🎁</span><span class="proof-text"><strong>1 000 crédits</strong> offerts</span></div>
-        <div class="proof-item"><span class="proof-icon">📞</span><span class="proof-text"><strong>Zéro appel</strong> téléphonique</span></div>
-        <div class="proof-item"><span class="proof-icon">⏱</span><span class="proof-text"><strong>30 secondes</strong> pour publier</span></div>
-      </div>
-    </div>
-    <div class="hero-visual">
-      <div class="dashboard-card">
-        <div class="dash-header">
-          <div class="dash-header-title">🏢 Mon annonce</div>
-          <div class="dash-header-badge">● Active</div>
-        </div>
-        <div class="dash-body">
-          <div class="dash-stats">
-            <div class="dash-stat"><div class="dash-stat-val">24</div><div class="dash-stat-label">palettes</div></div>
-            <div class="dash-stat"><div class="dash-stat-val">72 €</div><div class="dash-stat-label">prix du lot</div></div>
-          </div>
-          <div class="dash-annonce">
-            <div class="dash-annonce-title">3 demandes reçues</div>
-            <div style="display:flex;flex-direction:column;gap:8px;">
-              <div class="driver-row"><div class="driver-info"><div class="driver-avatar a">🚗</div><div><div class="driver-name">Marc D.</div><div class="driver-type">VL · ⭐ 4,9</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
-              <div class="driver-row"><div class="driver-info"><div class="driver-avatar b">🚛</div><div><div class="driver-name">Sophie L.</div><div class="driver-type">Porteur · ⭐ 4,7</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
-              <div class="driver-row"><div class="driver-info"><div class="driver-avatar c">🚚</div><div><div class="driver-name">Thomas R.</div><div class="driver-type">Semi · ⭐ 4,8</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -409,7 +385,7 @@
       <div class="step reveal"><div class="step-num">1</div><div style="font-size:28px;margin-bottom:12px">📦</div><div class="step-title">Publiez votre annonce</div><div class="step-desc">Quantité de palettes, prix souhaité, heure limite de récupération. 30 secondes.</div></div>
       <div class="step reveal"><div class="step-num">2</div><div style="font-size:28px;margin-bottom:12px">📬</div><div class="step-title">Recevez des demandes</div><div class="step-desc">Des chauffeurs près de vous voient l'annonce et envoient une demande de réservation.</div></div>
       <div class="step reveal"><div class="step-num">3</div><div style="font-size:28px;margin-bottom:12px">✅</div><div class="step-title">Choisissez l'acheteur</div><div class="step-desc">Vous choisissez le chauffeur qui vous convient et vous l'autorisez à venir.</div></div>
-      <div class="step reveal"><div class="step-num">4</div><div style="font-size:28px;margin-bottom:12px">🤝</div><div class="step-title">Confirmez la récupération</div><div class="step-desc">Le chauffeur vient, récupère les palettes. Vous confirmez dans l'app. Terminé.</div></div>
+      <div class="step reveal"><div class="step-num">4</div><div style="font-size:28px;margin-bottom:12px">💸</div><div class="step-title">Vous encaissez</div><div class="step-desc">C'est du cash dans la poche.</div></div>
     </div>
   </div>
 </section>
@@ -433,27 +409,128 @@
           </ul>
         </div>
         <div class="role-visual">
-          <div class="mini-stat-row">
-            <div class="mini-stat"><div class="mini-stat-val">3</div><div class="mini-stat-label">demandes reçues</div></div>
-            <div class="mini-stat"><div class="mini-stat-val">72 €</div><div class="mini-stat-label">prix du lot</div></div>
-          </div>
-          <div class="mini-annonce">
-            <div class="mini-annonce-row"><span class="mini-annonce-label">Prix du lot</span><span class="mini-annonce-val">72 €</span></div>
-            <div class="mini-annonce-row"><span class="mini-annonce-label">Statut</span><span class="mini-annonce-val amber">● En attente</span></div>
-          </div>
-          <div style="background:rgba(255,255,255,.08);border-radius:10px;padding:12px;text-align:center;font-size:13px;color:rgba(255,255,255,.5)">
-            💡 Vos crédits ne sont débités qu'à la publication
+          <div class="dashboard-card">
+            <div class="dash-header">
+              <div class="dash-header-title">🏢 Mon annonce</div>
+              <div class="dash-header-badge">● Active</div>
+            </div>
+            <div class="dash-body">
+              <div class="dash-stats">
+                <div class="dash-stat"><div class="dash-stat-val">24</div><div class="dash-stat-label">palettes</div></div>
+                <div class="dash-stat"><div class="dash-stat-val">72 €</div><div class="dash-stat-label">prix du lot</div></div>
+              </div>
+              <div class="dash-annonce">
+                <div class="dash-annonce-title">3 demandes reçues</div>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <div class="driver-row"><div class="driver-info"><div class="driver-avatar a">🚗</div><div><div class="driver-name">Marc D.</div><div class="driver-type">VL · ⭐ 4,9</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
+                  <div class="driver-row"><div class="driver-info"><div class="driver-avatar b">🚛</div><div><div class="driver-name">Sophie L.</div><div class="driver-type">Porteur · ⭐ 4,7</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
+                  <div class="driver-row"><div class="driver-info"><div class="driver-avatar c">🚚</div><div><div class="driver-name">Thomas R.</div><div class="driver-type">Semi · ⭐ 4,8</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <div class="role-secondary reveal">
-        <div class="role-secondary-icon">🚚</div>
         <div class="role-secondary-content">
           <div class="role-secondary-badge">🚚 Chauffeur</div>
           <h3>Trouvez des palettes sur votre route</h3>
           <p>Consultez la carte, voyez le bénéfice potentiel de chaque annonce, réservez en deux clics. Filtrage automatique selon votre type de véhicule (VL, porteur, semi).</p>
+          <a href="#telecharger" class="btn-primary" style="white-space:nowrap;margin-top:8px;display:inline-flex">Télécharger →</a>
         </div>
-        <a href="#telecharger" class="btn-primary" style="white-space:nowrap">Télécharger →</a>
+        <div class="driver-map-card">
+          <div class="driver-map-header">
+            <span>📍 Annonces près de vous</span>
+            <span class="driver-map-count">4 disponibles</span>
+          </div>
+          <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
+            <!-- Fond carte clair -->
+            <rect width="340" height="230" fill="#f2f1ec"/>
+
+            <!-- Zones vertes (parcs/espaces) -->
+            <rect x="0" y="60" width="55" height="70" rx="4" fill="#c8e6c0" opacity=".7"/>
+            <rect x="260" y="30" width="80" height="50" rx="4" fill="#c8e6c0" opacity=".6"/>
+            <rect x="200" y="160" width="140" height="70" rx="4" fill="#daefd5" opacity=".5"/>
+
+            <!-- Blocs bâtiments gris clair -->
+            <rect x="70" y="10" width="40" height="22" rx="2" fill="#dddbd4"/>
+            <rect x="120" y="15" width="55" height="18" rx="2" fill="#dddbd4"/>
+            <rect x="185" y="8" width="35" height="25" rx="2" fill="#dddbd4"/>
+            <rect x="230" y="12" width="28" height="20" rx="2" fill="#dddbd4"/>
+            <rect x="65" y="155" width="45" height="28" rx="2" fill="#dddbd4"/>
+            <rect x="120" y="162" width="60" height="22" rx="2" fill="#dddbd4"/>
+            <rect x="60" y="95" width="30" height="20" rx="2" fill="#dddbd4"/>
+            <rect x="270" y="100" width="50" height="30" rx="2" fill="#dddbd4"/>
+            <rect x="220" y="90" width="38" height="24" rx="2" fill="#dddbd4"/>
+
+            <!-- Routes principales (gris moyen) -->
+            <!-- Horizontale principale -->
+            <rect x="0" y="118" width="340" height="12" fill="#ccc9be"/>
+            <rect x="0" y="122" width="340" height="4" fill="#b8b5a8" opacity=".5"/>
+            <!-- Diagonale gauche -->
+            <line x1="30" y1="0" x2="80" y2="230" stroke="#ccc9be" stroke-width="10"/>
+            <line x1="30" y1="0" x2="80" y2="230" stroke="#b8b5a8" stroke-width="3" opacity=".4"/>
+            <!-- Verticale centre-droite -->
+            <rect x="178" y="0" width="10" height="230" fill="#ccc9be"/>
+            <rect x="181" y="0" width="3" height="230" fill="#b8b5a8" opacity=".4"/>
+            <!-- Horizontale secondaire basse -->
+            <rect x="0" y="178" width="340" height="8" fill="#d8d6cf"/>
+
+            <!-- Autoroute (bleu-gris foncé) -->
+            <path d="M 0,145 Q 100,130 180,124 Q 250,118 340,108" stroke="#9ba8b8" stroke-width="14" fill="none"/>
+            <path d="M 0,145 Q 100,130 180,124 Q 250,118 340,108" stroke="#b5bfcc" stroke-width="8" fill="none"/>
+
+            <!-- Badge autoroute -->
+            <rect x="118" y="130" width="28" height="14" rx="3" fill="#e05252"/>
+            <text x="132" y="141" text-anchor="middle" font-size="7.5" font-weight="700" fill="white" font-family="Inter,sans-serif">A62</text>
+
+            <!-- Position chauffeur -->
+            <circle cx="172" cy="122" r="12" fill="#1E40AF" opacity=".15"/>
+            <circle cx="172" cy="122" r="7" fill="#1E40AF" opacity=".35"/>
+            <circle cx="172" cy="122" r="4" fill="#1E40AF"/>
+
+            <!-- Marker vert 1 : +19€ / 6 pal. -->
+            <g transform="translate(108,80)">
+              <rect x="-26" y="-24" width="52" height="40" rx="7" fill="#34a853"/>
+              <polygon points="0,18 -7,16 7,16" fill="#34a853"/>
+              <text x="0" y="-7" text-anchor="middle" font-size="13" font-weight="900" fill="white" font-family="Inter,sans-serif">+19€</text>
+              <text x="0" y="8" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.85)" font-family="Inter,sans-serif">6 pal.</text>
+            </g>
+
+            <!-- Marker jaune 2 : +62€ / 16 pal. -->
+            <g transform="translate(200,158)">
+              <rect x="-28" y="-24" width="56" height="40" rx="7" fill="#f5a623"/>
+              <polygon points="0,18 -7,16 7,16" fill="#f5a623"/>
+              <text x="0" y="-7" text-anchor="middle" font-size="13" font-weight="900" fill="white" font-family="Inter,sans-serif">+62€</text>
+              <text x="0" y="8" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.85)" font-family="Inter,sans-serif">16 pal.</text>
+            </g>
+
+            <!-- Marker vert 3 : +12€ / 4 pal. -->
+            <g transform="translate(38,148)">
+              <rect x="-26" y="-24" width="52" height="40" rx="7" fill="#34a853"/>
+              <polygon points="0,18 -7,16 7,16" fill="#34a853"/>
+              <text x="0" y="-7" text-anchor="middle" font-size="13" font-weight="900" fill="white" font-family="Inter,sans-serif">+12€</text>
+              <text x="0" y="8" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.85)" font-family="Inter,sans-serif">4 pal.</text>
+            </g>
+
+            <!-- Marker jaune 4 : +39€ / 11 pal. -->
+            <g transform="translate(290,55)">
+              <rect x="-28" y="-24" width="56" height="40" rx="7" fill="#f5a623"/>
+              <polygon points="0,18 -7,16 7,16" fill="#f5a623"/>
+              <text x="0" y="-7" text-anchor="middle" font-size="13" font-weight="900" fill="white" font-family="Inter,sans-serif">+39€</text>
+              <text x="0" y="8" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.85)" font-family="Inter,sans-serif">11 pal.</text>
+            </g>
+
+            <!-- Légende en haut -->
+            <rect x="8" y="6" width="200" height="22" rx="5" fill="white" opacity=".9"/>
+            <circle cx="22" cy="17" r="4" fill="#34a853"/>
+            <text x="30" y="21" font-size="8" fill="#444" font-family="Inter,sans-serif">Rentable</text>
+            <circle cx="80" cy="17" r="4" fill="#f5a623"/>
+            <text x="88" y="21" font-size="8" fill="#444" font-family="Inter,sans-serif">Top affaire</text>
+            <circle cx="148" cy="17" r="4" fill="#e05252"/>
+            <text x="156" y="21" font-size="8" fill="#444" font-family="Inter,sans-serif">Perte</text>
+          </svg>
+        </div>
       </div>
     </div>
   </div>
@@ -479,7 +556,17 @@
   <h2>Prêt à valoriser<br>vos palettes ?</h2>
   <p>Téléchargez Palette Run et commencez avec 1 000 crédits offerts. Gratuit, sans engagement.</p>
   <div class="store-buttons">
-    <a href="#" class="store-btn"><div class="store-btn-icon">🍎</div><div><div class="store-btn-sub">Disponible sur</div><div class="store-btn-name">App Store</div></div></a>
+    <a href="#" class="store-btn">
+      <div class="store-btn-icon">
+        <svg width="26" height="26" viewBox="0 0 814 1000" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.5-150.3-109.2c-52.8-76.7-94.9-196.2-94.9-310.7 0-156.4 100.7-239.8 199.1-239.8 74.5 0 136.5 48.9 183.1 48.9 44.3 0 114.6-51.8 201.8-51.8zM637.8 80c-19.1 22.4-49.1 40.8-79.1 40.8-38.9 0-71.3-24-92.5-63.5-20.1-37.3-34.8-95.2-34.8-148.4 0-5.1.5-10.3 1.4-15.1 34.8 1.4 76.8 23.4 103.1 55.8 24.4 29.8 42.8 79.1 42.8 119.5 0 6.1-.5 11.6-1.4 16.1 3.5.4 7.7.8 10.5.8z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="store-btn-sub">Disponible sur</div>
+        <div class="store-btn-name">App Store</div>
+      </div>
+    </a>
     <a href="#" class="store-btn"><div class="store-btn-icon">▶</div><div><div class="store-btn-sub">Disponible sur</div><div class="store-btn-name">Google Play</div></div></a>
   </div>
   <div class="cta-note">Lancement prévu · Toulouse d'abord, puis national</div>
