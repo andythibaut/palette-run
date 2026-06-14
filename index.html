@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -505,7 +505,7 @@
 </footer>
 
 <script>
-async function shatter() {
+function shatter() {
   const splash = document.getElementById("splash")
   const canvas = document.getElementById("shatter-canvas")
   const ctx = canvas.getContext("2d")
@@ -516,23 +516,61 @@ async function shatter() {
   canvas.height = H
   canvas.style.display = "block"
 
-  // Capture le splash avec html2canvas
-  const snapshot = await html2canvas(splash, {
-    backgroundColor: "#000000",
-    scale: window.devicePixelRatio || 1,
-    useCORS: true,
-    allowTaint: true,
-    width: W,
-    height: H
-  })
+  // Dessiner la scène splash manuellement sur un canvas offscreen
+  const offscreen = document.createElement("canvas")
+  offscreen.width = W
+  offscreen.height = H
+  const off = offscreen.getContext("2d")
 
-  splash.style.display = "none"
+  const logo = new Image()
+  logo.src = "palette-run.png"
 
+  function buildScene() {
+    // Fond noir
+    off.fillStyle = "#000"
+    off.fillRect(0, 0, W, H)
+
+    // Logo centré
+    const maxW = Math.min(520, W * 0.88)
+    const ratio = logo.naturalHeight / logo.naturalWidth
+    const lw = maxW
+    const lh = maxW * ratio
+    const lx = (W - lw) / 2
+    const ly = (H - lh) / 2 - 40  // légèrement au-dessus du centre (bouton en dessous)
+    off.drawImage(logo, lx, ly, lw, lh)
+
+    // Bouton "Découvrir l'app" dessiné sur le canvas
+    const btnW = 260
+    const btnH = 58
+    const bx = (W - btnW) / 2
+    const by = ly + lh + 48
+    off.beginPath()
+    off.roundRect(bx, by, btnW, btnH, 16)
+    off.fillStyle = "#F5A623"
+    off.fill()
+    off.font = "700 18px Inter, sans-serif"
+    off.fillStyle = "#111827"
+    off.textAlign = "center"
+    off.textBaseline = "middle"
+    off.fillText("Découvrir l'app →", bx + btnW / 2, by + btnH / 2)
+
+    // Lancer la désintégration
+    splash.style.display = "none"
+    startShatter(canvas, ctx, offscreen, W, H)
+  }
+
+  if (logo.complete && logo.naturalWidth > 0) {
+    buildScene()
+  } else {
+    logo.onload = buildScene
+  }
+}
+
+function startShatter(canvas, ctx, snapshot, W, H) {
   const COLS = 14
   const ROWS = 10
   const TW = W / COLS
   const TH = H / ROWS
-  const PR = window.devicePixelRatio || 1
 
   const tiles = []
   for (let r = 0; r < ROWS; r++) {
@@ -569,9 +607,7 @@ async function shatter() {
       t.elapsed += dt
 
       if (t.elapsed < t.delay) {
-        ctx.drawImage(snapshot,
-          t.sx * PR, t.sy * PR, t.w * PR, t.h * PR,
-          t.sx,      t.sy,      t.w,      t.h)
+        ctx.drawImage(snapshot, t.sx, t.sy, t.w, t.h, t.sx, t.sy, t.w, t.h)
         anyActive = true
         continue
       }
@@ -581,7 +617,7 @@ async function shatter() {
       t.vy += 0.2
       t.vx *= 0.993
       t.rotation += t.vr
-      t.alpha -= 0.020
+      t.alpha -= 0.018
       if (t.alpha <= 0) continue
       anyActive = true
 
@@ -589,10 +625,8 @@ async function shatter() {
       ctx.globalAlpha = t.alpha
       ctx.translate(t.x + t.w / 2, t.y + t.h / 2)
       ctx.rotate(t.rotation)
-      ctx.drawImage(snapshot,
-        t.sx * PR, t.sy * PR, t.w * PR, t.h * PR,
-        -t.w / 2,  -t.h / 2,  t.w,      t.h)
-      ctx.strokeStyle = "rgba(245,166,35,0.45)"
+      ctx.drawImage(snapshot, t.sx, t.sy, t.w, t.h, -t.w / 2, -t.h / 2, t.w, t.h)
+      ctx.strokeStyle = "rgba(245,166,35,0.5)"
       ctx.lineWidth = 0.8
       ctx.strokeRect(-t.w / 2, -t.h / 2, t.w, t.h)
       ctx.restore()
