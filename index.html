@@ -3,773 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Palette Run — Vendez vos palettes sans effort. On vous trouve l'acheteur." />
+  <meta name="description" content="Palette Run — Bourse aux palettes entre chauffeurs et entreprises." />
   <meta name="theme-color" content="#F5A623" />
-  <title>Palette Run — Bourse aux palettes</title>
-  <link rel="preload" href="palette-run.png" as="image" />
+  <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Barlow+Condensed:wght@700;900&display=swap&font-display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Inter:wght@500;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --amber: #F5A623;
-      --amber-dark: #D4891A;
-      --amber-light: #FEF3C7;
-      --dark: #111827;
-      --muted: #6B7280;
-      --light: #F9FAFB;
-      --border: #E5E7EB;
-      --white: #FFFFFF;
-      --blue: #1E40AF;
-      --blue-light: #EFF6FF;
-    }
-
-    html { scroll-behavior: smooth; }
-    body.splash-active { overflow: hidden; }
-
     body {
+      background: #000000;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       font-family: 'Inter', sans-serif;
-      color: var(--dark);
-      background: var(--white);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* ── Nav ── */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px; height: 64px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .nav-logo {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px; font-weight: 900; letter-spacing: 1px;
-      color: var(--dark); text-decoration: none;
-    }
-    .nav-logo span { color: var(--amber); }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a {
-      text-decoration: none; font-size: 14px; font-weight: 500;
-      color: var(--muted); transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--dark); }
-    .btn-nav {
-      background: var(--amber); color: var(--white);
-      border: none; border-radius: 10px;
-      padding: 10px 20px; font-size: 14px; font-weight: 700;
-      cursor: pointer; text-decoration: none; transition: background .2s;
-    }
-    .btn-nav:hover { background: var(--amber-dark); }
-
-    /* ── Hero ── */
-    .hero {
-      padding: 120px 24px 80px;
-      background: linear-gradient(160deg, #FFFBF0 0%, #FFFFFF 60%);
-      border-bottom: 1px solid var(--border);
-    }
-    .hero-inner {
-      max-width: 1100px; margin: 0 auto;
-      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
-    }
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: var(--amber-light); color: #92400E;
-      font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-      padding: 6px 14px; border-radius: 20px; margin-bottom: 24px;
-    }
-    .hero h1 {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(44px, 5.5vw, 72px);
-      font-weight: 900; line-height: 1.0;
-      letter-spacing: -1px; margin-bottom: 8px;
-    }
-    .hero h1 .accent { color: var(--amber); }
-    .hero-tagline {
-      font-size: clamp(16px, 2vw, 20px);
-      color: var(--muted); line-height: 1.6;
-      margin-bottom: 36px; max-width: 460px;
-    }
-    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
-    .btn-primary {
-      background: var(--amber); color: var(--white);
-      border: none; border-radius: 14px;
-      padding: 16px 28px; font-size: 16px; font-weight: 700;
-      cursor: pointer; text-decoration: none;
-      display: inline-flex; align-items: center; gap: 8px;
-      transition: background .2s, transform .15s;
-      box-shadow: 0 4px 20px rgba(245,166,35,0.35);
-    }
-    .btn-primary:hover { background: var(--amber-dark); transform: translateY(-1px); }
-    .btn-secondary {
-      background: var(--white); color: var(--dark);
-      border: 2px solid var(--border); border-radius: 14px;
-      padding: 14px 24px; font-size: 16px; font-weight: 700;
-      cursor: pointer; text-decoration: none;
-      display: inline-flex; align-items: center; gap: 8px;
-      transition: border-color .2s;
-    }
-    .btn-secondary:hover { border-color: var(--amber); }
-    .hero-proof {
-      display: flex; gap: 28px; flex-wrap: wrap;
-      padding-top: 32px; border-top: 1px solid var(--border);
-    }
-    .proof-item { display: flex; align-items: center; gap: 8px; font-size: 14px; }
-    .proof-icon { font-size: 18px; }
-    .proof-text { color: var(--muted); }
-    .proof-text strong { color: var(--dark); }
-    .hero-visual { position: relative; }
-    .dashboard-card {
-      background: white; border-radius: 24px;
-      border: 1px solid var(--border);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.10);
       overflow: hidden;
     }
-    .dash-header {
-      background: var(--dark); color: white;
-      padding: 14px 20px;
-      display: flex; align-items: center; justify-content: space-between;
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      padding: 40px 24px;
+      animation: fadeIn .8s ease both;
     }
-    .dash-header-title { font-size: 13px; font-weight: 700; }
-    .dash-header-badge {
-      background: #22C55E; color: white;
-      font-size: 10px; font-weight: 700;
-      padding: 3px 8px; border-radius: 20px;
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    .dash-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
-    .dash-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .dash-stat { background: var(--light); border-radius: 12px; padding: 12px; text-align: center; }
-    .dash-stat-val {
+
+    .logo {
+      width: min(520px, 90vw);
+      height: auto;
+      filter: none;
+    }
+
+    .tagline {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px; font-weight: 900; color: var(--amber);
-    }
-    .dash-stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
-    .dash-annonce { background: var(--light); border-radius: 12px; padding: 14px; }
-    .dash-annonce-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
-    .driver-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 10px 0; border-bottom: 1px solid var(--border);
-    }
-    .driver-row:last-child { border-bottom: none; }
-    .driver-info { display: flex; align-items: center; gap: 10px; }
-    .driver-avatar {
-      width: 32px; height: 32px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center; font-size: 14px;
-    }
-    .driver-avatar.a { background: #FEF3C7; }
-    .driver-avatar.b { background: #EFF6FF; }
-    .driver-avatar.c { background: #F0FFF4; }
-    .driver-name { font-size: 12px; font-weight: 700; }
-    .driver-type { font-size: 10px; color: var(--muted); }
-    .driver-actions { display: flex; gap: 6px; }
-    .driver-btn { font-size: 10px; font-weight: 700; padding: 5px 10px; border-radius: 8px; border: none; cursor: pointer; }
-    .driver-btn.accept { background: #22C55E; color: white; }
-    .driver-btn.refuse { background: var(--light); color: var(--muted); }
-
-    /* ── Sections ── */
-    section { padding: 88px 24px; }
-    .section-inner { max-width: 1100px; margin: 0 auto; }
-    .section-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--amber); margin-bottom: 12px; }
-    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(32px, 4vw, 52px); font-weight: 900; line-height: 1.05; margin-bottom: 16px; }
-    .section-sub { font-size: 17px; color: var(--muted); max-width: 520px; line-height: 1.7; }
-    .why-bg { background: var(--light); }
-    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 52px; }
-    .why-card { background: white; border-radius: 20px; padding: 28px; border: 1px solid var(--border); transition: box-shadow .2s, transform .2s; }
-    .why-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-2px); }
-    .why-icon { font-size: 36px; margin-bottom: 16px; display: block; }
-    .why-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-    .why-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
-    .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 52px; position: relative; }
-    .steps-grid::before { content: ''; position: absolute; top: 26px; left: 10%; right: 10%; height: 2px; background: var(--border); z-index: 0; }
-    .step { text-align: center; padding: 0 16px; position: relative; z-index: 1; }
-    .step-num { width: 52px; height: 52px; border-radius: 50%; background: var(--amber); color: white; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 4px solid white; box-shadow: 0 0 0 2px var(--border); }
-    .step-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
-    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
-    .roles-container { margin-top: 52px; display: flex; flex-direction: column; gap: 24px; }
-    .role-main { background: var(--dark); border-radius: 24px; padding: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; color: white; }
-    .role-main .role-badge { display: inline-block; background: var(--amber); color: var(--dark); font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; margin-bottom: 20px; }
-    .role-main h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 900; line-height: 1.1; margin-bottom: 12px; }
-    .role-main p { color: rgba(255,255,255,.65); font-size: 15px; line-height: 1.7; margin-bottom: 24px; }
-    .role-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .role-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: rgba(255,255,255,.8); }
-    .role-list li::before { content: '✓'; min-width: 20px; height: 20px; background: var(--amber); color: var(--dark); font-weight: 900; font-size: 11px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
-    .role-visual { background: rgba(255,255,255,.05); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-    .mini-stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .mini-stat { background: rgba(255,255,255,.08); border-radius: 10px; padding: 12px; text-align: center; }
-    .mini-stat-val { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; color: var(--amber); }
-    .mini-stat-label { font-size: 10px; color: rgba(255,255,255,.5); margin-top: 2px; }
-    .mini-annonce { background: rgba(255,255,255,.08); border-radius: 10px; padding: 12px; }
-    .mini-annonce-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-    .mini-annonce-row + .mini-annonce-row { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.1); }
-    .mini-annonce-label { color: rgba(255,255,255,.5); }
-    .mini-annonce-val { font-weight: 700; color: white; }
-    .mini-annonce-val.amber { color: var(--amber); }
-    .role-secondary { background: var(--blue-light); border-radius: 20px; padding: 28px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; border: 1px solid #BFDBFE; align-items: center; }
-    .role-secondary-icon { font-size: 40px; }
-    .driver-map-card { background: white; border-radius: 14px; border: 1px solid #BFDBFE; overflow: hidden; box-shadow: 0 4px 20px rgba(30,64,175,.1); }
-    .driver-map-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; font-size: 12px; font-weight: 700; color: var(--blue); border-bottom: 1px solid #BFDBFE; }
-    .driver-map-count { background: var(--blue); color: white; font-size: 10px; padding: 2px 8px; border-radius: 20px; }
-    .driver-listing-price { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; color: var(--blue); }
-    .role-secondary-content { flex: 1; }
-    .role-secondary-badge { display: inline-block; background: var(--blue); color: white; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; }
-    .role-secondary h3 { font-size: 18px; font-weight: 700; color: var(--blue); margin-bottom: 6px; }
-    .role-secondary p { font-size: 14px; color: #1E40AF; opacity: .7; line-height: 1.6; }
-    .credits-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-top: 52px; align-items: start; }
-    .pack-card { background: white; border-radius: 16px; padding: 20px 24px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; transition: border-color .2s; }
-    .pack-card:hover { border-color: var(--amber); }
-    .pack-card.popular { border-color: var(--amber); background: #FFFBEB; }
-    .pack-label { font-size: 11px; font-weight: 700; color: var(--amber); margin-bottom: 3px; }
-    .pack-name { font-size: 17px; font-weight: 900; }
-    .pack-detail { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .pack-price { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; }
-    .credits-table { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-    .credits-table-header { background: var(--dark); color: white; padding: 14px 20px; font-size: 13px; font-weight: 700; }
-    .credits-table-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 14px; }
-    .credits-table-row:last-child { border-bottom: none; }
-    .credits-table-row span:first-child { color: var(--muted); }
-    .credits-table-row span:last-child { font-weight: 700; color: var(--dark); }
-    .credits-table-row span.green { color: #15803D; }
-    .cta-section { background: var(--amber); color: var(--dark); text-align: center; padding: 88px 24px; }
-    .cta-section h2 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(36px, 5vw, 60px); font-weight: 900; margin-bottom: 16px; line-height: 1.05; }
-    .cta-section p { font-size: 18px; color: rgba(17,24,39,.7); margin-bottom: 40px; }
-    .store-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-    .store-btn { display: flex; align-items: center; gap: 12px; background: var(--dark); color: white; border: none; border-radius: 14px; padding: 14px 24px; cursor: pointer; text-decoration: none; transition: transform .15s, background .2s; min-width: 180px; }
-    .store-btn:hover { transform: translateY(-2px); background: #1F2937; }
-    .store-btn-icon { font-size: 26px; }
-    .store-btn-sub { font-size: 10px; color: rgba(255,255,255,.5); }
-    .store-btn-name { font-size: 15px; font-weight: 700; }
-    .cta-note { margin-top: 20px; font-size: 13px; color: rgba(17,24,39,.5); }
-    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start; margin-top: 52px; }
-    .contact-info h3 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
-    .contact-info p { font-size: 15px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
-    .contact-item { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; font-size: 15px; }
-    .contact-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--amber-light); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .contact-form { display: flex; flex-direction: column; gap: 14px; }
-    .form-label { font-size: 13px; font-weight: 600; display: block; margin-bottom: 5px; }
-    .form-input, .form-textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 16px; font-size: 15px; font-family: 'Inter', sans-serif; outline: none; transition: border-color .2s; color: var(--dark); }
-    .form-input:focus, .form-textarea:focus { border-color: var(--amber); }
-    .form-textarea { resize: vertical; min-height: 110px; }
-    .form-submit { background: var(--amber); color: var(--dark); border: none; border-radius: 12px; padding: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .2s; }
-    .form-submit:hover { background: var(--amber-dark); color: white; }
-    footer { background: var(--dark); color: rgba(255,255,255,.35); padding: 28px 24px; text-align: center; font-size: 13px; }
-    footer a { color: var(--amber); text-decoration: none; }
-
-    @media (max-width: 900px) {
-      .hero-inner { grid-template-columns: 1fr; gap: 40px; }
-      .why-grid { grid-template-columns: 1fr 1fr; }
-      .steps-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
-      .steps-grid::before { display: none; }
-      .role-main { grid-template-columns: 1fr; gap: 28px; }
-      .credits-layout { grid-template-columns: 1fr; }
-      .contact-grid { grid-template-columns: 1fr; }
-      .nav-links { display: none; }
-      .role-secondary { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 600px) {
-      .why-grid { grid-template-columns: 1fr; }
-      .steps-grid { grid-template-columns: 1fr; }
-      .hero-proof { flex-direction: column; gap: 12px; }
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 700;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-align: center;
     }
 
-    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .5s ease, transform .5s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* ── Splash ── */
-    #splash {
-      position: fixed; inset: 0; z-index: 9999;
-      background: #000;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 48px; padding: 40px 24px;
-    }
-    #splash-spinner {
-      width: 40px; height: 40px;
-      border: 3px solid rgba(245,166,35,0.2);
-      border-top-color: #F5A623;
-      border-radius: 50%;
-      animation: spin .8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #splash-spinner.hidden { display: none; }
-
-    #splash-logo {
-      width: min(520px, 90vw); height: auto;
-      opacity: 0; transition: opacity .5s ease;
-    }
-    #splash-logo.loaded { opacity: 1; }
-    #splash-btn {
-      display: inline-flex; align-items: center; gap: 10px;
-      background: #F5A623; color: #111827;
-      border: none; border-radius: 16px;
-      font-size: 18px; font-weight: 700; font-family: 'Inter', sans-serif;
-      padding: 18px 40px; cursor: pointer;
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #F5A623;
+      color: #111827;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 18px 40px;
+      border-radius: 16px;
+      transition: transform .2s, box-shadow .2s;
       box-shadow: 0 8px 32px rgba(245,166,35,0.4);
-      opacity: 0; transition: transform .2s, box-shadow .2s, opacity .5s ease .2s;
     }
-    #splash-btn.loaded { opacity: 1; }
-    #splash-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(245,166,35,0.55); }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(245,166,35,0.55);
+    }
 
-    /* Canvas par-dessus tout pendant la désintégration */
-    #shatter-canvas {
-      position: fixed; inset: 0; z-index: 99999;
-      pointer-events: none; display: none;
-    }
+    .btn-arrow { font-size: 20px; }
   </style>
 </head>
 <body>
-
-<!-- Canvas désintégration -->
-<canvas id="shatter-canvas"></canvas>
-
-<!-- ═══ SPLASH ═══ -->
-<div id="splash">
-  <div id="splash-spinner"></div>
-  <img id="splash-logo" src="palette-run.png" alt="Palette Run" />
-  <button id="splash-btn" onclick="shatter()">
-    Découvrir l'app <span style="font-size:20px">→</span>
-  </button>
-</div>
-
-<!-- ═══ LANDING ═══ -->
-<nav>
-  <a href="#" class="nav-logo"><img src="palette-run-app.png" alt="" style="width:32px;height:32px;border-radius:8px;vertical-align:middle;margin-right:8px">PALETTE <span>RUN</span></a>
-  <div class="nav-links">
-    <a href="#pourquoi">Pourquoi nous ?</a>
-    <a href="#comment">Comment ça marche</a>
-    <a href="#credits">Tarifs</a>
-    <a href="#contact">Contact</a>
-    <a href="#telecharger" class="btn-nav">Télécharger</a>
-  </div>
-</nav>
-
-<div class="hero">
-  <div class="hero-inner" style="grid-template-columns:1fr">
-    <div>
-      <h1>Vos palettes<br>ont de la <span class="accent">valeur.</span><br>On vous trouve<br>l'acheteur.</h1>
-      <p class="hero-tagline">Publiez une annonce en 30 secondes. Des chauffeurs près de vous font une demande. Vous choisissez, vous confirmez. C'est tout.</p>
-      <div class="hero-actions">
-        <a href="#telecharger" class="btn-primary">📱 Télécharger gratuitement</a>
-        <a href="#comment" class="btn-secondary">Comment ça marche →</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<section class="why-bg" id="pourquoi">
-  <div class="section-inner">
-    <div class="section-eyebrow">Pourquoi Palette Run ?</div>
-    <h2 class="section-title">Fini les palettes<br>qui traînent</h2>
-    <p class="section-sub">Palette Run transforme un problème logistique en source de revenus, sans effort de votre part.</p>
-    <div class="why-grid">
-      <div class="why-card reveal"><span class="why-icon">💸</span><div class="why-title">Vous encaissez</div><div class="why-desc">Vos palettes ont une valeur. Plutôt que de payer pour les évacuer, vous les vendez directement à des chauffeurs qui en ont besoin.</div></div>
-      <div class="why-card reveal"><span class="why-icon">📞</span><div class="why-title">Zéro appel téléphonique</div><div class="why-desc">Plus de négociation, plus de rendez-vous à organiser par téléphone. Tout se passe dans l'app : demande, validation, confirmation.</div></div>
-      <div class="why-card reveal"><span class="why-icon">🔒</span><div class="why-title">Vous choisissez l'acheteur</div><div class="why-desc">Plusieurs chauffeurs font une demande ? Vous choisissez celui que vous voulez. Note, type de véhicule, historique — tout est visible.</div></div>
-      <div class="why-card reveal"><span class="why-icon">📍</span><div class="why-title">Adresse protégée</div><div class="why-desc">Votre adresse exacte reste masquée jusqu'à ce que vous validiez un chauffeur. Pas de visiteurs surprises.</div></div>
-      <div class="why-card reveal"><span class="why-icon">⚡</span><div class="why-title">Annonce en 30 secondes</div><div class="why-desc">Quantité, prix du lot, heure limite. Trois champs et c'est publié. Les chauffeurs autour de vous voient l'annonce en temps réel.</div></div>
-      <div class="why-card reveal"><span class="why-icon">🚫</span><div class="why-title">Blacklist intégrée</div><div class="why-desc">Un chauffeur ne vous a pas convenu ? Blacklistez-le en un clic. Il ne verra plus jamais vos annonces.</div></div>
-    </div>
-  </div>
-</section>
-
-<section id="comment">
-  <div class="section-inner">
-    <div class="section-eyebrow">Comment ça marche</div>
-    <h2 class="section-title">4 étapes, c'est tout</h2>
-    <p class="section-sub">De la publication à la récupération, tout se gère depuis l'app en quelques minutes.</p>
-    <div class="steps-grid">
-      <div class="step reveal"><div class="step-num">1</div><div style="font-size:28px;margin-bottom:12px">📦</div><div class="step-title">Publiez votre annonce</div><div class="step-desc">Quantité de palettes, prix souhaité, heure limite de récupération. 30 secondes.</div></div>
-      <div class="step reveal"><div class="step-num">2</div><div style="font-size:28px;margin-bottom:12px">📬</div><div class="step-title">Recevez des demandes</div><div class="step-desc">Des chauffeurs près de vous voient l'annonce et envoient une demande de réservation.</div></div>
-      <div class="step reveal"><div class="step-num">3</div><div style="font-size:28px;margin-bottom:12px">✅</div><div class="step-title">Choisissez l'acheteur</div><div class="step-desc">Vous choisissez le chauffeur qui vous convient et vous l'autorisez à venir.</div></div>
-      <div class="step reveal"><div class="step-num">4</div><div style="font-size:28px;margin-bottom:12px">💸</div><div class="step-title">Vous encaissez</div><div class="step-desc">C'est du cash dans la poche.</div></div>
-    </div>
-  </div>
-</section>
-
-<section style="background:var(--light)" id="roles">
-  <div class="section-inner">
-    <div class="section-eyebrow">Qui utilise Palette Run ?</div>
-    <h2 class="section-title">Une app, deux rôles</h2>
-    <div class="roles-container">
-      <div class="role-main reveal">
-        <div>
-          <div class="role-badge">🏢 Entreprise / Commerçant</div>
-          <h3>Valorisez vos palettes<br>sans vous en occuper</h3>
-          <p>Vous avez des palettes qui s'accumulent ? Publiez une annonce, attendez les demandes, choisissez votre acheteur. Palette Run fait le reste.</p>
-          <ul class="role-list">
-            <li>Publication en 30 secondes chrono</li>
-            <li>Vous choisissez parmi les chauffeurs intéressés</li>
-            <li>Adresse révélée uniquement à la validation</li>
-            <li>Blacklist pour écarter les indésirables</li>
-            <li>1 000 crédits offerts à l'inscription</li>
-          </ul>
-        </div>
-        <div class="role-visual">
-          <div class="dashboard-card">
-            <div class="dash-header">
-              <div class="dash-header-title">🏢 Mon annonce</div>
-              <div class="dash-header-badge">● Active</div>
-            </div>
-            <div class="dash-body">
-              <div class="dash-stats">
-                <div class="dash-stat"><div class="dash-stat-val">24</div><div class="dash-stat-label">palettes</div></div>
-                <div class="dash-stat"><div class="dash-stat-val">72 €</div><div class="dash-stat-label">prix du lot</div></div>
-              </div>
-              <div class="dash-annonce">
-                <div class="dash-annonce-title">3 demandes reçues</div>
-                <div style="display:flex;flex-direction:column;gap:8px;">
-                  <div class="driver-row"><div class="driver-info"><div class="driver-avatar a">🚗</div><div><div class="driver-name">Marc D.</div><div class="driver-type">VL · ⭐ 4,9</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
-                  <div class="driver-row"><div class="driver-info"><div class="driver-avatar b">🚛</div><div><div class="driver-name">Sophie L.</div><div class="driver-type">Porteur · ⭐ 4,7</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
-                  <div class="driver-row"><div class="driver-info"><div class="driver-avatar c">🚚</div><div><div class="driver-name">Thomas R.</div><div class="driver-type">Semi · ⭐ 4,8</div></div></div><div class="driver-actions"><button class="driver-btn accept">✓ Autoriser</button><button class="driver-btn refuse">✕</button></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="role-secondary reveal">
-        <div class="role-secondary-content">
-          <div class="role-secondary-badge">🚚 Chauffeur</div>
-          <h3>Trouvez des palettes sur votre route</h3>
-          <p>Consultez la carte, voyez le bénéfice potentiel de chaque annonce, réservez en deux clics. Filtrage automatique selon votre type de véhicule (VL, porteur, semi).</p>
-          <a href="#telecharger" class="btn-primary" style="white-space:nowrap;margin-top:8px;display:inline-flex">Télécharger →</a>
-        </div>
-        <div class="driver-map-card">
-          <div class="driver-map-header">
-            <span>📍 Annonces près de vous</span>
-            <span class="driver-map-count">4 disponibles</span>
-          </div>
-          <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">
-            <!-- Fond carte clair -->
-            <rect width="340" height="230" fill="#f2f1ec"/>
-
-            <!-- Zones vertes (parcs/espaces) -->
-            <rect x="0" y="60" width="55" height="70" rx="4" fill="#c8e6c0" opacity=".7"/>
-            <rect x="260" y="30" width="80" height="50" rx="4" fill="#c8e6c0" opacity=".6"/>
-            <rect x="200" y="160" width="140" height="70" rx="4" fill="#daefd5" opacity=".5"/>
-
-            <!-- Blocs bâtiments gris clair -->
-            <rect x="70" y="10" width="40" height="22" rx="2" fill="#dddbd4"/>
-            <rect x="120" y="15" width="55" height="18" rx="2" fill="#dddbd4"/>
-            <rect x="185" y="8" width="35" height="25" rx="2" fill="#dddbd4"/>
-            <rect x="230" y="12" width="28" height="20" rx="2" fill="#dddbd4"/>
-            <rect x="65" y="155" width="45" height="28" rx="2" fill="#dddbd4"/>
-            <rect x="120" y="162" width="60" height="22" rx="2" fill="#dddbd4"/>
-            <rect x="60" y="95" width="30" height="20" rx="2" fill="#dddbd4"/>
-            <rect x="270" y="100" width="50" height="30" rx="2" fill="#dddbd4"/>
-            <rect x="220" y="90" width="38" height="24" rx="2" fill="#dddbd4"/>
-
-            <!-- Routes principales (gris moyen) -->
-            <!-- Horizontale principale -->
-            <rect x="0" y="118" width="340" height="12" fill="#ccc9be"/>
-            <rect x="0" y="122" width="340" height="4" fill="#b8b5a8" opacity=".5"/>
-            <!-- Diagonale gauche -->
-            <line x1="30" y1="0" x2="80" y2="230" stroke="#ccc9be" stroke-width="10"/>
-            <line x1="30" y1="0" x2="80" y2="230" stroke="#b8b5a8" stroke-width="3" opacity=".4"/>
-            <!-- Verticale centre-droite -->
-            <rect x="178" y="0" width="10" height="230" fill="#ccc9be"/>
-            <rect x="181" y="0" width="3" height="230" fill="#b8b5a8" opacity=".4"/>
-            <!-- Horizontale secondaire basse -->
-            <rect x="0" y="178" width="340" height="8" fill="#d8d6cf"/>
-
-            <!-- Autoroute (bleu-gris foncé) -->
-            <path d="M 0,145 Q 100,130 180,124 Q 250,118 340,108" stroke="#9ba8b8" stroke-width="14" fill="none"/>
-            <path d="M 0,145 Q 100,130 180,124 Q 250,118 340,108" stroke="#b5bfcc" stroke-width="8" fill="none"/>
-
-            <!-- Badge autoroute -->
-            <rect x="118" y="130" width="28" height="14" rx="3" fill="#e05252"/>
-            <text x="132" y="141" text-anchor="middle" font-size="7.5" font-weight="700" fill="white" font-family="Inter,sans-serif">A62</text>
-
-            <!-- Position chauffeur -->
-            <circle cx="172" cy="122" r="12" fill="#1E40AF" opacity=".15"/>
-            <circle cx="172" cy="122" r="7" fill="#1E40AF" opacity=".35"/>
-            <circle cx="172" cy="122" r="4" fill="#1E40AF"/>
-
-            <!-- Marker vert 1 : +19€ / 6 pal. -->
-            <g transform="translate(108,80)">
-              <rect x="-26" y="-24" width="52" height="40" rx="7" fill="#34a853"/>
-              <polygon points="0,18 -7,16 7,16" fill="#34a853"/>
-              <text x="0" y="-7" text-anchor="middle" font-size="13" font-weight="900" fill="white" font-family="Inter,sans-serif">+19€</text>
-              <text x="0" y="8" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.85)" font-family="Inter,sans-serif">6 pal.</text>
-            </g>
-
-            <!-- Marker jaune 2 : +62€ / 16 pal. -->
-            <g transform="translate(200,158)">
-              <rect x="-28" y="-24" width="56" height="40" rx="7" fill="#f5a623"/>
-              <polygon points="0,18 -7,16 7,16" fill="#f5a623"/>
-              <text x="0" y="-7" text-anchor="middle" font-size="13" font-weight="900" fill="white" font-family="Inter,sans-serif">+62€</text>
-              <text x="0" y="8" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.85)" font-family="Inter,sans-serif">16 pal.</text>
-            </g>
-
-            <!-- Marker vert 3 : +12€ / 4 pal. -->
-            <g transform="translate(38,148)">
-              <rect x="-26" y="-24" width="52" height="40" rx="7" fill="#34a853"/>
-              <polygon points="0,18 -7,16 7,16" fill="#34a853"/>
-              <text x="0" y="-7" text-anchor="middle" font-size="13" font-weight="900" fill="white" font-family="Inter,sans-serif">+12€</text>
-              <text x="0" y="8" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.85)" font-family="Inter,sans-serif">4 pal.</text>
-            </g>
-
-            <!-- Marker jaune 4 : +39€ / 11 pal. -->
-            <g transform="translate(290,55)">
-              <rect x="-28" y="-24" width="56" height="40" rx="7" fill="#f5a623"/>
-              <polygon points="0,18 -7,16 7,16" fill="#f5a623"/>
-              <text x="0" y="-7" text-anchor="middle" font-size="13" font-weight="900" fill="white" font-family="Inter,sans-serif">+39€</text>
-              <text x="0" y="8" text-anchor="middle" font-size="8.5" fill="rgba(255,255,255,.85)" font-family="Inter,sans-serif">11 pal.</text>
-            </g>
-
-            <!-- Légende en haut -->
-            <rect x="8" y="6" width="200" height="22" rx="5" fill="white" opacity=".9"/>
-            <circle cx="22" cy="17" r="4" fill="#34a853"/>
-            <text x="30" y="21" font-size="8" fill="#444" font-family="Inter,sans-serif">Rentable</text>
-            <circle cx="80" cy="17" r="4" fill="#f5a623"/>
-            <text x="88" y="21" font-size="8" fill="#444" font-family="Inter,sans-serif">Top affaire</text>
-            <circle cx="148" cy="17" r="4" fill="#e05252"/>
-            <text x="156" y="21" font-size="8" fill="#444" font-family="Inter,sans-serif">Perte</text>
-          </svg>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="credits">
-  <div class="section-inner">
-    <div class="section-eyebrow">Tarifs</div>
-    <h2 class="section-title">Simple et sans engagement</h2>
-    <p class="section-sub">Un système de crédits simple. Rechargez quand vous en avez besoin, pas avant.</p>
-    <div class="credits-layout">
-      <div>
-        <div class="pack-card reveal"><div><div class="pack-label">STARTER</div><div class="pack-name">1 000 crédits</div><div class="pack-detail">≈ 100 palettes</div></div><div class="pack-price">9,90 €</div></div>
-        <div class="pack-card popular reveal"><div><div class="pack-label">⭐ POPULAIRE</div><div class="pack-name">3 000 crédits</div><div class="pack-detail">≈ 300 palettes · −16%</div></div><div class="pack-price">24,90 €</div></div>
-        <div class="pack-card reveal"><div><div class="pack-label">PRO</div><div class="pack-name">6 000 crédits</div><div class="pack-detail">≈ 600 palettes · −25%</div></div><div class="pack-price">44,90 €</div></div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<section class="cta-section" id="telecharger">
-  <h2>Prêt à valoriser<br>vos palettes ?</h2>
-  <p>Téléchargez Palette Run et commencez avec 1 000 crédits offerts. Gratuit, sans engagement.</p>
-  <div class="store-buttons">
-    <a href="#" class="store-btn">
-      <div class="store-btn-icon">
-        <svg width="26" height="26" viewBox="0 0 814 1000" fill="white" xmlns="http://www.w3.org/2000/svg">
-          <path d="M788.1 340.9c-5.8 4.5-108.2 62.2-108.2 190.5 0 148.4 130.3 200.9 134.2 202.2-.6 3.2-20.7 71.9-68.7 141.9-42.8 61.6-87.5 123.1-155.5 123.1s-85.5-39.5-164-39.5c-76 0-103.7 40.8-165.9 40.8s-105-43.5-150.3-109.2c-52.8-76.7-94.9-196.2-94.9-310.7 0-156.4 100.7-239.8 199.1-239.8 74.5 0 136.5 48.9 183.1 48.9 44.3 0 114.6-51.8 201.8-51.8zM637.8 80c-19.1 22.4-49.1 40.8-79.1 40.8-38.9 0-71.3-24-92.5-63.5-20.1-37.3-34.8-95.2-34.8-148.4 0-5.1.5-10.3 1.4-15.1 34.8 1.4 76.8 23.4 103.1 55.8 24.4 29.8 42.8 79.1 42.8 119.5 0 6.1-.5 11.6-1.4 16.1 3.5.4 7.7.8 10.5.8z"/>
-        </svg>
-      </div>
-      <div>
-        <div class="store-btn-sub">Disponible sur</div>
-        <div class="store-btn-name">App Store</div>
-      </div>
+  <div class="page">
+    <img src="palette-run.png" alt="Palette Run" class="logo" />
+    <a href="landing.html" class="btn">
+      Découvrir l'app <span class="btn-arrow">→</span>
     </a>
-    <a href="#" class="store-btn"><div class="store-btn-icon">▶</div><div><div class="store-btn-sub">Disponible sur</div><div class="store-btn-name">Google Play</div></div></a>
   </div>
-  <div class="cta-note">Lancement prévu · Toulouse d'abord, puis national</div>
-</section>
-
-<section id="contact">
-  <div class="section-inner">
-    <div class="section-eyebrow">Contact</div>
-    <h2 class="section-title">Une question ?</h2>
-    <div class="contact-grid">
-      <div class="contact-info">
-        <h3>On vous répond rapidement</h3>
-        <p>Une question sur l'app, un problème, une idée de partenariat ? Écrivez-nous.</p>
-        <div class="contact-item"><div class="contact-icon">📧</div><span>contact@palette-run.fr</span></div>
-        <div class="contact-item"><div class="contact-icon">📍</div><span>Toulouse, France</span></div>
-      </div>
-      <form class="contact-form" onsubmit="handleSubmit(event)">
-        <div><label class="form-label">Nom</label><input type="text" class="form-input" placeholder="Votre nom" required /></div>
-        <div><label class="form-label">Email</label><input type="email" class="form-input" placeholder="votre@email.fr" required /></div>
-        <div><label class="form-label">Message</label><textarea class="form-textarea" placeholder="Votre message..." required></textarea></div>
-        <button type="submit" class="form-submit">Envoyer</button>
-      </form>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <p>© 2026 Palette Run · <a href="mailto:contact@palette-run.fr">contact@palette-run.fr</a> · Toulouse, France</p>
-</footer>
-
-<script>
-function shatter() {
-  const splash = document.getElementById("splash")
-  const canvas = document.getElementById("shatter-canvas")
-  const ctx = canvas.getContext("2d")
-
-  const W = window.innerWidth
-  const H = window.innerHeight
-  canvas.width = W
-  canvas.height = H
-  canvas.style.display = "block"
-
-  // Dessiner la scène splash manuellement sur un canvas offscreen
-  const offscreen = document.createElement("canvas")
-  offscreen.width = W
-  offscreen.height = H
-  const off = offscreen.getContext("2d")
-
-  const logo = new Image()
-  logo.src = "palette-run.png"
-
-  function buildScene() {
-    // Fond noir
-    off.fillStyle = "#000"
-    off.fillRect(0, 0, W, H)
-
-    // Logo centré
-    const maxW = Math.min(520, W * 0.88)
-    const ratio = logo.naturalHeight / logo.naturalWidth
-    const lw = maxW
-    const lh = maxW * ratio
-    const lx = (W - lw) / 2
-    const ly = (H - lh) / 2 - 40  // légèrement au-dessus du centre (bouton en dessous)
-    off.drawImage(logo, lx, ly, lw, lh)
-
-    // Bouton "Découvrir l'app" dessiné sur le canvas
-    const btnW = 260
-    const btnH = 58
-    const bx = (W - btnW) / 2
-    const by = ly + lh + 48
-    off.beginPath()
-    off.roundRect(bx, by, btnW, btnH, 16)
-    off.fillStyle = "#F5A623"
-    off.fill()
-    off.font = "700 18px Inter, sans-serif"
-    off.fillStyle = "#111827"
-    off.textAlign = "center"
-    off.textBaseline = "middle"
-    off.fillText("Découvrir l'app →", bx + btnW / 2, by + btnH / 2)
-
-    // Lancer la désintégration
-    splash.style.display = "none"
-    document.body.classList.remove("splash-active")
-    window.scrollTo(0, 0)
-    startShatter(canvas, ctx, offscreen, W, H)
-  }
-
-  if (logo.complete && logo.naturalWidth > 0) {
-    buildScene()
-  } else {
-    logo.onload = buildScene
-  }
-}
-
-function startShatter(canvas, ctx, snapshot, W, H) {
-  const isMobile = W < 768
-  const TILE = Math.round(W / (isMobile ? 12 : 22))
-  const COLS = Math.ceil(W / TILE)
-  const ROWS = Math.ceil(H / TILE)
-  const TW = W / COLS
-  const TH = TW
-
-  const tiles = []
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c < COLS; c++) {
-      const delay = r * 40 + Math.random() * 50
-      tiles.push({
-        sx: c * TW, sy: r * TH,
-        x:  c * TW, y:  r * TH,
-        w: TW + 1,  h: TH + 1,
-        vx: (Math.random() - 0.5) * 5,
-        vy: Math.random() * 2 + 0.5,
-        vr: (Math.random() - 0.5) * 0.22,
-        rotation: 0,
-        alpha: 1,
-        delay,
-        elapsed: 0
-      })
-    }
-  }
-
-  let last = null
-
-  function animate(ts) {
-    if (!last) last = ts
-    const dt = ts - last
-    last = ts
-    ctx.clearRect(0, 0, W, H)
-    let anyActive = false
-
-    for (const t of tiles) {
-      t.elapsed += dt
-
-      if (t.elapsed < t.delay) {
-        ctx.drawImage(snapshot, t.sx, t.sy, t.w, t.h, t.sx, t.sy, t.w, t.h)
-        anyActive = true
-        continue
-      }
-
-      t.x  += t.vx
-      t.y  += t.vy
-      t.vy += 0.2
-      t.vx *= 0.993
-      t.rotation += t.vr
-      t.alpha -= 0.018
-      if (t.alpha <= 0) continue
-      anyActive = true
-
-      ctx.save()
-      ctx.globalAlpha = t.alpha
-      ctx.translate(t.x + t.w / 2, t.y + t.h / 2)
-      ctx.rotate(t.rotation)
-      ctx.drawImage(snapshot, t.sx, t.sy, t.w, t.h, -t.w / 2, -t.h / 2, t.w, t.h)
-      ctx.strokeStyle = "rgba(245,166,35,0.5)"
-      ctx.lineWidth = 0.8
-      ctx.strokeRect(-t.w / 2, -t.h / 2, t.w, t.h)
-      ctx.restore()
-    }
-
-    if (anyActive) requestAnimationFrame(animate)
-    else canvas.style.display = "none"
-  }
-
-  requestAnimationFrame(animate)
-}
-
-/* ── Contact form ── */
-function handleSubmit(e) {
-  e.preventDefault()
-  const btn = e.target.querySelector(".form-submit")
-  btn.textContent = "✅ Message envoyé !"
-  btn.style.background = "#22C55E"
-  btn.style.color = "white"
-  setTimeout(() => {
-    btn.textContent = "Envoyer"
-    btn.style.background = ""
-    btn.style.color = ""
-    e.target.reset()
-  }, 3000)
-}
-
-/* ── Scroll reveal ── */
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(el => { if (el.isIntersecting) el.target.classList.add("visible") })
-}, { threshold: 0.08 })
-document.querySelectorAll(".reveal").forEach(el => observer.observe(el))
-
-// Apparition logo + bouton après chargement
-const splashLogo = document.getElementById("splash-logo")
-const splashBtn  = document.getElementById("splash-btn")
-function revealSplash() {
-  document.getElementById("splash-spinner").classList.add("hidden")
-  splashLogo.classList.add("loaded")
-  splashBtn.classList.add("loaded")
-}
-if (splashLogo.complete && splashLogo.naturalWidth > 0) {
-  requestAnimationFrame(revealSplash)
-} else {
-  splashLogo.addEventListener("load", revealSplash)
-}
-
-// Bloquer le scroll tant que le splash est visible
-document.body.classList.add("splash-active")
-</script>
 </body>
 </html>
