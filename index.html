@@ -31,6 +31,8 @@
       gap: 48px;
       padding: 40px 24px;
       animation: fadeIn .8s ease both;
+      position: relative;
+      z-index: 10;
     }
 
     @keyframes fadeIn {
@@ -41,17 +43,6 @@
     .logo {
       width: min(520px, 90vw);
       height: auto;
-      filter: none;
-    }
-
-    .tagline {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(20px, 3vw, 28px);
-      font-weight: 700;
-      color: rgba(255,255,255,0.45);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      text-align: center;
     }
 
     .btn {
@@ -67,6 +58,8 @@
       border-radius: 16px;
       transition: transform .2s, box-shadow .2s;
       box-shadow: 0 8px 32px rgba(245,166,35,0.4);
+      cursor: pointer;
+      border: none;
     }
     .btn:hover {
       transform: translateY(-2px);
@@ -74,14 +67,87 @@
     }
 
     .btn-arrow { font-size: 20px; }
+
+    /* Grille de tuiles */
+    #tiles {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      pointer-events: none;
+      z-index: 100;
+      opacity: 0;
+    }
+
+    .tile {
+      background: #000;
+      transform-origin: center bottom;
+    }
+
+    @keyframes tilefall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(120vh) rotate(var(--rot)); opacity: 0; }
+    }
+
+    .tile.falling {
+      animation: tilefall var(--dur) cubic-bezier(.4, 0, .8, .6) var(--delay) forwards;
+    }
   </style>
 </head>
 <body>
+
+  <div id="tiles"></div>
+
   <div class="page">
     <img src="palette-run.png" alt="Palette Run" class="logo" />
-    <a href="landing.html" class="btn">
+    <button class="btn" onclick="startTransition()">
       Découvrir l'app <span class="btn-arrow">→</span>
-    </a>
+    </button>
   </div>
+
+  <script>
+    const COLS = 8
+    const ROWS = 6
+
+    function buildGrid() {
+      const tiles = document.getElementById("tiles")
+      tiles.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`
+      tiles.style.gridTemplateRows = `repeat(${ROWS}, 1fr)`
+      for (let i = 0; i < COLS * ROWS; i++) {
+        const t = document.createElement("div")
+        t.className = "tile"
+        t.dataset.index = i
+        tiles.appendChild(t)
+      }
+    }
+
+    function startTransition() {
+      const tiles = document.getElementById("tiles")
+      tiles.style.opacity = "1"
+      tiles.style.pointerEvents = "all"
+
+      const allTiles = Array.from(tiles.querySelectorAll(".tile"))
+
+      // Melange aleatoire pour que les tuiles tombent dans un ordre naturel
+      const shuffled = [...allTiles].sort(() => Math.random() - 0.5)
+
+      shuffled.forEach((tile, i) => {
+        const delay = i * 28
+        const dur = 420 + Math.random() * 200
+        const rot = (Math.random() - 0.5) * 30
+        tile.style.setProperty("--delay", delay + "ms")
+        tile.style.setProperty("--dur", dur + "ms")
+        tile.style.setProperty("--rot", rot + "deg")
+        tile.classList.add("falling")
+      })
+
+      // Redirection apres la fin de l'animation
+      const total = shuffled.length * 28 + 650
+      setTimeout(() => {
+        window.location.href = "landing.html"
+      }, total)
+    }
+
+    buildGrid()
+  </script>
 </body>
 </html>
