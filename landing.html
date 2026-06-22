@@ -413,18 +413,18 @@
           <span>Toulouse, France</span>
         </div>
       </div>
-      <form class="contact-form" onsubmit="handleSubmit(event)">
+      <form class="contact-form" action="https://formspree.io/f/xaqgyojv" method="POST" onsubmit="handleSubmit(event)">
         <div>
           <label class="form-label">Nom</label>
-          <input type="text" class="form-input" placeholder="Votre nom" required />
+          <input type="text" name="nom" class="form-input" placeholder="Votre nom" required />
         </div>
         <div>
           <label class="form-label">Email</label>
-          <input type="email" class="form-input" placeholder="votre@email.fr" required />
+          <input type="email" name="email" class="form-input" placeholder="votre@email.fr" required />
         </div>
         <div>
           <label class="form-label">Message</label>
-          <textarea class="form-textarea" placeholder="Votre message..." required></textarea>
+          <textarea name="message" class="form-textarea" placeholder="Votre message..." required></textarea>
         </div>
         <button type="submit" class="form-submit">Envoyer</button>
       </form>
