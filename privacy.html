@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Politique de confidentialité — Palette Run" />
+  <meta name="theme-color" content="#F5A623" />
+  <title>Politique de confidentialité — Palette Run</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --amber: #F5A623;
+      --dark: #111827;
+      --muted: #6B7280;
+      --light: #F9FAFB;
+      --border: #E5E7EB;
+      --white: #FFFFFF;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--dark);
+      background: var(--white);
+      line-height: 1.7;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 900; letter-spacing: 1px;
+      color: var(--dark); text-decoration: none;
+    }
+    .nav-logo span { color: var(--amber); }
+    .nav-back {
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-back:hover { color: var(--dark); }
+
+    /* ── Page ── */
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 60px 24px 100px;
+    }
+
+    .page-label {
+      font-size: 12px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--amber);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(28px, 5vw, 40px);
+      font-weight: 900; line-height: 1.1;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+
+    .updated {
+      font-size: 13px; color: var(--muted);
+      margin-bottom: 48px;
+    }
+
+    /* ── Sections ── */
+    .section {
+      margin-bottom: 40px;
+      padding-bottom: 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section:last-child { border-bottom: none; }
+
+    h2 {
+      font-size: 16px; font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    h2 .icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: #FEF3C7; display: inline-flex;
+      align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+
+    p { font-size: 15px; color: #374151; margin-bottom: 10px; }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      list-style: none; padding: 0;
+      display: flex; flex-direction: column; gap: 6px;
+      margin-bottom: 10px;
+    }
+    ul li { font-size: 15px; color: #374151; padding-left: 20px; position: relative; }
+    ul li::before { content: "–"; position: absolute; left: 0; color: var(--amber); font-weight: 700; }
+
+    a { color: var(--amber); text-decoration: none; font-weight: 500; }
+    a:hover { text-decoration: underline; }
+
+    .highlight {
+      background: var(--light); border-left: 3px solid var(--amber);
+      border-radius: 0 8px 8px 0; padding: 14px 16px;
+      font-size: 14px; color: var(--muted); margin-top: 12px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 13px; color: var(--muted);
+    }
+    footer a { color: var(--muted); }
+
+    @media (max-width: 600px) {
+      .page { padding: 40px 20px 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="/">PALETTE <span>RUN</span></a>
+  <a class="nav-back" href="/">← Retour</a>
+</nav>
+
+<div class="page">
+
+  <div class="page-label">Légal</div>
+  <h1>Politique de confidentialité</h1>
+  <p class="updated">Dernière mise à jour : juin 2026</p>
+
+  <div class="section">
+    <h2><span class="icon">👤</span> Responsable du traitement</h2>
+    <p>Le responsable du traitement des données personnelles collectées via l'application Palette Run est :</p>
+    <ul>
+      <li><strong>Andy Thibaut</strong></li>
+      <li>Email : <a href="mailto:andy.thibaut@gmail.com">andy.thibaut@gmail.com</a></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="icon">📋</span> Données collectées</h2>
+    <p>Lors de l'utilisation de l'application, nous collectons les données suivantes :</p>
+    <ul>
+      <li>Adresse e-mail et nom (à l'inscription)</li>
+      <li>Position GPS (lors de la soumission d'un dossier de vérification de commerce)</li>
+      <li>Photos du stock de palettes (pour la vérification d'authenticité du commerce)</li>
+      <li>Adresse du commerce (commerçants)</li>
+      <li>Historique des transactions et réservations effectuées via l'application</li>
+      <li>Token de notification push (pour recevoir les alertes en temps réel)</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="icon">🎯</span> Finalité du traitement</h2>
+    <p>Les données collectées sont utilisées exclusivement pour :</p>
+    <ul>
+      <li>Permettre la mise en relation entre commerçants (vendeurs de palettes) et chauffeurs (acheteurs)</li>
+      <li>Vérifier l'authenticité et l'existence réelle des commerces inscrits sur la plateforme</li>
+      <li>Gérer les transactions, réservations et historiques associés</li>
+      <li>Envoyer des notifications liées à l'activité du compte (nouvelles réservations, validation de dossier)</li>
+    </ul>
+    <div class="highlight">
+      Les photos de vérification sont conservées après validation pour garantir la traçabilité de la vérification. Elles ne sont jamais partagées publiquement.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="icon">⚖️</span> Base légale</h2>
+    <p>Le traitement de vos données repose sur l'<strong>exécution du contrat</strong> auquel vous avez souscrit en créant un compte sur Palette Run (article 6.1.b du RGPD).</p>
+    <p>En vous inscrivant, vous acceptez que vos données soient traitées dans le cadre de la fourniture du service décrit ci-dessus.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="icon">🕐</span> Durée de conservation</h2>
+    <ul>
+      <li>Vos données sont conservées tant que votre compte est actif</li>
+      <li>En cas d'inactivité de plus de <strong>2 ans</strong>, les données peuvent être supprimées</li>
+      <li>Sur demande explicite de suppression de compte, l'ensemble des données personnelles est effacé dans un délai de 30 jours</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="icon">🏢</span> Hébergement des données</h2>
+    <p>Les données sont hébergées par <strong>Supabase</strong>, dont les serveurs sont situés dans l'<strong>Union européenne (Irlande)</strong>, conformément aux exigences du RGPD.</p>
+    <p>Supabase agit en qualité de sous-traitant et traite les données uniquement sur instruction du responsable de traitement.</p>
+  </div>
+
+  <div class="section">
+    <h2><span class="icon">🔒</span> Vos droits</h2>
+    <p>Conformément au RGPD, vous disposez des droits suivants sur vos données :</p>
+    <ul>
+      <li><strong>Droit d'accès</strong> — consulter les données que nous détenons sur vous</li>
+      <li><strong>Droit de rectification</strong> — corriger des informations inexactes</li>
+      <li><strong>Droit à l'effacement</strong> — demander la suppression de votre compte et de vos données</li>
+      <li><strong>Droit à la portabilité</strong> — recevoir vos données dans un format structuré</li>
+      <li><strong>Droit d'opposition</strong> — vous opposer à certains traitements</li>
+    </ul>
+    <div class="highlight">
+      Vous pouvez exercer ces droits directement depuis les <strong>paramètres de l'application</strong> (suppression de compte) ou en nous contactant par email à <a href="mailto:andy.thibaut@gmail.com">andy.thibaut@gmail.com</a>.
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="icon">🏛️</span> Réclamation auprès de la CNIL</h2>
+    <p>Si vous estimez que le traitement de vos données ne respecte pas la réglementation en vigueur, vous avez le droit d'introduire une réclamation auprès de la <strong>Commission Nationale de l'Informatique et des Libertés (CNIL)</strong> :</p>
+    <ul>
+      <li>Site web : <a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a></li>
+      <li>Adresse : 3 Place de Fontenoy, TSA 80715 – 75334 Paris Cedex 07</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2><span class="icon">✉️</span> Contact</h2>
+    <p>Pour toute question relative à cette politique de confidentialité ou à l'exercice de vos droits, contactez-nous à : <a href="mailto:andy.thibaut@gmail.com">andy.thibaut@gmail.com</a></p>
+  </div>
+
+</div>
+
+<footer>
+  <p>© 2026 Palette Run · <a href="/">Accueil</a> · <a href="/privacy.html">Confidentialité</a></p>
+</footer>
+
+</body>
+</html>
